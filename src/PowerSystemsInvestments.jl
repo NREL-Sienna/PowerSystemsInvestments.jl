@@ -7,6 +7,7 @@ import MathOptInterface
 import PowerSystemsInvestmentsPortfolios
 
 const IS = InfrastructureSystems
+const ISOPT = InfrastructureSystems.Optimization
 const PSY = PowerSystems
 const MOI = MathOptInterface
 const PSIP = PowerSystemsInvestmentsPortfolios

@@ -1,4 +1,4 @@
-mutable struct InvestmentModel{<: InvestmentProblem}
+mutable struct InvestmentModel{<:InvestmentProblem}
     portfolio::PSIP.Portfolio
     internal::Union{Nothing, IS.ModelInternal}
     store::InvestmentModelStore
