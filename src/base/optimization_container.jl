@@ -30,7 +30,7 @@ function ObjectiveFunction()
     )
 end
 
-Base.@kwdef mutable struct MultiOptimizationContainer{T <: DecompositionAlgorithm} <: ISOPT.AbstractModelContainer
+Base.@kwdef mutable struct MultiOptimizationContainer{T <: SolutionAlgorithm} <: ISOPT.AbstractModelContainer
     main_problem::OptimizationContainer
     subproblems::Dict{String, OptimizationContainer}
     time_steps::UnitRange{Int}
@@ -56,7 +56,7 @@ function MultiOptimizationContainer(
     settings::Settings,
     ::Type{U},
     subproblem_keys::Vector{String},
-) where {T <: DecompositionAlgorithm, U <: PSY.TimeSeriesData}
+) where {T <: SolutionAlgorithm, U <: PSY.TimeSeriesData}
     resolution = PSY.get_time_series_resolution(sys)
     if isabstracttype(U)
         error("Default Time Series Type $U can't be abstract")
