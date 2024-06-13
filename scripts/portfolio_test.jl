@@ -36,17 +36,15 @@ t_th_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_th_ext["operational_periods"] = [1, 2, 3]
 t_th_ext["operational_periods_2"] = [
-    1, 2, 3, # first investment period
-    4, 5, 6  # second investment period
+    1,
+    2,
+    3, # first investment period
+    4,
+    5,
+    6,  # second investment period
 ]
-t_th_ext["investment_operational_periods_map"] = Dict(
-    1 => 2030,
-    2 => 2030,
-    3 => 2030,
-    4 => 2040,
-    5 => 2040,
-    6 => 2040,
-)
+t_th_ext["investment_operational_periods_map"] =
+    Dict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_th_ext["initial_capacity"] = 200.0 # Data in MW
 t_th_ext["maximum_capacity"] = 10000.0
 t_th_ext["minimum_required_capacity"] = [0.0, 0.0]
@@ -69,22 +67,19 @@ t_th_exp_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_th_exp_ext["operational_periods"] = [1, 2, 3]
 t_th_exp_ext["operational_periods_2"] = [
-    1, 2, 3, # first investment period
-    4, 5, 6  # second investment period
+    1,
+    2,
+    3, # first investment period
+    4,
+    5,
+    6,  # second investment period
 ]
 
-t_th_exp_ext["investment_operational_periods_map"] = Dict(
-    1 => 2030,
-    2 => 2030,
-    3 => 2030,
-    4 => 2040,
-    5 => 2040,
-    6 => 2040,
-)
+t_th_exp_ext["investment_operational_periods_map"] =
+    Dict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_th_exp_ext["initial_capacity"] = 200.0 # Data in MW
 t_th_exp_ext["maximum_capacity"] = 10000.0
 t_th_exp_ext["minimum_required_capacity"] = [0.0, 0.0]
-
 
 # Renewable Technology
 
@@ -107,34 +102,25 @@ t_re_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_re_ext["operational_periods"] = [1, 2, 3]
 t_re_ext["operational_periods_2"] = [
-    1, 2, 3, # first investment period
-    4, 5, 6  # second investment period
+    1,
+    2,
+    3, # first investment period
+    4,
+    5,
+    6,  # second investment period
 ]
-t_re_ext["investment_operational_periods_map"] = Dict(
-    1 => 2030,
-    2 => 2030,
-    3 => 2030,
-    4 => 2040,
-    5 => 2040,
-    6 => 2040,
-)
+t_re_ext["investment_operational_periods_map"] =
+    Dict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_re_ext["initial_capacity"] = 200.0 # Data in MW
 t_re_ext["maximum_capacity"] = 10000.0
 t_re_ext["minimum_required_capacity"] = [0.0, 0.0]
 
-
 # Demand side technologies
-d_1 = DemandSideTechnology{ElectricLoad}(
-    name="demand",
-    available=true,
-    capital_cost
-)
-
+d_1 = DemandSideTechnology{ElectricLoad}(name="demand", available=true, capital_cost)
 
 PSIP.add_technology!(p, t_th)
 PSIP.add_technology!(p, t_re)
 PSIP.add_technology!(p, t_th_exp)
-
 
 IS.serialize(t_th)
 IS.serialize(t_re)
