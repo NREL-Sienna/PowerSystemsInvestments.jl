@@ -1,1 +1,1 @@
-struct SupplyDemandBalance <: IS.VariableType end
+struct SupplyDemandBalance <: ISOPT.ConstraintType end
