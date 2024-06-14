@@ -1,14 +1,3 @@
-using Pkg
-Pkg.activate("")
-Pkg.instantiate()
-using Revise
-using PowerSystems
-import InfrastructureSystems
-using PowerSystemsInvestmentsPortfolios
-const IS = InfrastructureSystems
-const PSY = PowerSystems
-const PSIP = PowerSystemsInvestmentsPortfolios
-
 #data = PSY._create_system_data_from_kwargs()
 
 #bus = ACBus(nothing)
@@ -18,14 +7,22 @@ const PSIP = PowerSystemsInvestmentsPortfolios
 
 p = Portfolio(0.07)
 
-t_th = SupplyTechnology{ThermalStandard}(
-    name="thermal_tech",
+t_th = SupplyTechnology{ThermalStandard}(;
+    base_power=100.0,
+    capital_cost=50.0,
+    minimum_required_capacity=0.0,
+    prime_mover_type="ST",
     available=true,
-    fuel=PSY.ThermalFuels.COAL,
-    prime_mover=PSY.PrimeMovers.ST,
-    capacity_factor=0.98, # cap factor
-    capital_cost=nothing,
-    operational_cost=nothing,
+    gen_ID="1",
+    name="thermal_tech",
+    initial_capacity=200.0,
+    fuel="COAL",
+    power_systems_type="ThermalStandard",
+    variable_cost=1.0,
+    balancing_topology="Region",
+    operations_cost=5.0,
+    maximum_capacity=10000.0,
+    capacity_factor="0.98",
 )
 
 t_th_ext = t_th.ext
@@ -49,14 +46,22 @@ t_th_ext["initial_capacity"] = 200.0 # Data in MW
 t_th_ext["maximum_capacity"] = 10000.0
 t_th_ext["minimum_required_capacity"] = [0.0, 0.0]
 
-t_th_exp = SupplyTechnology{ThermalStandard}(
-    name="thermal_tech_expensive",
+t_th_exp = SupplyTechnology{ThermalStandard}(;
+    base_power=100.0,
+    capital_cost=150.0,
+    minimum_required_capacity=0.0,
+    prime_mover_type="ST",
     available=true,
-    fuel=PSY.ThermalFuels.WASTE_OIL,
-    prime_mover=PSY.PrimeMovers.ST,
-    capacity_factor=0.92, # cap factor
-    capital_cost=nothing,
-    operational_cost=nothing,
+    gen_ID="1",
+    name="thermal_tech_expensive",
+    initial_capacity=200.0,
+    fuel="WASTE_OIL",
+    power_systems_type="ThermalStandard",
+    variable_cost=1.0,
+    balancing_topology="Region",
+    operations_cost=15.0,
+    maximum_capacity=10000.0,
+    capacity_factor="0.92",
 )
 
 t_th_exp_ext = t_th_exp.ext
@@ -83,14 +88,22 @@ t_th_exp_ext["minimum_required_capacity"] = [0.0, 0.0]
 
 # Renewable Technology
 
-t_re = SupplyTechnology{RenewableDispatch}(
-    name="renewable_tech",
+t_re = SupplyTechnology{ThermalStandard}(;
+    base_power=100.0,
+    capital_cost=100.0,
+    minimum_required_capacity=0.0,
+    prime_mover_type="WT",
     available=true,
-    fuel=PSY.ThermalFuels.OTHER,
-    prime_mover=PSY.PrimeMovers.WT,
-    capacity_factor=0.98, # cap factor
-    capital_cost=nothing,
-    operational_cost=nothing,
+    gen_ID="1",
+    name="renewable_tech",
+    initial_capacity=200.0,
+    fuel="OTHER",
+    power_systems_type="ThermalStandard",
+    variable_cost=0.0,
+    balancing_topology="Region",
+    operations_cost=10.0,
+    maximum_capacity=10000.0,
+    capacity_factor="1.0",
 )
 
 t_re_ext = t_re.ext
@@ -116,7 +129,14 @@ t_re_ext["maximum_capacity"] = 10000.0
 t_re_ext["minimum_required_capacity"] = [0.0, 0.0]
 
 # Demand side technologies
-d_1 = DemandSideTechnology{ElectricLoad}(name="demand", available=true, capital_cost)
+d_1 = PSIP.DemandRequirement{ElectricLoad}(
+    load_growth=0.05,
+    name="demand",
+    available=true,
+    power_systems_type="ElectricLoad",
+    region="1",
+    peak_load=500.0,
+)
 
 PSIP.add_technology!(p, t_th)
 PSIP.add_technology!(p, t_re)
