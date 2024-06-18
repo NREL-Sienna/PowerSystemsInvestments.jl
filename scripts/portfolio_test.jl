@@ -9,20 +9,20 @@ p = Portfolio(0.07)
 
 t_th = SupplyTechnology{ThermalStandard}(;
     base_power=100.0,
-    capital_cost=50.0,
-    minimum_required_capacity=0.0,
-    prime_mover_type="ST",
-    available=true,
+    prime_mover_type=PrimeMovers.ST,
+    capital_cost=LinearFunctionData(50.0),
+    minimum_required_capacity=0.0,    
     gen_ID="1",
+    available=true,
     name="thermal_tech",
     initial_capacity=200.0,
-    fuel="COAL",
+    fuel=ThermalFuels.COAL,
     power_systems_type="ThermalStandard",
-    variable_cost=1.0,
+    variable_cost=LinearFunctionData(1.0),
     balancing_topology="Region",
-    operations_cost=5.0,
+    operations_cost=LinearFunctionData(5.0),
     maximum_capacity=10000.0,
-    capacity_factor="0.98",
+    capacity_factor=0.98,
 )
 
 t_th_ext = t_th.ext
