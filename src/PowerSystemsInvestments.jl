@@ -16,8 +16,19 @@ const MOI = MathOptInterface
 const PSIP = PowerSystemsInvestmentsPortfolios
 const PM = PowerModels
 
+### Exports ###
+
 export InvestmentModel
 export SimpleCapacityExpansion
+
+## Variables ##
+export BuildCapacity
+
+## Expressions ##
+export CumulativeCapacity
+export CapitalCost
+export TotalCapitalCost
+export FixedOMCost
 
 using DocStringExtensions
 
@@ -93,5 +104,6 @@ include("base/feasibility_model.jl")
 include("base/investment_problem.jl")
 include("base/investment_model_store.jl")
 include("base/investment_model.jl")
+include("base/formulations.jl")
 
 end
