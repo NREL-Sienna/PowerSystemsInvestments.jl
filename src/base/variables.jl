@@ -1,4 +1,4 @@
 """
 Total installed capacity for a technology
 """
-struct InstalledCapacity <: ISOPT.VariableType end
+struct BuildCapacity <: ISOPT.VariableType end
