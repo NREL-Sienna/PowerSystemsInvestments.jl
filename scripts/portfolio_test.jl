@@ -31,9 +31,9 @@ t_th = SupplyTechnology{ThermalStandard}(;
 )
 
 t_th_ext = t_th.ext
-t_th_ext["capital_cost"] = [50.0, 125.0]
-t_th_ext["operations_cost"] = [5.0, 2.5]
-t_th_ext["variable_cost"] = [1.0, 1.0]
+t_th_ext["capital_cost"] = OrderedDict(2030 => 50.0, 2040 => 125.0)
+t_th_ext["operations_cost"] = OrderedDict(2030 => 5.0, 2040 => 2.5)
+t_th_ext["variable_cost"] = OrderedDict(2030 => 1.0, 2040 => 1.0)
 t_th_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_th_ext["operational_periods"] = [1, 2, 3]
@@ -49,7 +49,7 @@ t_th_ext["investment_operational_periods_map"] =
     OrderedDict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_th_ext["initial_capacity"] = 200.0 # Data in MW
 t_th_ext["maximum_capacity"] = 10000.0
-t_th_ext["minimum_required_capacity"] = [0.0, 0.0]
+t_th_ext["minimum_required_capacity"] = OrderedDict(2030 => 0.0, 2040 => 0.0)
 
 t_th_exp = SupplyTechnology{ThermalStandard}(;
     base_power=100.0,
@@ -70,9 +70,9 @@ t_th_exp = SupplyTechnology{ThermalStandard}(;
 )
 
 t_th_exp_ext = t_th_exp.ext
-t_th_exp_ext["capital_cost"] = [150.0, 100.0]
-t_th_exp_ext["operations_cost"] = [15.0, 10.0]
-t_th_exp_ext["variable_cost"] = [1.0, 1.0]
+t_th_exp_ext["capital_cost"] = OrderedDict(2030 => 150.0, 2040 => 100.0)
+t_th_exp_ext["operations_cost"] = OrderedDict(2030 => 15.0, 2040 => 10.0)
+t_th_exp_ext["variable_cost"] = OrderedDict(2030 => 1.0, 2040 => 1.0)
 t_th_exp_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_th_exp_ext["operational_periods"] = [1, 2, 3]
@@ -89,7 +89,7 @@ t_th_exp_ext["investment_operational_periods_map"] =
     OrderedDict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_th_exp_ext["initial_capacity"] = 200.0 # Data in MW
 t_th_exp_ext["maximum_capacity"] = 10000.0
-t_th_exp_ext["minimum_required_capacity"] = [0.0, 0.0]
+t_th_exp_ext["minimum_required_capacity"] = OrderedDict(2030 => 0, 2040 => 0)
 
 # Renewable Technology
 
@@ -112,14 +112,13 @@ t_re = SupplyTechnology{RenewableDispatch}(;
 )
 
 t_re_ext = t_re.ext
-t_re_ext["capital_cost"] = [100.0, 75.0]
-t_re_ext["operations_cost"] = [10.0, 6.5]
-t_re_ext["variable_cost"] = [0, 0]
+t_re_ext["capital_cost"] = OrderedDict(2030 => 100.0, 2040 => 75.0)
+t_re_ext["operations_cost"] = OrderedDict(2030 => 10.0, 2040 => 6.5)
+t_re_ext["variable_cost"] = OrderedDict(2030 => 0, 2040 => 0)
 t_re_ext["variable_capacity_factor"] = [0.8, 0.6, 0.3, 0.5, 0.9, 0.4]
 t_re_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
-t_re_ext["operational_periods"] = [1, 2, 3]
-t_re_ext["operational_periods_2"] = [
+t_re_ext["operational_periods"] = [
     1,
     2,
     3, # first investment period
@@ -131,7 +130,7 @@ t_re_ext["investment_operational_periods_map"] =
     OrderedDict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
 t_re_ext["initial_capacity"] = 200.0 # Data in MW
 t_re_ext["maximum_capacity"] = 10000.0
-t_re_ext["minimum_required_capacity"] = [0.0, 0.0]
+t_re_ext["minimum_required_capacity"] = OrderedDict(2030 => 0, 2040 => 0)
 
 # Demand side technologies
 d_1 = DemandRequirement{ElectricLoad}(
