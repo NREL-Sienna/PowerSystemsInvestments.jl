@@ -50,8 +50,9 @@ end
 Base.@kwdef mutable struct MultiOptimizationContainer{T <: SolutionAlgorithm} <:
                            AbstractModelContainer
     main_problem::OptimizationContainer
-    subproblems::Dict{String, OptimizationContainer}
+    subproblems::Union{Nothing, Dict{String, OptimizationContainer}}
     time_steps::UnitRange{Int}
+    time_steps_operation::UnitRange{Int}
     resolution::Dates.TimePeriod
     settings::Settings
     settings_copy::Settings
@@ -88,6 +89,7 @@ function MultiOptimizationContainer(
         main_problem=OptimizationContainer(sys, settings, nothing, U),
         subproblems=subproblems,
         time_steps=1:1,
+        time_steps_operation=1:1,
         resolution=IS.time_period_conversion(resolution),
         settings=settings,
         settings_copy=copy_for_serialization(settings),
@@ -161,21 +163,20 @@ function _finalize_jump_model!(container::MultiOptimizationContainer, settings::
     return
 end
 
-#=
 function init_optimization_container!(
     container::MultiOptimizationContainer,
     network_model::NetworkModel{<:PM.AbstractPowerModel},
-    sys::PSY.System,
+    portfolio::PSIP.Portfolio,
 )
-    PSY.set_units_base_system!(sys, "SYSTEM_BASE")
+    PSY.set_units_base_system!(portfolio, "NATURAL_UNITS")
     # The order of operations matter
     settings = get_settings(container)
 
     if get_initial_time(settings) == UNSET_INI_TIME
         if get_default_time_series_type(container) <: PSY.AbstractDeterministic
-            set_initial_time!(settings, PSY.get_forecast_initial_timestamp(sys))
+            set_initial_time!(settings, PSY.get_forecast_initial_timestamp(portfolio))
         elseif get_default_time_series_type(container) <: PSY.SingleTimeSeries
-            ini_time, _ = PSY.check_time_series_consistency(sys, PSY.SingleTimeSeries)
+            ini_time, _ = PSY.check_time_series_consistency(portfolio, PSY.SingleTimeSeries)
             set_initial_time!(settings, ini_time)
         else
             error("Bug: unhandled $(get_default_time_series_type(container))")
@@ -184,7 +185,7 @@ function init_optimization_container!(
 
     # TODO: what if the time series type is SingleTimeSeries?
     if get_horizon(settings) == UNSET_HORIZON
-        set_horizon!(settings, PSY.get_forecast_horizon(sys))
+        set_horizon!(settings, PSY.get_forecast_horizon(portfolio))
     end
     container.time_steps = 1:get_horizon(settings)
 
@@ -205,7 +206,6 @@ function init_optimization_container!(
     _finalize_jump_model!(container, settings)
     return
 end
-=#
 
 function serialize_optimization_model(
     container::MultiOptimizationContainer,
