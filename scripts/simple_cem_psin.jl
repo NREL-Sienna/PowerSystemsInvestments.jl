@@ -99,6 +99,56 @@ function add_expressions!(
     end
 end
 
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.ContinuousInvestment,
+) where {T <: PSIN.CapitalCost}
+    expressions = container["expressions"]
+    tech_names = PSIP.get_name.(techs)
+    inv_periods = container["data"]["investment_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, tech_names, inv_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    var = container["variables"][PSIN.BuildCapacity]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        capex = container["components"][name].ext["capital_cost"]
+        for t in inv_periods
+            JuMP.add_to_expression!(expr[name, t], capex[t], var[name, t])
+        end
+    end
+end
+
+#FOM will be the same as CAPEX, just multiplying by CumulativeCapacity instead of BuildCapacity
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.ContinuousInvestment,
+) where {T <: PSIN.FixedOMCost}
+    expressions = container["expressions"]
+    tech_names = PSIP.get_name.(techs)
+    inv_periods = container["data"]["investment_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, tech_names, inv_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    var = container["expressions"][PSIN.CumulativeCapacity]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        fom = container["components"][name].ext["operations_cost"]
+        for t in inv_periods
+            JuMP.add_to_expression!(expr[name, t], fom[t], var[name, t])
+        end
+    end
+end
 ########################
 ##### Constraints ######
 ########################
@@ -133,6 +183,13 @@ temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
 formulation = PSIN.ContinuousInvestment()
 
+# Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
+
+# Expressions
 add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)
+add_expressions!(temp_container, PSIN.CapitalCost, techs, formulation)
+add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
+
+# Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)
