@@ -154,6 +154,31 @@ function add_expressions!(
     end
 end
 
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.ContinuousInvestment,
+) where {T <: PSIN.FixedOMCost}
+    expressions = container["expressions"]
+    tech_names = PSIP.get_name.(techs)
+    inv_periods = container["data"]["investment_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, tech_names, inv_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    var = container["expressions"][PSIN.CumulativeCapacity]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        fom = container["components"][name].ext["operations_cost"]
+        for t in inv_periods
+            JuMP.add_to_expression!(expr[name, t], fom[t], var[name, t])
+        end
+    end
+end
+
 ##################################
 ##### Operation Expressions ######
 ##################################
@@ -188,24 +213,91 @@ function add_expressions!(
     container,
     ::Type{T},
     techs::Vector{SupplyTechnology},
-    formulation::PSIN.ContinuousInvestment,
-) where {T <: PSIN.FixedOMCost}
+    formulation::PSIN.BasicDispatch,
+) where {T <: PSIN.SupplyTotal}
     expressions = container["expressions"]
     tech_names = PSIP.get_name.(techs)
-    inv_periods = container["data"]["investment_periods"]
+    op_periods = container["data"]["operational_periods"]
 
     # This should be replaced by add_expression_container!
-    expr = container_spec(GAE, tech_names, inv_periods)
+    expr = container_spec(GAE, op_periods)
     remove_undef!(expr)
     expressions[T] = expr
-    var = container["expressions"][PSIN.CumulativeCapacity]
+    var = container["variables"][PSIN.Dispatch]
 
     for tech in techs
         name = PSIP.get_name(tech)
-        fom = container["components"][name].ext["operations_cost"]
-        for t in inv_periods
-            JuMP.add_to_expression!(expr[name, t], fom[t], var[name, t])
+        for t in op_periods
+            JuMP.add_to_expression!(expr[t], 1.0, var[name, t])
         end
+    end
+end
+
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.NoDispatch,
+) where {T <: PSIN.SupplyTotal}
+    expressions = container["expressions"]
+    tech_names = PSIP.get_name.(techs)
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, op_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    cap = container["expressions"][PSIN.CumulativeCapacity]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        derate = container["components"][name].capacity_factor
+        for t in op_periods
+            p = container["data"]["investment_operational_periods_map"][t]
+            JuMP.add_to_expression!(expr[t], derate, cap[name, p])
+        end
+    end
+end
+
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.BasicDispatch,
+) where {T <: PSIN.DemandTotal}
+    expressions = container["expressions"]
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, op_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    peak = container["components"]["demand"].peak_load
+    var = container["components"]["demand"].ext["load_scale_factor"]
+
+    for t in op_periods
+        JuMP.add_to_expression!(expr[t], peak, var[t])
+    end
+end
+
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.NoDispatch,
+) where {T <: PSIN.DemandTotal}
+    expressions = container["expressions"]
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, op_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    peak = container["components"]["demand"].peak_load
+    var = container["components"]["demand"].ext["load_scale_factor"]
+
+    for t in op_periods
+        JuMP.add_to_expression!(expr[t], peak, var[t])
     end
 end
 
@@ -301,7 +393,7 @@ formulation = PSIN.ContinuousInvestment()
 
 # Have versions of the model for both NoDispatch and BasicDispatch
 basic_op_formulation = PSIN.BasicDispatch()
-# no_op_formulation = PSIN.NoDispatch()
+#no_op_formulation = PSIN.NoDispatch()
 
 # Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
@@ -312,6 +404,11 @@ add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)
 add_expressions!(temp_container, PSIN.CapitalCost, techs, formulation)
 add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
 add_expressions!(temp_container, PSIN.VariableOMCost, techs, basic_op_formulation)
+add_expressions!(temp_container, PSIN.SupplyTotal, techs, basic_op_formulation)
+add_expressions!(temp_container, PSIN.DemandTotal, techs, basic_op_formulation)
+
+#add_expressions!(temp_container, PSIN.SupplyTotal, techs, no_op_formulation)
+#add_expressions!(temp_container, PSIN.DemandTotal, techs, no_op_formulation)
 
 # Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)

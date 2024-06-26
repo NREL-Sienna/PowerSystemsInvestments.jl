@@ -31,6 +31,8 @@ export CapitalCost
 export TotalCapitalCost
 export FixedOMCost
 export VariableOMCost
+export SupplyTotal
+export DemandTotal
 
 ## Constraints ##
 export MaximumCumulativeCapacity
