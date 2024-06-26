@@ -34,9 +34,9 @@ function remove_undef!(expression_array::AbstractArray)
     return expression_array
 end
 
-########################
-# Investment variables #
-########################
+##############################
+#### Investment variables ####
+##############################
 
 function add_variables!(
     container,
@@ -65,9 +65,9 @@ function add_variables!(
     end
 end
 
-########################
-# Operations variables #
-########################
+##############################
+#### Operations variables ####
+##############################
 
 function add_variables!(
     container,
@@ -95,9 +95,9 @@ function add_variables!(
     end
 end
 
-########################
-##### Expressions ######
-########################
+###################################
+##### Investment Expressions ######
+###################################
 
 function add_expressions!(
     container,
@@ -154,6 +154,10 @@ function add_expressions!(
     end
 end
 
+##################################
+##### Operation Expressions ######
+##################################
+
 function add_expressions!(
     container,
     ::Type{T},
@@ -205,9 +209,9 @@ function add_expressions!(
     end
 end
 
-########################
-##### Constraints ######
-########################
+###################################
+##### Investment Constraints ######
+###################################
 
 function add_constraints!(
     container,
@@ -259,25 +263,57 @@ function add_constraints!(
     end
 end
 
+###################################
+##### Operations Constraints ######
+###################################
+
+function add_constraints!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.BasicDispatch,
+) where {T <: PSIN.MaximumDispatch}
+    model = container["model"]
+    constraints = container["constraints"]
+    tech_names = PSIP.get_name.(techs)
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    cons = container_spec(JuMP.ConstraintRef, tech_names, op_periods)
+    constraints[T] = cons
+    expr = container["expressions"][PSIN.CumulativeCapacity]
+    var = container["variables"][PSIN.Dispatch]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        derate = container["components"][name].capacity_factor
+        for t in op_periods
+            p = container["data"]["investment_operational_periods_map"][t]
+            cons[name, t] = JuMP.@constraint(model, var[name, t] <= derate*expr[name, p])
+        end
+    end
+end
+
 ### Construction Stage ###
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
 formulation = PSIN.ContinuousInvestment()
 
 # Have versions of the model for both NoDispatch and BasicDispatch
-op_formulation = PSIN.BasicDispatch()
-# op_formulation = PSIN.NoDispatch()
+basic_op_formulation = PSIN.BasicDispatch()
+# no_op_formulation = PSIN.NoDispatch()
 
 # Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
-add_variables!(temp_container, PSIN.Dispatch, techs, op_formulation)
+add_variables!(temp_container, PSIN.Dispatch, techs, basic_op_formulation)
 
 # Expressions
 add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)
 add_expressions!(temp_container, PSIN.CapitalCost, techs, formulation)
 add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
-add_expressions!(temp_container, PSIN.VariableOMCost, techs, op_formulation)
+add_expressions!(temp_container, PSIN.VariableOMCost, techs, basic_op_formulation)
 
 # Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)
 add_constraints!(temp_container, PSIN.MinimumCumulativeCapacity, techs, formulation)
+add_constraints!(temp_container, PSIN.MaximumDispatch, techs, basic_op_formulation)

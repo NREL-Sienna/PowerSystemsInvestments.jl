@@ -35,6 +35,7 @@ export VariableOMCost
 ## Constraints ##
 export MaximumCumulativeCapacity
 export MinimumCumulativeCapacity
+export MaximumDispatch
 
 using DocStringExtensions
 

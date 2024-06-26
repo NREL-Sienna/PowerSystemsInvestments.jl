@@ -43,7 +43,7 @@ t_th_ext["operational_periods_2"] = [
     3, # first investment period
     4,
     5,
-    6,  # second investment period
+    6, # second investment period
 ]
 t_th_ext["investment_operational_periods_map"] =
     OrderedDict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
