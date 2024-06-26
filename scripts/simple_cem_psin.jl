@@ -66,6 +66,37 @@ function add_variables!(
 end
 
 ########################
+# Operations variables #
+########################
+
+function add_variables!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.BasicDispatch,
+) where {T <: PSIN.Dispatch}
+    model = container["model"]
+    variables = container["variables"]
+    tech_names = PSIP.get_name.(techs)
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_variable_container!
+    var = container_spec(JuMP.VariableRef, tech_names, op_periods)
+    variables[PSIN.Dispatch] = var
+
+    for name in tech_names
+        for t in op_periods
+            # Build and capacity variables        
+            var[name, t] = JuMP.@variable(
+                model,
+                base_name = "$(T)_{$(name), $(t)}",
+                lower_bound = 0.0,
+            )
+        end
+    end
+end
+
+########################
 ##### Expressions ######
 ########################
 
@@ -124,7 +155,6 @@ function add_expressions!(
     end
 end
 
-#FOM will be the same as CAPEX, just multiplying by CumulativeCapacity instead of BuildCapacity
 function add_expressions!(
     container,
     ::Type{T},
@@ -149,6 +179,7 @@ function add_expressions!(
         end
     end
 end
+
 ########################
 ##### Constraints ######
 ########################
@@ -182,9 +213,11 @@ end
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
 formulation = PSIN.ContinuousInvestment()
+op_formulation = PSIN.BasicDispatch()
 
 # Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
+add_variables!(temp_container, PSIN.Dispatch, techs, op_formulation)
 
 # Expressions
 add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)

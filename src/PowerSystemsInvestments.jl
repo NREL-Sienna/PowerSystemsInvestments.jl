@@ -23,6 +23,7 @@ export SimpleCapacityExpansion
 
 ## Variables ##
 export BuildCapacity
+export Dispatch
 
 ## Expressions ##
 export CumulativeCapacity
