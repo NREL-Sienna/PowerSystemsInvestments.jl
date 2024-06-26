@@ -105,5 +105,6 @@ include("base/investment_problem.jl")
 include("base/investment_model_store.jl")
 include("base/investment_model.jl")
 include("base/formulations.jl")
+include("utils/jump_utils.jl")
 
 end
