@@ -85,8 +85,7 @@ function add_variables!(
     variables[PSIN.Dispatch] = var
 
     for name in tech_names
-        for t in op_periods
-            # Build and capacity variables        
+        for t in op_periods        
             var[name, t] = JuMP.@variable(
                 model,
                 base_name = "$(T)_{$(name), $(t)}",

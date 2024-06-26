@@ -152,6 +152,7 @@ temp_container["components"] =
 temp_container["data"] = Dict()
 temp_container["data"]["investment_operational_periods_map"] =
     OrderedDict(1 => 2030, 2 => 2030, 3 => 2030, 4 => 2040, 5 => 2040, 6 => 2040)
+temp_container["data"]["operational_periods"] = [1, 2, 3, 4, 5, 6]
 temp_container["data"]["investment_periods"] = [2030, 2040]
 temp_container["variables"] = Dict()
 temp_container["expressions"] = Dict()
