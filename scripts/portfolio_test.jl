@@ -158,7 +158,6 @@ temp_container["variables"] = Dict()
 temp_container["expressions"] = Dict()
 temp_container["constraints"] = Dict()
 
-
 PSIP.add_technology!(p, t_th)
 PSIP.add_technology!(p, t_re)
 PSIP.add_technology!(p, t_th_exp)
@@ -167,15 +166,14 @@ PSIP.add_technology!(p, d_1)
 IS.serialize(t_th)
 IS.serialize(t_re)
 IS.serialize(t_th_exp)
-IS.serialize(p)
+#IS.serialize(p)
 
 PSIP.get_technologies(x -> (PSIP.get_available(x)), SupplyTechnology{ThermalStandard}, p)
 
 PSIP.get_technologies(SupplyTechnology{ThermalStandard}, p)
-PSIP.remove_technology!(SupplyTechnology{ThermalStandard}, p, "thermal_tech")
+#PSIP.remove_technology!(SupplyTechnology{ThermalStandard}, p, "thermal_tech")
 
 #get_available(t_th)
 #get_available(t_re)
 #get_available(t_th_exp)
 #IS.deserialize(p)
-
