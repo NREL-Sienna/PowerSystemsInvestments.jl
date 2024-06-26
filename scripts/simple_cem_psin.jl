@@ -85,7 +85,7 @@ function add_variables!(
     variables[PSIN.Dispatch] = var
 
     for name in tech_names
-        for t in op_periods        
+        for t in op_periods
             var[name, t] = JuMP.@variable(
                 model,
                 base_name = "$(T)_{$(name), $(t)}",
@@ -381,7 +381,7 @@ function add_constraints!(
         derate = container["components"][name].capacity_factor
         for t in op_periods
             p = container["data"]["investment_operational_periods_map"][t]
-            cons[name, t] = JuMP.@constraint(model, var[name, t] <= derate*expr[name, p])
+            cons[name, t] = JuMP.@constraint(model, var[name, t] <= derate * expr[name, p])
         end
     end
 end
@@ -407,7 +407,6 @@ function add_constraints!(
     end
 end
 
-
 ### Construction Stage ###
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
@@ -429,7 +428,7 @@ add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)
 add_constraints!(temp_container, PSIN.MinimumCumulativeCapacity, techs, formulation)
 
-if typeof(op_formulation)==PSIN.NoDispatch
+if typeof(op_formulation) == PSIN.NoDispatch
     ### Operations (No Dispatch)
 
     # Expressions
@@ -454,5 +453,3 @@ else
 
     add_constraints!(temp_container, PSIN.SupplyDemandBalance, techs, op_formulation)
 end
-
-
