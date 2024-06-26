@@ -38,6 +38,7 @@ export DemandTotal
 export MaximumCumulativeCapacity
 export MinimumCumulativeCapacity
 export MaximumDispatch
+export SupplyDemandBalance
 
 using DocStringExtensions
 

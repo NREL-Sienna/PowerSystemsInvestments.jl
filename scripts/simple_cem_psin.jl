@@ -386,31 +386,73 @@ function add_constraints!(
     end
 end
 
+function add_constraints!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.OperationsTechnologyFormulation,
+) where {T <: PSIN.SupplyDemandBalance}
+    model = container["model"]
+    constraints = container["constraints"]
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    cons = container_spec(JuMP.ConstraintRef, op_periods)
+    constraints[T] = cons
+    supply = container["expressions"][PSIN.SupplyTotal]
+    demand = container["expressions"][PSIN.DemandTotal]
+
+    for t in op_periods
+        cons[t] = JuMP.@constraint(model, supply[t] >= demand[t])
+    end
+end
+
+
 ### Construction Stage ###
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
 formulation = PSIN.ContinuousInvestment()
+op_formulation = PSIN.NoDispatch()
+#op_formulation = PSIN.BasicDispatch()
 
-# Have versions of the model for both NoDispatch and BasicDispatch
-basic_op_formulation = PSIN.BasicDispatch()
-#no_op_formulation = PSIN.NoDispatch()
+### Investment
 
 # Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
-add_variables!(temp_container, PSIN.Dispatch, techs, basic_op_formulation)
 
 # Expressions
 add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)
 add_expressions!(temp_container, PSIN.CapitalCost, techs, formulation)
 add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
-add_expressions!(temp_container, PSIN.VariableOMCost, techs, basic_op_formulation)
-add_expressions!(temp_container, PSIN.SupplyTotal, techs, basic_op_formulation)
-add_expressions!(temp_container, PSIN.DemandTotal, techs, basic_op_formulation)
-
-#add_expressions!(temp_container, PSIN.SupplyTotal, techs, no_op_formulation)
-#add_expressions!(temp_container, PSIN.DemandTotal, techs, no_op_formulation)
 
 # Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)
 add_constraints!(temp_container, PSIN.MinimumCumulativeCapacity, techs, formulation)
-add_constraints!(temp_container, PSIN.MaximumDispatch, techs, basic_op_formulation)
+
+if typeof(op_formulation)==PSIN.NoDispatch
+    ### Operations (No Dispatch)
+
+    # Expressions
+    add_expressions!(temp_container, PSIN.SupplyTotal, techs, op_formulation)
+    add_expressions!(temp_container, PSIN.DemandTotal, techs, op_formulation)
+
+    # Constraints
+    add_constraints!(temp_container, PSIN.SupplyDemandBalance, techs, op_formulation)
+else
+    ### Operations (Basic Dispatch)
+
+    # Variables
+    add_variables!(temp_container, PSIN.Dispatch, techs, op_formulation)
+
+    # Expressions
+    add_expressions!(temp_container, PSIN.VariableOMCost, techs, op_formulation)
+    add_expressions!(temp_container, PSIN.SupplyTotal, techs, op_formulation)
+    add_expressions!(temp_container, PSIN.DemandTotal, techs, op_formulation)
+
+    # Constraints
+    add_constraints!(temp_container, PSIN.MaximumDispatch, techs, op_formulation)
+
+    add_constraints!(temp_container, PSIN.SupplyDemandBalance, techs, op_formulation)
+end
+
+
