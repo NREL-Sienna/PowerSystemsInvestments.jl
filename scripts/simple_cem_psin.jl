@@ -234,6 +234,31 @@ function add_constraints!(
     end
 end
 
+function add_constraints!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
+    formulation::PSIN.ContinuousInvestment,
+) where {T <: PSIN.MinimumCumulativeCapacity}
+    model = container["model"]
+    constraints = container["constraints"]
+    tech_names = PSIP.get_name.(techs)
+    inv_periods = container["data"]["investment_periods"]
+
+    # This should be replaced by add_expression_container!
+    cons = container_spec(JuMP.ConstraintRef, tech_names, inv_periods)
+    constraints[T] = cons
+    expr = container["expressions"][PSIN.CumulativeCapacity]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        min_cap = container["components"][name].ext["minimum_required_capacity"]
+        for t in inv_periods
+            cons[name, t] = JuMP.@constraint(model, min_cap[t] <= expr[name, t])
+        end
+    end
+end
+
 ### Construction Stage ###
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
@@ -255,3 +280,4 @@ add_expressions!(temp_container, PSIN.VariableOMCost, techs, op_formulation)
 
 # Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)
+add_constraints!(temp_container, PSIN.MinimumCumulativeCapacity, techs, formulation)

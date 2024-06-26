@@ -32,6 +32,10 @@ export TotalCapitalCost
 export FixedOMCost
 export VariableOMCost
 
+## Constraints ##
+export MaximumCumulativeCapacity
+export MinimumCumulativeCapacity
+
 using DocStringExtensions
 
 @template (FUNCTIONS, METHODS) = """
