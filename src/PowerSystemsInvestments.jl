@@ -30,6 +30,7 @@ export CumulativeCapacity
 export CapitalCost
 export TotalCapitalCost
 export FixedOMCost
+export VariableOMCost
 
 using DocStringExtensions
 

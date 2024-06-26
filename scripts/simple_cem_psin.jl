@@ -158,6 +158,32 @@ function add_expressions!(
     container,
     ::Type{T},
     techs::Vector{SupplyTechnology},
+    formulation::PSIN.BasicDispatch,
+) where {T <: PSIN.VariableOMCost}
+    expressions = container["expressions"]
+    tech_names = PSIP.get_name.(techs)
+    op_periods = container["data"]["operational_periods"]
+
+    # This should be replaced by add_expression_container!
+    expr = container_spec(GAE, tech_names, op_periods)
+    remove_undef!(expr)
+    expressions[T] = expr
+    var = container["variables"][PSIN.Dispatch]
+
+    for tech in techs
+        name = PSIP.get_name(tech)
+        vom = container["components"][name].ext["variable_cost"]
+        for t in op_periods
+            p = container["data"]["investment_operational_periods_map"][t]
+            JuMP.add_to_expression!(expr[name, t], vom[p], var[name, t])
+        end
+    end
+end
+
+function add_expressions!(
+    container,
+    ::Type{T},
+    techs::Vector{SupplyTechnology},
     formulation::PSIN.ContinuousInvestment,
 ) where {T <: PSIN.FixedOMCost}
     expressions = container["expressions"]
@@ -212,7 +238,10 @@ end
 temp_container["model"] = JuMP.Model(HiGHS.Optimizer)
 techs = [t_th, t_th_exp, t_re];
 formulation = PSIN.ContinuousInvestment()
+
+# Have versions of the model for both NoDispatch and BasicDispatch
 op_formulation = PSIN.BasicDispatch()
+# op_formulation = PSIN.NoDispatch()
 
 # Variables
 add_variables!(temp_container, PSIN.BuildCapacity, techs, formulation)
@@ -222,6 +251,7 @@ add_variables!(temp_container, PSIN.Dispatch, techs, op_formulation)
 add_expressions!(temp_container, PSIN.CumulativeCapacity, techs, formulation)
 add_expressions!(temp_container, PSIN.CapitalCost, techs, formulation)
 add_expressions!(temp_container, PSIN.FixedOMCost, techs, formulation)
+add_expressions!(temp_container, PSIN.VariableOMCost, techs, op_formulation)
 
 # Constraints
 add_constraints!(temp_container, PSIN.MaximumCumulativeCapacity, techs, formulation)

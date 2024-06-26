@@ -72,7 +72,7 @@ t_th_exp = SupplyTechnology{ThermalStandard}(;
 t_th_exp_ext = t_th_exp.ext
 t_th_exp_ext["capital_cost"] = OrderedDict(2030 => 150.0, 2040 => 100.0)
 t_th_exp_ext["operations_cost"] = OrderedDict(2030 => 15.0, 2040 => 10.0)
-t_th_exp_ext["variable_cost"] = OrderedDict(2030 => 1.0, 2040 => 1.0)
+t_th_exp_ext["variable_cost"] = OrderedDict(2030 => 3.0, 2040 => 2.0)
 t_th_exp_ext["investment_periods"] = [2030, 2040]
 # one option is to repeat these for each investment
 t_th_exp_ext["operational_periods"] = [1, 2, 3]
