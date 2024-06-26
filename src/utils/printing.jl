@@ -5,10 +5,15 @@ function Base.show(io::IO, ::MIME"text/plain", input::InvestmentProblemTemplate)
 end
 
 function Base.show(io::IO, ::MIME"text/html", input::InvestmentProblemTemplate)
-    _show_method(io, input, :html; standalone = false, tf = PrettyTables.tf_html_simple)
+    _show_method(io, input, :html; standalone=false, tf=PrettyTables.tf_html_simple)
 end
 
-function _show_method(io::IO, template::InvestmentProblemTemplate, backend::Symbol; kwargs...)
+function _show_method(
+    io::IO,
+    template::InvestmentProblemTemplate,
+    backend::Symbol;
+    kwargs...,
+)
     table = [
         "Network Model" string(get_network_formulation(template.network_model))
         "Slacks" get_use_slacks(template.network_model)
@@ -19,15 +24,16 @@ function _show_method(io::IO, template::InvestmentProblemTemplate, backend::Symb
     PrettyTables.pretty_table(
         io,
         table;
-        backend = Val(backend),
-        show_header = false,
-        title = "Network Model",
-        alignment = :l,
+        backend=Val(backend),
+        show_header=false,
+        title="Network Model",
+        alignment=:l,
         kwargs...,
     )
 
     println(io)
-    header = ["Technology Type", "Investment Formulation", "Operations Formulation", "Slacks"]
+    header =
+        ["Technology Type", "Investment Formulation", "Operations Formulation", "Slacks"]
 
     table = Matrix{String}(undef, length(template.technologies), length(header))
     for (ix, model) in enumerate(values(template.technologies))
@@ -40,10 +46,10 @@ function _show_method(io::IO, template::InvestmentProblemTemplate, backend::Symb
     PrettyTables.pretty_table(
         io,
         table;
-        backend = Val(backend),
-        header = header,
-        title = "Technology Models",
-        alignment = :l,
+        backend=Val(backend),
+        header=header,
+        title="Technology Models",
+        alignment=:l,
     )
     return
 end

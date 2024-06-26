@@ -8,7 +8,9 @@ abstract type AbstractInvestmentProblemTemplate end
 mutable struct InvestmentProblemTemplate <: AbstractInvestmentProblemTemplate
     network_model::NetworkModel{<:PM.AbstractPowerModel}
     technologies::TechnologiesModelContainer
-    function InvestmentProblemTemplate(network::NetworkModel{T}) where {T <: PM.AbstractPowerModel}
+    function InvestmentProblemTemplate(
+        network::NetworkModel{T},
+    ) where {T <: PM.AbstractPowerModel}
         new(network, TechnologiesModelContainer())
     end
 end

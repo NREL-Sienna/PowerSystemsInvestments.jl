@@ -37,7 +37,11 @@ end
 function _set_model!(
     dict::Dict,
     model::TechnologyModel{D, B, C},
-) where {D <: PSIP.Technology, B <: InvestmentTechnologyFormulation, C <: OperationsTechnologyFormulation}
+) where {
+    D <: PSIP.Technology,
+    B <: InvestmentTechnologyFormulation,
+    C <: OperationsTechnologyFormulation,
+}
     key = Symbol(D)
     if haskey(dict, key)
         @warn "Overwriting $(D) existing model"
