@@ -1,5 +1,5 @@
 Base.@kwdef mutable struct MultiOptimizationContainer{T <: SolutionAlgorithm} <:
-                           IS.Optimization.AbstractOptimizationContainer
+                           ISOPT.AbstractOptimizationContainer
     main_problem::SingleOptimizationContainer
     subproblems::Union{Nothing, Dict{String, SingleOptimizationContainer}}
     time_steps::UnitRange{Int}

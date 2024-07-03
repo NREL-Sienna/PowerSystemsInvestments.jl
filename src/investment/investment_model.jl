@@ -18,7 +18,7 @@ function InvestmentModel{M}(
     elseif name isa String
         name = Symbol(name)
     end
-    internal = IS.Optimization.ModelInternal(
+    internal = ISOPT.ModelInternal(
         MultiOptimizationContainer(portfolio, settings, jump_model, PSY.Deterministic),
     )
 
