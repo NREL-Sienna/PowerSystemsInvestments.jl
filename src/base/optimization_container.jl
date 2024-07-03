@@ -30,9 +30,6 @@ function ObjectiveFunction()
     )
 end
 
-abstract type AbstractModelContainer end
-abstract type OptimizationContainer end
-
 struct MpiInfo
     comm::Any
     rank::Int
@@ -100,6 +97,7 @@ function MultiOptimizationContainer(
         parameters=Dict{ParameterKey, ParameterContainer}(),
         base_power=PSY.get_base_power(sys),
         optimizer_stats=ISOPT.OptimizerStats(),
+        optimizer_stats=OptimizerStats(),
         built_for_recurrent_solves=false,
         metadata=OptimizationContainerMetadata(),
         default_time_series_type=U,
@@ -111,13 +109,18 @@ function get_container_keys(container::MultiOptimizationContainer)
     return Iterators.flatten(keys(getfield(container, f)) for f in STORE_CONTAINERS)
 end
 
+=======
+end
+
+function get_container_keys(container::MultiOptimizationContainer)
+    return Iterators.flatten(keys(getfield(container, f)) for f in STORE_CONTAINERS)
+end
+
 get_default_time_series_type(container::MultiOptimizationContainer) =
     container.default_time_series_type
 get_duals(container::MultiOptimizationContainer) = container.duals
 get_expressions(container::MultiOptimizationContainer) = container.expressions
 get_initial_conditions(container::MultiOptimizationContainer) = container.initial_conditions
-get_initial_conditions_data(container::MultiOptimizationContainer) =
-    container.initial_conditions_data
 get_initial_time(container::MultiOptimizationContainer) =
     get_initial_time(container.settings)
 get_jump_model(container::MultiOptimizationContainer) =
@@ -155,7 +158,10 @@ function check_optimization_container(container::MultiOptimizationContainer)
     return
 end
 
-function _finalize_jump_model!(container::MultiOptimizationContainer, settings::Settings)
+function _finalize_jump_model!(
+    container::MultiOptimizationContainer,
+    settings::Settings,
+)
     @debug "Instantiating the JuMP model" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
     _finalize_jump_model!(container.main_problem, settings)
     return
@@ -205,9 +211,10 @@ function init_optimization_container!(
     _finalize_jump_model!(container, settings)
     return
 end
-=#
+
 
 function serialize_optimization_model(
     container::MultiOptimizationContainer,
     save_path::String,
 ) end
+=#
