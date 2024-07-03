@@ -106,11 +106,11 @@ include("base/solution_algorithms.jl")
 include("base/operation_model.jl")
 include("base/feasibility_model.jl")
 include("base/investment_problem.jl")
-include("base/investment_model.jl")
+include("investment/investment_model.jl")
 
 # Order Required
 include("base/technology_model.jl")
-include("base/problem_template.jl")
+include("investment/problem_template.jl")
 include("base/optimization_container.jl")
 
 include("utils/printing.jl")
