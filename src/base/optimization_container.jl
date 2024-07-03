@@ -109,6 +109,16 @@ function MultiOptimizationContainer(
     )
 end
 
+function MultiOptimizationContainer(
+    portfolio::PSIP.Portfolio,
+    settings::Settings,
+    ::Type{U},
+    subproblem_keys::Vector{String},
+) where {U <: PSY.TimeSeriesData}
+    MultiOptimizationContainer(SingleInstanceSolve, portfolio, settings, U, subproblem_keys)
+return
+end
+
 function get_container_keys(container::MultiOptimizationContainer)
     return Iterators.flatten(keys(getfield(container, f)) for f in STORE_CONTAINERS)
 end
@@ -210,4 +220,6 @@ end
 function serialize_optimization_model(
     container::MultiOptimizationContainer,
     save_path::String,
-) end
+) 
+    return
+end
