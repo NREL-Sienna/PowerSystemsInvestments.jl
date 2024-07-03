@@ -22,7 +22,6 @@ const PNM = PowerNetworkMatrices
 ### Exports ###
 
 export InvestmentModel
-export SimpleCapacityExpansion
 
 ## Variables ##
 export BuildCapacity
