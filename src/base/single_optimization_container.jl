@@ -10,7 +10,7 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
     expressions::Dict{ISOPT.ExpressionKey, AbstractArray}
     parameters::Dict{ISOPT.ParameterKey, ParameterContainer}
     infeasibility_conflict::Dict{Symbol, Array}
-    optimizer_stats::OptimizerStats
+    optimizer_stats::ISOPT.OptimizerStats
     metadata::ISOPT.OptimizationContainerMetadata
 end
 
@@ -37,7 +37,7 @@ function SingleOptimizationContainer(
         Dict{ExpressionKey, AbstractArray}(),
         Dict{ParameterKey, ParameterContainer}(),
         Dict{Symbol, Array}(),
-        OptimizerStats(),
+        ISOPT.OptimizerStats(),
         ISOPT.OptimizationContainerMetadata(),
     )
 end

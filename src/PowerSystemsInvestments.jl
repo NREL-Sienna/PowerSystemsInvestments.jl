@@ -107,14 +107,15 @@ include("base/settings.jl")
 include("base/solution_algorithms.jl")
 include("base/operation_model.jl")
 include("base/feasibility_model.jl")
-include("base/investment_problem.jl")
-include("investment/investment_model.jl")
 
 include("base/technology_model.jl")
-include("investment/problem_template.jl")
 include("base/objective_function.jl")
 include("base/single_optimization_container.jl")
 include("base/multi_optimization_container.jl")
+
+include("investment/problem_template.jl")
+include("base/investment_problem.jl")
+include("investment/investment_model.jl")
 
 include("utils/printing.jl")
 include("technology_models/technologies/supply_tech.jl")

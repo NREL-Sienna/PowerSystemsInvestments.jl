@@ -7,7 +7,7 @@ mutable struct InvestmentModel{I <: InvestmentProblem, S <: SolutionAlgorithm}
 end
 
 function InvestmentModel{M}(
-    template::AbstractProblemTemplate,
+    template::AbstractInvestmentProblemTemplate,
     portfolio::PSIP.Portfolio,
     settings::Settings,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
@@ -37,36 +37,29 @@ function InvestmentModel{M}(
     return model
 end
 
-function InvestmentModel{I, S}(
-    template::AbstractProblemTemplate,
+function InvestmentModel{M}(
+    template::AbstractInvestmentProblemTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     name=nothing,
     optimizer=nothing,
     horizon=UNSET_HORIZON,
     resolution=UNSET_RESOLUTION,
-    warm_start=true,
     portfolio_to_file=true,
-    initialize_model=true,
-    initialization_file="",
-    deserialize_initial_conditions=false,
     export_pwl_vars=false,
-    allow_fails=false,
     optimizer_solve_log_print=false,
     detailed_optimizer_stats=false,
     calculate_conflict=false,
     direct_mode_optimizer=false,
     store_variable_names=false,
-    rebuild_model=false,
     check_numerical_bounds=true,
     initial_time=UNSET_INI_TIME,
     time_series_cache_size::Int=IS.TIME_SERIES_CACHE_SIZE_BYTES,
-) where {M <: DecisionProblem}
+) where {M <: InvestmentProblem}
     settings = Settings(
         portfolio;
         initial_time=initial_time,
         time_series_cache_size=time_series_cache_size,
-        warm_start=warm_start,
         horizon=horizon,
         resolution=resolution,
         optimizer=optimizer,
@@ -75,13 +68,8 @@ function InvestmentModel{I, S}(
         detailed_optimizer_stats=detailed_optimizer_stats,
         calculate_conflict=calculate_conflict,
         portfolio_to_file=portfolio_to_file,
-        initialize_model=initialize_model,
-        initialization_file=initialization_file,
-        deserialize_initial_conditions=deserialize_initial_conditions,
         export_pwl_vars=export_pwl_vars,
-        allow_fails=allow_fails,
         check_numerical_bounds=check_numerical_bounds,
-        rebuild_model=rebuild_model,
         store_variable_names=store_variable_names,
     )
     return DecisionModel{M}(template, sys, settings, jump_model; name=name)
@@ -90,7 +78,7 @@ end
 function InvestmentModel(
     ::Type{I},
     ::Type{S},
-    template::AbstractProblemTemplate,
+    template::AbstractInvestmentProblemTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     kwargs...,
@@ -99,7 +87,7 @@ function InvestmentModel(
 end
 
 function InvestmentModel(
-    template::AbstractProblemTemplate,
+    template::AbstractInvestmentProblemTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     kwargs...,
