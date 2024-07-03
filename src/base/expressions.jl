@@ -6,3 +6,5 @@ struct CapitalCost <: ISOPT.ExpressionType end
 struct FixedOMCost <: ISOPT.ExpressionType end
 
 struct TotalCapitalCost <: ISOPT.ExpressionType end
+
+struct VariableOMCost <: ISOPT.ExpressionType end
