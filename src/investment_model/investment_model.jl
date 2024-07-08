@@ -1,4 +1,4 @@
-mutable struct InvestmentModel{I <: InvestmentProblem, S <: SolutionAlgorithm}
+mutable struct InvestmentModel{S <: SolutionAlgorithm}
     name::Symbol
     portfolio::PSIP.Portfolio
     internal::Union{Nothing, ISOPT.ModelInternal}
@@ -6,13 +6,14 @@ mutable struct InvestmentModel{I <: InvestmentProblem, S <: SolutionAlgorithm}
     ext::Dict{String, Any}
 end
 
-function InvestmentModel{M}(
-    template::AbstractInvestmentProblemTemplate,
+function InvestmentModel(
+    template::AbstractInvestmentModelTemplate,
+    algorithm::SolutionAlgorithm,
     portfolio::PSIP.Portfolio,
     settings::Settings,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     name=nothing,
-) where {M <: InvestmentProblem}
+)
     if name === nothing
         name = nameof(M)
     elseif name isa String
@@ -24,7 +25,7 @@ function InvestmentModel{M}(
 
     template_ = deepcopy(template)
     finalize_template!(template_, sys)
-    model = DecisionModel{M}(
+    model = InvestmentModel(
         name,
         template_,
         sys,
@@ -38,7 +39,7 @@ function InvestmentModel{M}(
 end
 
 function InvestmentModel{M}(
-    template::AbstractInvestmentProblemTemplate,
+    template::AbstractInvestmentModelTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     name=nothing,
@@ -55,7 +56,7 @@ function InvestmentModel{M}(
     check_numerical_bounds=true,
     initial_time=UNSET_INI_TIME,
     time_series_cache_size::Int=IS.TIME_SERIES_CACHE_SIZE_BYTES,
-) where {M <: InvestmentProblem}
+) where {M <: InvestmentModel}
     settings = Settings(
         portfolio;
         initial_time=initial_time,
@@ -78,16 +79,16 @@ end
 function InvestmentModel(
     ::Type{I},
     ::Type{S},
-    template::AbstractInvestmentProblemTemplate,
+    template::AbstractInvestmentModelTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     kwargs...,
-) where {I <: InvestmentProblem, S <: SolutionAlgorithm}
+) where {I <: InvestmentModel, S <: SolutionAlgorithm}
     return InvestmentModel{I, S}(template, portfolio, jump_model; kwargs...)
 end
 
 function InvestmentModel(
-    template::AbstractInvestmentProblemTemplate,
+    template::AbstractInvestmentModelTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
     kwargs...,

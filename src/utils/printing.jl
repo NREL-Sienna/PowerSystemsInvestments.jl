@@ -1,16 +1,16 @@
-# InvestmentProblemTemplate
+# InvestmentModelTemplate
 
-function Base.show(io::IO, ::MIME"text/plain", input::InvestmentProblemTemplate)
+function Base.show(io::IO, ::MIME"text/plain", input::InvestmentModelTemplate)
     _show_method(io, input, :auto)
 end
 
-function Base.show(io::IO, ::MIME"text/html", input::InvestmentProblemTemplate)
+function Base.show(io::IO, ::MIME"text/html", input::InvestmentModelTemplate)
     _show_method(io, input, :html; standalone=false, tf=PrettyTables.tf_html_simple)
 end
 
 function _show_method(
     io::IO,
-    template::InvestmentProblemTemplate,
+    template::InvestmentModelTemplate,
     backend::Symbol;
     kwargs...,
 )

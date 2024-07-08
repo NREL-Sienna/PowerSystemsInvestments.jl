@@ -1,0 +1,3 @@
+abstract type TechnologyCapitalFormulation end
+abstract type TechnologyOperationsFormulation end
+abstract type FeasibilityModelFormulation end
