@@ -3,19 +3,19 @@ const TechnologiesModelContainer = Dict{Symbol, TechnologyModel}
 #const BranchModelContainer = Dict{Symbol, DeviceModelForBranches}
 #const ServicesModelContainer = Dict{Tuple{String, Symbol}, ServiceModel}
 
-abstract type AbstractInvestmentProblemTemplate end
+abstract type AbstractInvestmentModelTemplate end
 
-mutable struct InvestmentProblemTemplate <: AbstractInvestmentProblemTemplate
+mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
     network_model::NetworkModel{<:PM.AbstractPowerModel}
     technologies::TechnologiesModelContainer
-    function InvestmentProblemTemplate(
+    function InvestmentModelTemplate(
         network::NetworkModel{T},
     ) where {T <: PM.AbstractPowerModel}
         new(network, TechnologiesModelContainer())
     end
 end
 
-function Base.isempty(template::InvestmentProblemTemplate)
+function Base.isempty(template::InvestmentModelTemplate)
     if !isempty(template.technologies)
         return false
     else
@@ -23,20 +23,20 @@ function Base.isempty(template::InvestmentProblemTemplate)
     end
 end
 
-InvestmentProblemTemplate(::Type{T}) where {T <: PM.AbstractPowerModel} =
-    InvestmentProblemTemplate(NetworkModel(T))
-InvestmentProblemTemplate() = InvestmentProblemTemplate(CopperPlatePowerModel)
+InvestmentModelTemplate(::Type{T}) where {T <: PM.AbstractPowerModel} =
+    InvestmentModelTemplate(NetworkModel(T))
+InvestmentModelTemplate() = InvestmentModelTemplate(CopperPlatePowerModel)
 
-get_technology_models(template::InvestmentProblemTemplate) = template.technologies
-get_network_model(template::InvestmentProblemTemplate) = template.network_model
-get_network_formulation(template::InvestmentProblemTemplate) =
+get_technology_models(template::InvestmentModelTemplate) = template.technologies
+get_network_model(template::InvestmentModelTemplate) = template.network_model
+get_network_formulation(template::InvestmentModelTemplate) =
     get_network_formulation(get_network_model(template))
 
 """
 Sets the network model in a template.
 """
 function set_network_model!(
-    template::InvestmentProblemTemplate,
+    template::InvestmentModelTemplate,
     model::NetworkModel{<:PM.AbstractPowerModel},
 )
     template.network_model = model
@@ -44,7 +44,7 @@ function set_network_model!(
 end
 
 function set_device_model!(
-    template::InvestmentProblemTemplate,
+    template::InvestmentModelTemplate,
     component_type::Type{<:PSIP.Technology},
     investment_formulation::Type{<:InvestmentTechnologyFormulation},
     operations_formulation::Type{<:OperationsTechnologyFormulation},
@@ -57,7 +57,7 @@ function set_device_model!(
 end
 
 function set_device_model!(
-    template::InvestmentProblemTemplate,
+    template::InvestmentModelTemplate,
     model::TechnologyModel{
         <:PSIP.Technology,
         <:InvestmentTechnologyFormulation,

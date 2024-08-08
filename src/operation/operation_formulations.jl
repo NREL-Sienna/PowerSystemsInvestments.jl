@@ -1,11 +1,3 @@
-abstract type InvestmentTechnologyFormulation end
-abstract type OperationsTechnologyFormulation end
-
-### Investment Formulations ###
-
-struct ContinuousInvestment <: InvestmentTechnologyFormulation end
-struct IntegerInvestment <: InvestmentTechnologyFormulation end
-
 ### Operations Formulations ###
 
 struct BasicDispatch <: OperationsTechnologyFormulation end

@@ -1,5 +1,11 @@
 using Test
-import Logging
+import InfrastructureSystems
+using JuMP
+using Logging
+using PowerSystemsInvestments
+
+const IS = InfrastructureSystems
+const PSINV = PowerSystemsInvestments
 
 import Aqua
 Aqua.test_unbound_args(PowerSystemsInvestments)

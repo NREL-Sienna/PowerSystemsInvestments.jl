@@ -22,7 +22,6 @@ const PNM = PowerNetworkMatrices
 ### Exports ###
 
 export InvestmentModel
-export SimpleCapacityExpansion
 
 ## Variables ##
 export BuildCapacity
@@ -31,7 +30,7 @@ export BuildCapacity
 export CumulativeCapacity
 export CapitalCost
 export TotalCapitalCost
-export FixedOMCost
+export FixedOperationModelCost
 
 using DocStringExtensions
 
@@ -93,6 +92,8 @@ import InfrastructureSystems.Optimization:
     to_matrix,
     get_store_container_type
 ####
+# Order Required
+include("utils/mpi_utils.jl")
 
 include("base/formulations.jl")
 include("base/investment_model_store.jl")
@@ -105,13 +106,15 @@ include("base/settings.jl")
 include("base/solution_algorithms.jl")
 include("base/operation_model.jl")
 include("base/feasibility_model.jl")
+
+include("base/technology_model.jl")
+include("base/objective_function.jl")
+include("base/single_optimization_container.jl")
+include("base/multi_optimization_container.jl")
+
+include("investment/problem_template.jl")
 include("base/investment_problem.jl")
 include("investment/investment_model.jl")
-
-# Order Required
-include("base/technology_model.jl")
-include("investment/problem_template.jl")
-include("base/optimization_container.jl")
 
 include("utils/printing.jl")
 include("technology_models/technologies/supply_tech.jl")

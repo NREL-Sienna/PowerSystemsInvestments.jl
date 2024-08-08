@@ -51,17 +51,11 @@ end
 
 get_attribute_key(attr::VariableValueAttributes) = attr.attribute_key
 
-IS.@scoped_enum(SOSStatusVariable, NO_VARIABLE = 1, PARAMETER = 2, VARIABLE = 3,)
-
 struct CostFunctionAttributes{T} <: ParameterAttributes
     variable_type::Type
-    sos_status::SOSStatusVariable
-    uses_compact_power::Bool
 end
 
-get_sos_status(attr::CostFunctionAttributes) = attr.sos_status
 get_variable_type(attr::CostFunctionAttributes) = attr.variable_type
-get_uses_compact_power(attr::CostFunctionAttributes) = attr.uses_compact_power
 
 struct ParameterContainer{T <: AbstractArray, U <: AbstractArray}
     attributes::ParameterAttributes
