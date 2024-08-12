@@ -34,7 +34,7 @@ function Settings(
     store_variable_names=false,
     ext=Dict{String, Any}(),
 )
-    if time_series_cache_size > 0 && PSY.stores_time_series_in_memory(portfolio)
+    if time_series_cache_size > 0 && IS.stores_time_series_in_memory(portfolio.data)
         @info "Overriding time_series_cache_size because time series is stored in memory"
         time_series_cache_size = 0
     end
