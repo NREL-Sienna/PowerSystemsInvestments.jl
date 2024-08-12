@@ -53,7 +53,8 @@ get_default_time_series_type(container::SingleOptimizationContainer) =
     container.default_time_series_type
 get_duals(container::SingleOptimizationContainer) = container.duals
 get_expressions(container::SingleOptimizationContainer) = container.expressions
-get_initial_conditions(container::SingleOptimizationContainer) = container.initial_conditions
+get_initial_conditions(container::SingleOptimizationContainer) =
+    container.initial_conditions
 get_initial_conditions_data(container::SingleOptimizationContainer) =
     container.initial_conditions_data
 get_initial_time(container::SingleOptimizationContainer) =
@@ -79,8 +80,6 @@ set_time_steps!(container::SingleOptimizationContainer, time_steps::UnitRange{In
 get_aux_variables(container::SingleOptimizationContainer) = container.aux_variables
 get_base_power(container::SingleOptimizationContainer) = container.base_power
 get_constraints(container::SingleOptimizationContainer) = container.constraints
-
-
 
 function _assign_container!(container::Dict, key::OptimizationContainerKey, value)
     if haskey(container, key)
@@ -116,8 +115,8 @@ function add_variable_container!(
     ::T,
     ::Type{U},
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     return _add_variable_container!(container, var_key, sparse, axs...)
@@ -129,7 +128,7 @@ function add_variable_container!(
     ::Type{U},
     meta::String,
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     return _add_variable_container!(container, var_key, sparse, axs...)
@@ -144,7 +143,7 @@ function add_variable_container!(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U};
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: SparseVariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     _assign_container!(container.variables, var_key, _get_pwl_variables_container())
@@ -169,7 +168,7 @@ function get_variable(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta::String = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_variable(container, VariableKey(T, U, meta))
 end

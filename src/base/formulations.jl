@@ -3,8 +3,6 @@ abstract type AbstractTechnologyFormulation end
 abstract type InvestmentTechnologyFormulation <: AbstractTechnologyFormulation end
 abstract type OperationsTechnologyFormulation <: AbstractTechnologyFormulation end
 
-
-
 ### Investment Formulations ###
 
 struct ContinuousInvestment <: InvestmentTechnologyFormulation end

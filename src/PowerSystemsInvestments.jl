@@ -110,7 +110,6 @@ include("base/solution_algorithms.jl")
 include("base/supply_technology_model.jl")
 include("base/investment_model_template.jl")
 
-
 include("base/objective_function.jl")
 include("base/single_optimization_container.jl")
 include("base/multi_optimization_container.jl")

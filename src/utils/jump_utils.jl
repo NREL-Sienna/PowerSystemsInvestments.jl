@@ -1,7 +1,7 @@
 #Given the changes in syntax in ParameterJuMP and the new format to create anonymous parameters
 function add_jump_parameter(jump_model::JuMP.Model, val::Number)
     param = JuMP.@variable(jump_model, base_name = "param")
-    JuMP.fix(param, val; force = true)
+    JuMP.fix(param, val; force=true)
     return param
 end
 
@@ -37,7 +37,7 @@ function jump_value(input::Vector{Tuple{Float64, Float64}})::Vector{Tuple{Float6
 end
 
 function fix_parameter_value(input::JuMP.VariableRef, value::Float64)
-    JuMP.fix(input, value; force = true)
+    JuMP.fix(input, value; force=true)
     return
 end
 
@@ -270,15 +270,14 @@ end
 function _get_solver_time(jump_model::JuMP.Model)
     solver_solve_time = NaN
 
-    try_s =
-        get!(jump_model.ext, :try_supports_solvetime, (trycatch = true, supports = true))
+    try_s = get!(jump_model.ext, :try_supports_solvetime, (trycatch=true, supports=true))
     if try_s.trycatch
         try
             solver_solve_time = MOI.get(jump_model, MOI.SolveTimeSec())
-            jump_model.ext[:try_supports_solvetime] = (trycatch = false, supports = true)
+            jump_model.ext[:try_supports_solvetime] = (trycatch=false, supports=true)
         catch
             @debug "SolveTimeSec() property not supported by the Solver"
-            jump_model.ext[:try_supports_solvetime] = (trycatch = false, supports = false)
+            jump_model.ext[:try_supports_solvetime] = (trycatch=false, supports=false)
         end
     else
         if try_s.supports
