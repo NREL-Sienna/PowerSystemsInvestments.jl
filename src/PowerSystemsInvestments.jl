@@ -94,9 +94,10 @@ import InfrastructureSystems.Optimization:
 ####
 # Order Required
 include("utils/mpi_utils.jl")
+include("base/definitions.jl")
 
 include("base/formulations.jl")
-include("base/investment_model_store.jl")
+#include("base/investment_model_store.jl")
 include("base/network_model.jl")
 include("base/constraints.jl")
 include("base/variables.jl")
@@ -104,18 +105,21 @@ include("base/expressions.jl")
 include("base/parameters.jl")
 include("base/settings.jl")
 include("base/solution_algorithms.jl")
-include("base/operation_model.jl")
-include("base/feasibility_model.jl")
+#include("base/operation_model.jl")
+#include("base/feasibility_model.jl")
+include("base/supply_technology_model.jl")
+include("base/investment_model_template.jl")
 
-include("base/technology_model.jl")
+
 include("base/objective_function.jl")
 include("base/single_optimization_container.jl")
 include("base/multi_optimization_container.jl")
 
-include("investment/problem_template.jl")
-include("base/investment_problem.jl")
-include("investment/investment_model.jl")
+include("investment_model/investment_model_store.jl")
+include("investment_model/investment_model.jl")
 
 include("utils/printing.jl")
+include("utils/jump_utils.jl")
+include("technology_models/technologies/common/add_variable.jl")
 include("technology_models/technologies/supply_tech.jl")
 end
