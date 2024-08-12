@@ -1,3 +1,5 @@
+abstract type SparseVariableType <: ISOPT.VariableType end
+
 """
 Total installed capacity for a technology
 """
