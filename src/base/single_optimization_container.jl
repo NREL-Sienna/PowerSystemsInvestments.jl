@@ -2,6 +2,7 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
                            ISOPT.AbstractOptimizationContainer
     JuMPmodel::JuMP.Model
     time_steps::UnitRange{Int}
+    time_steps_investments::UnitRange{Int}
     settings::Settings
     settings_copy::Settings
     variables::Dict{ISOPT.VariableKey, AbstractArray}
@@ -30,6 +31,7 @@ function SingleOptimizationContainer(
 
     return SingleOptimizationContainer(
         jump_model === nothing ? JuMP.Model() : jump_model,
+        1:1,
         1:1,
         settings,
         copy_for_serialization(settings),
@@ -76,6 +78,9 @@ is_synchronized(container::SingleOptimizationContainer) =
     container.objective_function.synchronized
 set_time_steps!(container::SingleOptimizationContainer, time_steps::UnitRange{Int64}) =
     container.time_steps = time_steps
+set_time_steps_investments!(container::SingleOptimizationContainer, time_steps::UnitRange{Int64}) =
+    container.time_steps_investments = time_steps
+
 
 get_aux_variables(container::SingleOptimizationContainer) = container.aux_variables
 get_base_power(container::SingleOptimizationContainer) = container.base_power
