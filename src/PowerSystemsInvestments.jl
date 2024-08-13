@@ -10,6 +10,7 @@ import PowerModels
 import DataStructures
 import PowerNetworkMatrices
 import PrettyTables
+import TimeSeries
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization
