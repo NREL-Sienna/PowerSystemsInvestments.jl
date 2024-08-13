@@ -68,6 +68,7 @@ get_parameters(container::SingleOptimizationContainer) = container.parameters
 get_resolution(container::SingleOptimizationContainer) = container.resolution
 get_settings(container::SingleOptimizationContainer) = container.settings
 get_time_steps(container::SingleOptimizationContainer) = container.time_steps
+get_time_steps_investments(container::SingleOptimizationContainer) = container.time_steps_investments
 get_variables(container::SingleOptimizationContainer) = container.variables
 
 set_initial_conditions_data!(container::SingleOptimizationContainer, data) =
