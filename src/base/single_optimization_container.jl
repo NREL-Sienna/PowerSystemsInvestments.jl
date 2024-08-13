@@ -68,7 +68,8 @@ get_parameters(container::SingleOptimizationContainer) = container.parameters
 get_resolution(container::SingleOptimizationContainer) = container.resolution
 get_settings(container::SingleOptimizationContainer) = container.settings
 get_time_steps(container::SingleOptimizationContainer) = container.time_steps
-get_time_steps_investments(container::SingleOptimizationContainer) = container.time_steps_investments
+get_time_steps_investments(container::SingleOptimizationContainer) =
+    container.time_steps_investments
 get_variables(container::SingleOptimizationContainer) = container.variables
 
 set_initial_conditions_data!(container::SingleOptimizationContainer, data) =
@@ -79,9 +80,10 @@ is_synchronized(container::SingleOptimizationContainer) =
     container.objective_function.synchronized
 set_time_steps!(container::SingleOptimizationContainer, time_steps::UnitRange{Int64}) =
     container.time_steps = time_steps
-set_time_steps_investments!(container::SingleOptimizationContainer, time_steps::UnitRange{Int64}) =
-    container.time_steps_investments = time_steps
-
+set_time_steps_investments!(
+    container::SingleOptimizationContainer,
+    time_steps::UnitRange{Int64},
+) = container.time_steps_investments = time_steps
 
 get_aux_variables(container::SingleOptimizationContainer) = container.aux_variables
 get_base_power(container::SingleOptimizationContainer) = container.base_power
@@ -178,3 +180,61 @@ function get_variable(
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_variable(container, VariableKey(T, U, meta))
 end
+
+##################################### Constraint Container #################################
+function _add_constraints_container!(
+    container::SingleOptimizationContainer,
+    cons_key::ConstraintKey,
+    axs...;
+    sparse=false,
+)
+    if sparse
+        cons_container = sparse_container_spec(JuMP.ConstraintRef, axs...)
+    else
+        cons_container = container_spec(JuMP.ConstraintRef, axs...)
+    end
+    _assign_container!(container.constraints, cons_key, cons_container)
+    return cons_container
+end
+
+function add_constraints_container!(
+    container::SingleOptimizationContainer,
+    ::T,
+    ::Type{U},
+    axs...;
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    cons_key = ConstraintKey(T, U, meta)
+    return _add_constraints_container!(container, cons_key, axs...; sparse=sparse)
+end
+
+function get_constraint_keys(container::SingleOptimizationContainer)
+    return collect(keys(container.constraints))
+end
+
+function get_constraint(container::SingleOptimizationContainer, key::ConstraintKey)
+    var = get(container.constraints, key, nothing)
+    if var === nothing
+        name = IS.Optimization.encode_key(key)
+        keys = IS.Optimization.encode_key.(get_constraint_keys(container))
+        throw(IS.InvalidValue("constraint $name is not stored. $keys"))
+    end
+
+    return var
+end
+
+function get_constraint(
+    container::SingleOptimizationContainer,
+    ::T,
+    ::Type{U},
+    meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    return get_constraint(container, ConstraintKey(T, U, meta))
+end
+
+#=
+function read_duals(container::SingleOptimizationContainer)
+    return Dict(k => to_dataframe(jump_value.(v), k) for (k, v) in get_duals(container))
+end
+=#
