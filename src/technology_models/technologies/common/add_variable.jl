@@ -4,7 +4,7 @@ function add_variable!(
     devices::U,
     formulation::AbstractTechnologyFormulation,
 ) where {
-    T <: ISOPT.InvestmentVariableType,
+    T <: InvestmentVariableType,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
     @assert !isempty(devices)
