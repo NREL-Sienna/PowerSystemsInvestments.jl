@@ -181,6 +181,78 @@ function get_variable(
     return get_variable(container, VariableKey(T, U, meta))
 end
 
+##################################### Expression Container #################################
+
+function _add_to_jump_expression!(
+    expression::T,
+    value::Float64,
+) where {T <: JuMP.AbstractJuMPScalar}
+    JuMP.add_to_expression!(expression, value)
+    return
+end
+
+function _add_to_jump_expression!(
+    expression::T,
+    parameter::Float64,
+    multiplier::Float64,
+) where {T <: JuMP.AbstractJuMPScalar}
+    _add_to_jump_expression!(expression, parameter * multiplier)
+    return
+end
+
+function _add_expression_container!(
+    container::SingleOptimizationContainer,
+    expr_key::ExpressionKey,
+    ::Type{T},
+    axs...;
+    sparse = false,
+) where {T <: JuMP.AbstractJuMPScalar}
+    if sparse
+        expr_container = sparse_container_spec(T, axs...)
+    else
+        expr_container = container_spec(T, axs...)
+    end
+
+    _assign_container!(container.expressions, expr_key, expr_container)
+
+    return expr_container
+end
+
+function add_expression_container!(
+    container::SingleOptimizationContainer,
+    ::T,
+    ::Type{U},
+    axs...;
+    sparse = false,
+    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    expr_key = ExpressionKey(T, U, meta)
+    return _add_expression_container!(container, expr_key, JuMP.GenericAffExpr{Float64, JuMP.VariableRef}, axs...; sparse=sparse)
+end
+
+function get_expression_keys(container::SingleOptimizationContainer)
+    return collect(keys(container.expressions))
+end
+
+function get_expression(container::SingleOptimizationContainer, key::ExpressionKey)
+    expr = get(container.expressions, key, nothing)
+    if expr === nothing
+        name = IS.Optimization.encode_key(key)
+        keys = IS.Optimization.encode_key.(get_expression_keys(container))
+        throw(IS.InvalidValue("variable $name is not stored. $keys"))
+    end
+    return expr
+end
+
+function get_expression(
+    container::SingleOptimizationContainer,
+    ::T,
+    ::Type{U},
+    meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    return get_expression(container, ExpressionKey(T, U, meta))
+end
+
 ##################################### Constraint Container #################################
 function _add_constraints_container!(
     container::SingleOptimizationContainer,
