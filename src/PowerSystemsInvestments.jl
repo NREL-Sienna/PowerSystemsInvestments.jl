@@ -21,7 +21,6 @@ const PM = PowerModels
 const PNM = PowerNetworkMatrices
 
 ### Exports ###
-
 export InvestmentModel
 
 ## Variables ##
