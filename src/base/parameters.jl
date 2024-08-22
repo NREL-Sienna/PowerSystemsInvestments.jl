@@ -228,7 +228,6 @@ function set_parameter!(
     return
 end
 
-
 """
 Parameter to define active power time series
 """
@@ -238,7 +237,6 @@ struct ActivePowerTimeSeriesParameter <: TimeSeriesParameter end
 Parameter to define requirement time series
 """
 struct RequirementTimeSeriesParameter <: TimeSeriesParameter end
-
 
 abstract type VariableValueParameter <: RightHandSideParameter end
 
@@ -257,5 +255,4 @@ abstract type AuxVariableValueParameter <: RightHandSideParameter end
 should_write_resulting_value(::Type{<:RightHandSideParameter}) = true
 
 convert_result_to_natural_units(::Type{ActivePowerTimeSeriesParameter}) = true
-convert_result_to_natural_units(::Type{ReactivePowerTimeSeriesParameter}) = true
 convert_result_to_natural_units(::Type{RequirementTimeSeriesParameter}) = true

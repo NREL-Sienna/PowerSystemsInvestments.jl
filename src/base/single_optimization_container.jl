@@ -102,53 +102,51 @@ function _assign_container!(container::Dict, key::OptimizationContainerKey, valu
     return
 end
 
-
-
 function has_container_key(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     key = ExpressionKey(T, U, meta)
     return haskey(container.expressions, key)
 end
 
 function has_container_key(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     key = VariableKey(T, U, meta)
     return haskey(container.variables, key)
 end
 
 function has_container_key(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: AuxVariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     key = AuxVarKey(T, U, meta)
     return haskey(container.aux_variables, key)
 end
 
 function has_container_key(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     key = ConstraintKey(T, U, meta)
     return haskey(container.constraints, key)
 end
 
 function has_container_key(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     key = ParameterKey(T, U, meta)
     return haskey(container.parameters, key)
@@ -269,7 +267,7 @@ function _add_expression_container!(
     expr_key::ExpressionKey,
     ::Type{T},
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {T <: JuMP.AbstractJuMPScalar}
     if sparse
         expr_container = sparse_container_spec(T, axs...)
@@ -287,11 +285,17 @@ function add_expression_container!(
     ::T,
     ::Type{U},
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     expr_key = ExpressionKey(T, U, meta)
-    return _add_expression_container!(container, expr_key, JuMP.GenericAffExpr{Float64, JuMP.VariableRef}, axs...; sparse=sparse)
+    return _add_expression_container!(
+        container,
+        expr_key,
+        JuMP.GenericAffExpr{Float64, JuMP.VariableRef},
+        axs...;
+        sparse=sparse,
+    )
 end
 
 function get_expression_keys(container::SingleOptimizationContainer)
@@ -377,12 +381,12 @@ end
 
 ##################################### Parameter Container ##################################
 function _add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
     attribute::VariableValueAttributes{<:OptimizationContainerKey},
     param_type::DataType,
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {T <: VariableValueParameter, U <: PSY.Component}
     if sparse
         param_array = sparse_container_spec(param_type, axs...)
@@ -397,11 +401,11 @@ function _add_param_container!(
 end
 
 function _add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
     attribute::VariableValueAttributes{<:OptimizationContainerKey},
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {T <: VariableValueParameter, U <: PSY.Component}
     if built_for_recurrent_solves(container) && !get_rebuild_model(get_settings(container))
         param_type = JuMP.VariableRef
@@ -414,18 +418,18 @@ function _add_param_container!(
         attribute,
         param_type,
         axs...;
-        sparse = sparse,
+        sparse=sparse,
     )
 end
 
 function _add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
     attribute::TimeSeriesAttributes{V},
     param_axs,
     multiplier_axs,
     time_steps;
-    sparse = false,
+    sparse=false,
 ) where {T <: TimeSeriesParameter, U <: PSY.Component, V <: PSY.TimeSeriesData}
     if built_for_recurrent_solves(container) && !get_rebuild_model(get_settings(container))
         param_type = JuMP.VariableRef
@@ -447,11 +451,11 @@ function _add_param_container!(
 end
 
 function _add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
     attributes::CostFunctionAttributes{R},
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {R, T <: ObjectiveFunctionParameter, U <: PSY.Component}
     if sparse
         param_array = sparse_container_spec(R, axs...)
@@ -466,7 +470,7 @@ function _add_param_container!(
 end
 
 function add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
     ::Type{V},
@@ -474,8 +478,8 @@ function add_param_container!(
     param_axs,
     multiplier_axs,
     time_steps;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: TimeSeriesParameter, U <: PSY.Component, V <: PSY.TimeSeriesData}
     param_key = ParameterKey(T, U, meta)
     if isabstracttype(V)
@@ -489,54 +493,53 @@ function add_param_container!(
         param_axs,
         multiplier_axs,
         time_steps;
-        sparse = sparse,
+        sparse=sparse,
     )
 end
 
 function add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
     variable_type::Type{W},
-    sos_variable::SOSStatusVariable = NO_VARIABLE,
-    uses_compact_power::Bool = false,
-    data_type::DataType = Float64,
+    sos_variable::SOSStatusVariable=NO_VARIABLE,
+    uses_compact_power::Bool=false,
+    data_type::DataType=Float64,
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ObjectiveFunctionParameter, U <: PSY.Component, W <: VariableType}
     param_key = ParameterKey(T, U, meta)
     attributes =
         CostFunctionAttributes{data_type}(variable_type, sos_variable, uses_compact_power)
-    return _add_param_container!(container, param_key, attributes, axs...; sparse = sparse)
+    return _add_param_container!(container, param_key, attributes, axs...; sparse=sparse)
 end
 
-
 function add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
     source_key::V,
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableValueParameter, U <: PSY.Component, V <: OptimizationContainerKey}
     param_key = ParameterKey(T, U, meta)
     attributes = VariableValueAttributes(source_key)
-    return _add_param_container!(container, param_key, attributes, axs...; sparse = sparse)
+    return _add_param_container!(container, param_key, attributes, axs...; sparse=sparse)
 end
 
 # FixValue parameters are created using Float64 since we employ JuMP.fix to fix the downstream
 # variables.
 
 function add_param_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
     source_key::V,
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: FixValueParameter, U <: PSY.Component, V <: OptimizationContainerKey}
     if meta == IS.Optimization.CONTAINER_KEY_EMPTY_META
         error("$T parameters require passing the VariableType to the meta field")
@@ -549,16 +552,15 @@ function add_param_container!(
         attributes,
         Float64,
         axs...;
-        sparse = sparse,
+        sparse=sparse,
     )
 end
 
-
-function get_parameter_keys(container:SingleOptimizationContainer)
+function get_parameter_keys(container::SingleOptimizationContainer)
     return collect(keys(container.parameters))
 end
 
-function get_parameter(container:SingleOptimizationContainer, key::ParameterKey)
+function get_parameter(container::SingleOptimizationContainer, key::ParameterKey)
     param_container = get(container.parameters, key, nothing)
     if param_container === nothing
         name = IS.Optimization.encode_key(key)
@@ -572,73 +574,73 @@ function get_parameter(container:SingleOptimizationContainer, key::ParameterKey)
 end
 
 function get_parameter(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_parameter(container, ParameterKey(T, U, meta))
 end
 
-function get_parameter_array(container:SingleOptimizationContainer, key)
+function get_parameter_array(container::SingleOptimizationContainer, key)
     return get_parameter_array(get_parameter(container, key))
 end
 
 function get_parameter_array(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_parameter_array(get_parameter(container, key))
 end
 
 function get_parameter_multiplier_array(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_multiplier_array(get_parameter(container, key))
 end
 
 function get_parameter_attributes(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     key::ParameterKey{T, U},
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_attributes(get_parameter(container, key))
 end
 
 function get_parameter_array(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_parameter_array(container, ParameterKey(T, U, meta))
 end
 
 function get_parameter_multiplier_array(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_multiplier_array(get_parameter(container, ParameterKey(T, U, meta)))
 end
 
 function get_parameter_attributes(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_attributes(get_parameter(container, ParameterKey(T, U, meta)))
 end
 
 ##################################### Expression Container #################################
 function _add_expression_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     expr_key::ExpressionKey,
     ::Type{T},
     axs...;
-    sparse = false,
+    sparse=false,
 ) where {T <: JuMP.AbstractJuMPScalar}
     if sparse
         expr_container = sparse_container_spec(T, axs...)
@@ -651,15 +653,15 @@ function _add_expression_container!(
 end
 
 function add_expression_container!(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
     axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    sparse=false,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     expr_key = ExpressionKey(T, U, meta)
-    return _add_expression_container!(container, expr_key, GAE, axs...; sparse = sparse)
+    return _add_expression_container!(container, expr_key, GAE, axs...; sparse=sparse)
 end
 
 #=
@@ -682,11 +684,11 @@ function add_expression_container!(
     )
 end
 =#
-function get_expression_keys(container:SingleOptimizationContainer)
+function get_expression_keys(container::SingleOptimizationContainer)
     return collect(keys(container.expressions))
 end
 
-function get_expression(container:SingleOptimizationContainer, key::ExpressionKey)
+function get_expression(container::SingleOptimizationContainer, key::ExpressionKey)
     var = get(container.expressions, key, nothing)
     if var === nothing
         throw(
@@ -700,11 +702,10 @@ function get_expression(container:SingleOptimizationContainer, key::ExpressionKe
 end
 
 function get_expression(
-    container:SingleOptimizationContainer,
+    container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_expression(container, ExpressionKey(T, U, meta))
 end
-

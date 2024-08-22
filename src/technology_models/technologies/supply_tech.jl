@@ -62,7 +62,7 @@ function add_expression!(
         name = PSIP.get_name(d)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
-            sum(var[name,t_p] for t_p in time_steps if t_p <= t),
+            sum(var[name, t_p] for t_p in time_steps if t_p <= t),
             #binary = binary
         )
         #ub = get_variable_upper_bound(expression_type, d, formulation)
@@ -171,8 +171,7 @@ function add_constraints!(
             for t in time_steps_ix
                 con_ub[name, t] = JuMP.@constraint(
                     get_jump_model(container),
-                    active_power[name, t] <=
-                    installed_cap[name, time_step_inv]
+                    active_power[name, t] <= installed_cap[name, time_step_inv]
                 )
             end
         end
@@ -205,10 +204,9 @@ function add_constraints!(
         max_capacity = PSIP.get_maximum_capacity(d)
         for t in time_steps
             con_ub[name, t] = JuMP.@constraint(
-                    get_jump_model(container),
-                    installed_cap[name, t] <=
-                    max_capacity
-                )
+                get_jump_model(container),
+                installed_cap[name, t] <= max_capacity
+            )
         end
     end
 end

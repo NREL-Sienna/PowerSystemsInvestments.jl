@@ -45,14 +45,13 @@ function add_parameters!(
     V <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
     W <: AbstractTechnologyFormulation,
 } where {D <: Technology}
-    if  has_container_key(container, T, D)
+    if has_container_key(container, T, D)
         return
     end
     source_key = get_optimization_container_key(ff)
     _add_parameters!(container, T(), source_key, model, devices)
     return
 end
-
 
 function _add_parameters!(
     container::OptimizationContainer,
@@ -175,13 +174,7 @@ function _add_parameters!(
                 name,
                 t,
             )
-            set_parameter!(
-                parameter_container,
-                jump_model,
-                inital_parameter_value,
-                name,
-                t,
-            )
+            set_parameter!(parameter_container, jump_model, inital_parameter_value, name, t)
         end
     end
     return
