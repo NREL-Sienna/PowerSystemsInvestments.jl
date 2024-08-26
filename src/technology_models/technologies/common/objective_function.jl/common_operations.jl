@@ -7,10 +7,10 @@ function add_variable_cost!(
     ::U,
     devices::IS.FlattenIteratorWrapper{T},
     ::V,
-) where {T <: PSIP.Technology, U <: VariableType, V <: AbstractTechnologyFormulation}
+) where {T <: PSIP.SupplyTechnology, U <: ActivePowerVariable, V <: BasicDispatch}
     for d in devices
         op_cost_data = PSIP.get_variable_cost(d)
-        _add_variable_cost_to_objective!(container, U(), d, op_cost_data, V())
+        _add_cost_to_objective!(container, U(), d, op_cost_data, V())
     end
     return
 end
@@ -42,7 +42,7 @@ function _add_proportional_term!(
     technology::U,
     linear_term::Float64,
     time_period::Int,
-) where {T <: VariableType, U <: PSIP.Technology}
+) where {T <: ActivePowerVariable, U <: PSIP.Technology}
     technology_name = PSIP.get_name(technology)
     #@debug "Linear Variable Cost" _group = LOG_GROUP_COST_FUNCTIONS component_name
     variable = get_variable(container, T(), U)[technology_name, time_period]
