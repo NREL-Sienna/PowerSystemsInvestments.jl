@@ -243,9 +243,9 @@ end
 function objective_function!(
     container::SingleOptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
-    ::U, #DeviceModel{T, U},
+    #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
-) where {T <: PSIP.SupplyTechnology, U <: ActivePowerVariable}
+) where {T <: PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
     add_variable_cost!(container, ActivePowerVariable(), devices, formulation) #U()
     #add_start_up_cost!(container, StartVariable(), devices, U())
     #add_shut_down_cost!(container, StopVariable(), devices, U())
@@ -256,9 +256,10 @@ end
 function objective_function!(
     container::SingleOptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
-    ::U, #DeviceModel{T, U},
+    #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
-) where {T <: PSIP.SupplyTechnology, U <: BuildCapacity}
+) where {T <: PSIP.SupplyTechnology}#, U <: BuildCapacity}
     add_capital_cost!(container, BuildCapacity(), devices, formulation) #U()
+    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation) 
     return
 end
