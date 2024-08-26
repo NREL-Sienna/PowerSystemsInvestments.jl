@@ -43,7 +43,7 @@ function add_expression!(
 ) where {
     T <: CumulativeCapacity,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.Technology}
+} where {D <: PSIP.SupplyTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
@@ -58,6 +58,7 @@ function add_expression!(
         time_steps,
     )
 
+    # TODO: Move to add_to_expression!
     for t in time_steps, d in devices
         name = PSIP.get_name(d)
         expression[name, t] = JuMP.@expression(
@@ -83,7 +84,7 @@ function add_expression!(
 ) where {
     T <: VariableOMCost,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.Technology}
+} where {D <: PSIP.SupplyTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
@@ -97,6 +98,45 @@ function add_expression!(
         [PSIP.get_name(d) for d in devices],
         time_steps,
     )
+
+    return
+end
+
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::BasicDispatch,
+) where {
+    T <: SupplyTotal,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+} where {D <: PSIP.SupplyTechnology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        #[PSIP.get_name(d) for d in devices],
+        time_steps,
+    )
+
+    #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
+    variable = get_variable(container, ActivePowerVariable(), D)
+
+    for d in devices, t in time_steps
+        name = PSIP.get_name(d)
+        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+        _add_to_jump_expression!(
+            expression[t],
+            variable[name, t],
+            1.0 #get_variable_multiplier(U(), V, W()),
+        )
+    end
 
     return
 end

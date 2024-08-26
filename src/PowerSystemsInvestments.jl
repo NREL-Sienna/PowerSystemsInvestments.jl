@@ -33,9 +33,13 @@ export CapitalCost
 export TotalCapitalCost
 export FixedOperationModelCost
 export VariableOMCost
+export SupplyTotal
+export DemandTotal
 
+#remove later, just for testing
 export objective_function!
 export add_expression!
+export add_to_expression!
 
 using DocStringExtensions
 

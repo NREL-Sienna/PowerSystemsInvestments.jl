@@ -262,6 +262,15 @@ function _add_to_jump_expression!(
     return
 end
 
+function _add_to_jump_expression!(
+    expression::T,
+    var::JuMP.VariableRef,
+    multiplier::Float64,
+) where {T <: JuMP.AbstractJuMPScalar}
+    JuMP.add_to_expression!(expression, multiplier, var)
+    return
+end
+
 function _add_expression_container!(
     container::SingleOptimizationContainer,
     expr_key::ExpressionKey,
@@ -664,26 +673,6 @@ function add_expression_container!(
     return _add_expression_container!(container, expr_key, GAE, axs...; sparse=sparse)
 end
 
-#=
-function add_expression_container!(
-    container:SingleOptimizationContainer,
-    ::T,
-    ::Type{U},
-    axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ProductionCostExpression, U <: Union{PSIP.Technology, PSIP.Portfolio}}
-    expr_key = ExpressionKey(T, U, meta)
-    expr_type = JuMP.QuadExpr
-    return _add_expression_container!(
-        container,
-        expr_key,
-        expr_type,
-        axs...;
-        sparse = sparse,
-    )
-end
-=#
 function get_expression_keys(container::SingleOptimizationContainer)
     return collect(keys(container.expressions))
 end
@@ -708,6 +697,14 @@ function get_expression(
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_expression(container, ExpressionKey(T, U, meta))
+end
+
+function get_expression(
+    container::SingleOptimizationContainer,
+    ::T,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ExpressionType}
+    return get_expression(container, ExpressionKey(T, meta))
 end
 
 ##################################### Objective Function Container #################################
