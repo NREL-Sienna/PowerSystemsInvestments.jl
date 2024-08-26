@@ -8,7 +8,7 @@ Adds to the cost function cost terms for sum of variables with common factor to 
   - technology_name::String: The technology_name of the variable container
   - cost_component::PSY.CostCurve{PSY.LinearCurve} : container for cost to be associated with variable
 """
-function _add_variable_cost_to_objective!(
+function _add_cost_to_objective!(
     container::SingleOptimizationContainer,
     ::T,
     technology::PSIP.Technology,
@@ -28,7 +28,7 @@ function _add_variable_cost_to_objective!(
         device_base_power,
     )
     multiplier = 1.0 #objective_function_multiplier(T(), U())
-    _add_linearcurve_variable_cost!(
+    _add_linearcurve_cost!(
         container,
         T(),
         technology,
@@ -62,12 +62,31 @@ function _get_proportional_cost_per_system_unit(
 end
 
 # Dispatch for scalar proportional terms
-function _add_linearcurve_variable_cost!(
+function _add_linearcurve_cost!(
     container::SingleOptimizationContainer,
     ::T,
     technology::PSIP.Technology,
     proportional_term_per_unit::Float64,
-) where {T <: VariableType}
+) where {T <: InvestmentVariableType}
+    for t in get_time_steps_investments(container)
+        _add_linearcurve_variable_term_to_model!(
+            container,
+            T(),
+            technology,
+            proportional_term_per_unit,
+            t,
+        )
+    end
+    return
+end
+
+# Dispatch for scalar proportional terms
+function _add_linearcurve_cost!(
+    container::SingleOptimizationContainer,
+    ::T,
+    technology::PSIP.Technology,
+    proportional_term_per_unit::Float64,
+) where {T <: OperationsVariableType}
     for t in get_time_steps(container)
         _add_linearcurve_variable_term_to_model!(
             container,
@@ -84,10 +103,10 @@ end
 function _add_linearcurve_variable_term_to_model!(
     container::SingleOptimizationContainer,
     ::T,
-    component::PSIP.Technology,
+    technology::PSIP.Technology,
     proportional_term_per_unit::Float64,
     time_period::Int,
-) where {T <: VariableType}
+) where {T <: ActivePowerVariable}
     resolution = get_resolution(container)
     
     # TODO: Need to add in some way to calculate how to scale/weight these representative days/hours up to the full investment period
@@ -97,7 +116,7 @@ function _add_linearcurve_variable_term_to_model!(
     linear_cost = _add_proportional_term!(
         container,
         T(),
-        component,
+        technology,
         proportional_term_per_unit * dt,
         time_period,
     )
@@ -105,7 +124,37 @@ function _add_linearcurve_variable_term_to_model!(
         container,
         VariableOMCost,
         linear_cost,
-        component,
+        technology,
+        time_period,
+    )
+    return
+end
+
+# Add proportional terms to objective function and expression
+function _add_linearcurve_variable_term_to_model!(
+    container::SingleOptimizationContainer,
+    ::T,
+    technology::PSIP.Technology,
+    proportional_term_per_unit::Float64,
+    time_period::Int,
+) where {T <: BuildCapacity}
+    
+    # TODO: How are we handling investment vs. operation resolutions?
+    #resolution = get_resolution(container)
+
+    dt = 1 
+    linear_cost = _add_proportional_term!(
+        container,
+        T(),
+        technology,
+        proportional_term_per_unit * dt,
+        time_period,
+    )
+    add_to_expression!(
+        container,
+        CapitalCost,
+        linear_cost,
+        technology,
         time_period,
     )
     return
