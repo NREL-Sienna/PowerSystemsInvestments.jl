@@ -25,12 +25,17 @@ export InvestmentModel
 
 ## Variables ##
 export BuildCapacity
+export ActivePowerVariable
 
 ## Expressions ##
 export CumulativeCapacity
 export CapitalCost
 export TotalCapitalCost
 export FixedOperationModelCost
+export VariableOMCost
+
+export objective_function!
+export add_expression!
 
 using DocStringExtensions
 
@@ -122,5 +127,10 @@ include("investment_model/investment_model.jl")
 include("utils/printing.jl")
 include("utils/jump_utils.jl")
 include("technology_models/technologies/common/add_variable.jl")
+include("technology_models/technologies/common/add_to_expression.jl")
 include("technology_models/technologies/supply_tech.jl")
+
+include("technology_models/technologies/common/objective_function.jl/common_capital.jl")
+include("technology_models/technologies/common/objective_function.jl/common_operations.jl")
+include("technology_models/technologies/common/objective_function.jl/linear_curve.jl")
 end
