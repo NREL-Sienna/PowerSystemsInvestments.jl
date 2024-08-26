@@ -728,11 +728,11 @@ function add_to_objective_investment_expression!(
     container::SingleOptimizationContainer,
     cost_expr::T,
 ) where {T <: JuMP.AbstractJuMPScalar}
-    T_cf = typeof(container.objective_function.investment_terms)
+    T_cf = typeof(container.objective_function.capital_terms)
     if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
-        container.objective_function.investment_terms += cost_expr
+        container.objective_function.capital_terms += cost_expr
     else
-        JuMP.add_to_expression!(container.objective_function.investment_terms, cost_expr)
+        JuMP.add_to_expression!(container.objective_function.capital_terms, cost_expr)
     end
     return
 end
