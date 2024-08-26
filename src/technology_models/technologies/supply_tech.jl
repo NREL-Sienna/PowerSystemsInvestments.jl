@@ -41,7 +41,7 @@ function add_expression!(
     devices::U,
     formulation::AbstractTechnologyFormulation,
 ) where {
-    T <: InvestmentExpressionType,
+    T <: CumulativeCapacity,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
     @assert !isempty(devices)
@@ -71,6 +71,32 @@ function add_expression!(
         #lb = get_variable_lower_bound(expression_type, d, formulation)
         #lb !== nothing && JuMP.set_lower_bound(variable[name, t], lb)
     end
+
+    return
+end
+
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::AbstractTechnologyFormulation,
+) where {
+    T <: VariableOMCost,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+} where {D <: PSIP.Technology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    binary = false
+
+    var = get_variable(container, BuildCapacity(), D)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        [PSIP.get_name(d) for d in devices],
+        time_steps,
+    )
 
     return
 end
@@ -209,4 +235,20 @@ function add_constraints!(
             )
         end
     end
+end
+
+########################### Objective Function Calls#############################################
+# These functions are custom implementations of the cost data. In the file objective_functions.jl there are default implementations. Define these only if needed.
+
+function objective_function!(
+    container::SingleOptimizationContainer,
+    devices::IS.FlattenIteratorWrapper{T},
+    ::U, #DeviceModel{T, U},
+    formulation::AbstractTechnologyFormulation, #Type{<:PM.AbstractPowerModel},
+) where {T <: PSIP.SupplyTechnology, U <: ActivePowerVariable}
+    add_variable_cost!(container, ActivePowerVariable(), devices, formulation) #U()
+    #add_start_up_cost!(container, StartVariable(), devices, U())
+    #add_shut_down_cost!(container, StopVariable(), devices, U())
+    #add_proportional_cost!(container, OnVariable(), devices, U())
+    return
 end
