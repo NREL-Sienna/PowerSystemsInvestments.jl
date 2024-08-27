@@ -49,7 +49,7 @@ function _add_proportional_term!(
     lin_cost = variable * linear_term
     add_to_objective_operations_expression!(container, lin_cost)
     return lin_cost
-end 
+end
 
 #=
 function _add_variable_cost_to_objective!(

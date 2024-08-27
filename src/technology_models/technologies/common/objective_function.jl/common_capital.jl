@@ -28,7 +28,7 @@ function _add_proportional_term!(
     lin_cost = variable * linear_term
     add_to_objective_investment_expression!(container, lin_cost)
     return lin_cost
-end 
+end
 
 #############################
 ####### Fixed OM Cost #######
@@ -60,4 +60,4 @@ function _add_proportional_term!(
     lin_cost = expr * linear_term
     add_to_objective_investment_expression!(container, lin_cost)
     return lin_cost
-end 
+end

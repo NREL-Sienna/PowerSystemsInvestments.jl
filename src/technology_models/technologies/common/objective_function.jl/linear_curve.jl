@@ -155,7 +155,7 @@ function _add_linearcurve_variable_term_to_model!(
     time_period::Int,
 ) where {T <: ActivePowerVariable}
     resolution = get_resolution(container)
-    
+
     # TODO: Need to add in some way to calculate how to scale/weight these representative days/hours up to the full investment period
     operational_timepoint_scaling = 365
 
@@ -167,13 +167,7 @@ function _add_linearcurve_variable_term_to_model!(
         proportional_term_per_unit * dt,
         time_period,
     )
-    add_to_expression!(
-        container,
-        VariableOMCost,
-        linear_cost,
-        technology,
-        time_period,
-    )
+    add_to_expression!(container, VariableOMCost, linear_cost, technology, time_period)
     return
 end
 
@@ -185,11 +179,11 @@ function _add_linearcurve_variable_term_to_model!(
     proportional_term_per_unit::Float64,
     time_period::Int,
 ) where {T <: BuildCapacity}
-    
+
     # TODO: How are we handling investment vs. operation resolutions?
     #resolution = get_resolution(container)
 
-    dt = 1 
+    dt = 1
     linear_cost = _add_proportional_term!(
         container,
         T(),
@@ -197,13 +191,7 @@ function _add_linearcurve_variable_term_to_model!(
         proportional_term_per_unit * dt,
         time_period,
     )
-    add_to_expression!(
-        container,
-        CapitalCost,
-        linear_cost,
-        technology,
-        time_period,
-    )
+    add_to_expression!(container, CapitalCost, linear_cost, technology, time_period)
     return
 end
 
@@ -214,11 +202,11 @@ function _add_linearcurve_variable_term_to_model!(
     proportional_term_per_unit::Float64,
     time_period::Int,
 ) where {T <: CumulativeCapacity}
-    
+
     # TODO: How are we handling investment vs. operation resolutions?
     #resolution = get_resolution(container)
 
-    dt = 1 
+    dt = 1
     linear_cost = _add_proportional_term!(
         container,
         T(),
@@ -226,12 +214,6 @@ function _add_linearcurve_variable_term_to_model!(
         proportional_term_per_unit * dt,
         time_period,
     )
-    add_to_expression!(
-        container,
-        CapitalCost,
-        linear_cost,
-        technology,
-        time_period,
-    )
+    add_to_expression!(container, CapitalCost, linear_cost, technology, time_period)
     return
 end

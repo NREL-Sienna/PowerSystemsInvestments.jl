@@ -116,7 +116,6 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-
     expression = add_expression_container!(
         container,
         expression_type,
@@ -134,7 +133,7 @@ function add_expression!(
         _add_to_jump_expression!(
             expression[t],
             variable[name, t],
-            1.0 #get_variable_multiplier(U(), V, W()),
+            1.0, #get_variable_multiplier(U(), V, W()),
         )
     end
 
@@ -300,6 +299,6 @@ function objective_function!(
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
 ) where {T <: PSIP.SupplyTechnology}#, U <: BuildCapacity}
     add_capital_cost!(container, BuildCapacity(), devices, formulation) #U()
-    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation) 
+    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation)
     return
 end

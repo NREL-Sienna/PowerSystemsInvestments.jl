@@ -1,20 +1,14 @@
 function get_default_time_series_names(
     ::Type{U},
     ::Type{W},
-) where {
-    U <: PSIP.DemandRequirement,
-    W <: OperationsTechnologyFormulation,
-}
+) where {U <: PSIP.DemandRequirement, W <: OperationsTechnologyFormulation}
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
 
 function get_default_attributes(
     ::Type{U},
     ::Type{W},
-) where {
-    U <: PSIP.DemandRequirement,
-    W <: OperationsTechnologyFormulation,
-}
+) where {U <: PSIP.DemandRequirement, W <: OperationsTechnologyFormulation}
     return Dict{String, Any}()
 end
 
@@ -72,7 +66,7 @@ function add_expression!(
             for (ix, t) in enumerate(time_steps_ix)
                 _add_to_jump_expression!(
                     expression[t],
-                    ts_data[ix]*peak_load,
+                    ts_data[ix] * peak_load,
                     #get_variable_multiplier(U(), V, W()),
                 )
             end
@@ -94,18 +88,21 @@ function add_constraints!(
     T <: SupplyDemandBalance,
     U <: PSIP.DemandRequirement{PSY.PowerLoad},
     #X <: PM.AbstractPowerModel,
-} 
+}
     # TODO: Remove technologies from the expression definition for these and add corresponding get_expression functions
     time_steps = get_time_steps(container)
 
     energy_balance = add_constraints_container!(container, T(), U, time_steps)
 
     for t in time_steps
-        supply = get_expression(container, SupplyTotal(), PSIP.SupplyTechnology{PSY.RenewableDispatch})
-        demand = get_expression(container, DemandTotal(), PSIP.DemandRequirement{PSY.PowerLoad})
-        energy_balance[t] = JuMP.@constraint(
-                    get_jump_model(container),
-                    supply - demand >= 0
-                )
+        supply = get_expression(
+            container,
+            SupplyTotal(),
+            PSIP.SupplyTechnology{PSY.RenewableDispatch},
+        )
+        demand =
+            get_expression(container, DemandTotal(), PSIP.DemandRequirement{PSY.PowerLoad})
+        energy_balance[t] =
+            JuMP.@constraint(get_jump_model(container), supply - demand >= 0)
     end
 end
