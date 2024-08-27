@@ -21,7 +21,7 @@ function _add_proportional_term!(
     technology::U,
     linear_term::Float64,
     time_period::Int,
-) where {T <: BuildCapacity, U <: PSIP.SupplyTechnology}
+) where {T <: InvestmentVariableType, U <: PSIP.Technology}
     technology_name = PSIP.get_name(technology)
     #@debug "Linear Variable Cost" _group = LOG_GROUP_COST_FUNCTIONS component_name
     variable = get_variable(container, T(), U)[technology_name, time_period]
@@ -53,7 +53,7 @@ function _add_proportional_term!(
     technology::U,
     linear_term::Float64,
     time_period::Int,
-) where {T <: CumulativeCapacity, U <: PSIP.SupplyTechnology}
+) where {T <: InvestmentExpressionType, U <: PSIP.Technology}
     technology_name = PSIP.get_name(technology)
     #@debug "Linear Variable Cost" _group = LOG_GROUP_COST_FUNCTIONS component_name
     expr = get_expression(container, T(), U)[technology_name, time_period]
