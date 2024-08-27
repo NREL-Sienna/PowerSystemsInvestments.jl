@@ -708,6 +708,15 @@ function get_expression(
 end
 
 ##################################### Objective Function Container #################################
+function update_objective_function!(container::SingleOptimizationContainer)
+    JuMP.@objective(
+        get_jump_model(container),
+        get_sense(container.objective_function),
+        get_objective_expression(container.objective_function)
+    )
+    return
+end
+
 function add_to_objective_operations_expression!(
     container::SingleOptimizationContainer,
     cost_expr::T,
