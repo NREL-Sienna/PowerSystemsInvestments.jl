@@ -2,7 +2,7 @@ function construct_device!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
-    model, #::DeviceModel{R,D}
+    model::AbstractTechnologyFormulation, #::DeviceModel{R,D}
     network_model, #::NetworkModel
 ) # where { R <: ..., D <: ... } 
 
@@ -20,7 +20,7 @@ function construct_device!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
     ::ModelConstructStage,
-    model, #::DeviceModel{R, <:AbstractRenewableDispatchFormulation},
+    model::AbstractTechnologyFormulation, #::DeviceModel{R, <:AbstractRenewableDispatchFormulation},
     network_model, #::NetworkModel{<:PM.AbstractPowerModel},
 ) #where {R <: PSY.RenewableGen}
 

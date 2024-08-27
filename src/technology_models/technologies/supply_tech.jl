@@ -41,9 +41,9 @@ function add_expression!(
     devices::U,
     formulation::AbstractTechnologyFormulation,
 ) where {
-    T <: InvestmentExpressionType,
+    T <: CumulativeCapacity,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.Technology}
+} where {D <: PSIP.SupplyTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
@@ -58,6 +58,7 @@ function add_expression!(
         time_steps,
     )
 
+    # TODO: Move to add_to_expression!
     for t in time_steps, d in devices
         name = PSIP.get_name(d)
         expression[name, t] = JuMP.@expression(
@@ -70,6 +71,70 @@ function add_expression!(
 
         #lb = get_variable_lower_bound(expression_type, d, formulation)
         #lb !== nothing && JuMP.set_lower_bound(variable[name, t], lb)
+    end
+
+    return
+end
+
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::AbstractTechnologyFormulation,
+) where {
+    T <: VariableOMCost,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+} where {D <: PSIP.SupplyTechnology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    binary = false
+
+    var = get_variable(container, BuildCapacity(), D)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        [PSIP.get_name(d) for d in devices],
+        time_steps,
+    )
+
+    return
+end
+
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::BasicDispatch,
+) where {
+    T <: SupplyTotal,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+} where {D <: PSIP.SupplyTechnology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        #[PSIP.get_name(d) for d in devices],
+        time_steps,
+    )
+
+    #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
+    variable = get_variable(container, ActivePowerVariable(), D)
+
+    for d in devices, t in time_steps
+        name = PSIP.get_name(d)
+        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+        _add_to_jump_expression!(
+            expression[t],
+            variable[name, t],
+            1.0, #get_variable_multiplier(U(), V, W()),
+        )
     end
 
     return
@@ -209,4 +274,31 @@ function add_constraints!(
             )
         end
     end
+end
+
+########################### Objective Function Calls#############################################
+# These functions are custom implementations of the cost data. In the file objective_functions.jl there are default implementations. Define these only if needed.
+
+function objective_function!(
+    container::SingleOptimizationContainer,
+    devices::IS.FlattenIteratorWrapper{T},
+    #DeviceModel{T, U},
+    formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
+) where {T <: PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
+    add_variable_cost!(container, ActivePowerVariable(), devices, formulation) #U()
+    #add_start_up_cost!(container, StartVariable(), devices, U())
+    #add_shut_down_cost!(container, StopVariable(), devices, U())
+    #add_proportional_cost!(container, OnVariable(), devices, U())
+    return
+end
+
+function objective_function!(
+    container::SingleOptimizationContainer,
+    devices::IS.FlattenIteratorWrapper{T},
+    #DeviceModel{T, U},
+    formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
+) where {T <: PSIP.SupplyTechnology}#, U <: BuildCapacity}
+    add_capital_cost!(container, BuildCapacity(), devices, formulation) #U()
+    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation)
+    return
 end

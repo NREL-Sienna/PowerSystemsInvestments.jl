@@ -13,6 +13,6 @@ struct BuildCapacity <: InvestmentVariableType end
 ### Operations Variables ###
 
 """
-Total installed capacity for a technology
+Dispatch of a technology at a timepoint
 """
 struct ActivePowerVariable <: OperationsVariableType end

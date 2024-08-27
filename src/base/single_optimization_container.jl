@@ -65,7 +65,7 @@ get_jump_model(container::SingleOptimizationContainer) = container.JuMPmodel
 get_metadata(container::SingleOptimizationContainer) = container.metadata
 get_optimizer_stats(container::SingleOptimizationContainer) = container.optimizer_stats
 get_parameters(container::SingleOptimizationContainer) = container.parameters
-get_resolution(container::SingleOptimizationContainer) = container.resolution
+get_resolution(container::SingleOptimizationContainer) = get_resolution(container.settings)
 get_settings(container::SingleOptimizationContainer) = container.settings
 get_time_steps(container::SingleOptimizationContainer) = container.time_steps
 get_time_steps_investments(container::SingleOptimizationContainer) =
@@ -259,6 +259,15 @@ function _add_to_jump_expression!(
     multiplier::Float64,
 ) where {T <: JuMP.AbstractJuMPScalar}
     _add_to_jump_expression!(expression, parameter * multiplier)
+    return
+end
+
+function _add_to_jump_expression!(
+    expression::T,
+    var::JuMP.VariableRef,
+    multiplier::Float64,
+) where {T <: JuMP.AbstractJuMPScalar}
+    JuMP.add_to_expression!(expression, multiplier, var)
     return
 end
 
@@ -664,26 +673,6 @@ function add_expression_container!(
     return _add_expression_container!(container, expr_key, GAE, axs...; sparse=sparse)
 end
 
-#=
-function add_expression_container!(
-    container:SingleOptimizationContainer,
-    ::T,
-    ::Type{U},
-    axs...;
-    sparse = false,
-    meta = IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ProductionCostExpression, U <: Union{PSIP.Technology, PSIP.Portfolio}}
-    expr_key = ExpressionKey(T, U, meta)
-    expr_type = JuMP.QuadExpr
-    return _add_expression_container!(
-        container,
-        expr_key,
-        expr_type,
-        axs...;
-        sparse = sparse,
-    )
-end
-=#
 function get_expression_keys(container::SingleOptimizationContainer)
     return collect(keys(container.expressions))
 end
@@ -708,4 +697,48 @@ function get_expression(
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
     return get_expression(container, ExpressionKey(T, U, meta))
+end
+
+function get_expression(
+    container::SingleOptimizationContainer,
+    ::T,
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+) where {T <: ExpressionType}
+    return get_expression(container, ExpressionKey(T, meta))
+end
+
+##################################### Objective Function Container #################################
+function update_objective_function!(container::SingleOptimizationContainer)
+    JuMP.@objective(
+        get_jump_model(container),
+        get_sense(container.objective_function),
+        get_objective_expression(container.objective_function)
+    )
+    return
+end
+
+function add_to_objective_operations_expression!(
+    container::SingleOptimizationContainer,
+    cost_expr::T,
+) where {T <: JuMP.AbstractJuMPScalar}
+    T_cf = typeof(container.objective_function.operation_terms)
+    if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
+        container.objective_function.operation_terms += cost_expr
+    else
+        JuMP.add_to_expression!(container.objective_function.operation_terms, cost_expr)
+    end
+    return
+end
+
+function add_to_objective_investment_expression!(
+    container::SingleOptimizationContainer,
+    cost_expr::T,
+) where {T <: JuMP.AbstractJuMPScalar}
+    T_cf = typeof(container.objective_function.capital_terms)
+    if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
+        container.objective_function.capital_terms += cost_expr
+    else
+        JuMP.add_to_expression!(container.objective_function.capital_terms, cost_expr)
+    end
+    return
 end
