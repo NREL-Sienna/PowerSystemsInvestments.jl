@@ -27,6 +27,7 @@ function _add_cost_to_objective!(
         #base_power,
         device_base_power,
     )
+    @warn "TODO: multiplier"
     multiplier = 1.0 #objective_function_multiplier(T(), U())
     _add_linearcurve_cost!(
         container,
@@ -134,6 +135,7 @@ function _add_linearcurve_cost!(
     technology::PSIP.Technology,
     proportional_term_per_unit::Float64,
 ) where {T <: OperationsVariableType}
+    @warn "Add Scaling to Operational Terms to compare with Capital Terms"
     for t in get_time_steps(container)
         _add_linearcurve_variable_term_to_model!(
             container,
@@ -157,9 +159,12 @@ function _add_linearcurve_variable_term_to_model!(
     resolution = get_resolution(container)
 
     # TODO: Need to add in some way to calculate how to scale/weight these representative days/hours up to the full investment period
+    # @warn: Update hard code resolution
     operational_timepoint_scaling = 365
-
-    dt = Dates.value(resolution) / MILLISECONDS_IN_HOUR * operational_timepoint_scaling
+    resolution = Dates.Hour(1)
+    dt =
+        Dates.value(Dates.Millisecond(resolution)) / MILLISECONDS_IN_HOUR *
+        operational_timepoint_scaling
     linear_cost = _add_proportional_term!(
         container,
         T(),
