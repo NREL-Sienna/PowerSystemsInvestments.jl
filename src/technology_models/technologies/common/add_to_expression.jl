@@ -47,6 +47,21 @@ end
 """
 Default implementation to add device variables to SystemBalanceExpressions
 """
+function add_to_expression!(
+    container::SingleOptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::IS.FlattenIteratorWrapper{V},
+) where {T <: ActivePowerBalance, U <: OperationsVariableType, V <: PSIP.Technology}
+    variable = get_variable(container, U(), V)
+    expression = get_expression(container, T(), PSIP.Portfolio)
+    multiplier = get_variable_multiplier(U(), V)
+    for d in devices, t in get_time_steps(container)
+        name = PSY.get_name(d)
+        _add_to_jump_expression!(expression[t], variable[name, t], multiplier)
+    end
+end
+
 #=
 function add_to_expression!(
     container::SingleOptimizationContainer,

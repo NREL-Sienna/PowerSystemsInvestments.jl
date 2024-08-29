@@ -14,6 +14,8 @@ end
 
 ################### Variables ####################
 
+get_variable_multiplier(::ActivePowerVariable, ::Type{PSIP.DemandRequirement}) = -1.0
+
 ################## Expressions ###################
 
 function add_expression!(
@@ -22,7 +24,7 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: DemandTotal,
+    T <: ActivePowerBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.DemandRequirement}
     @assert !isempty(devices)
@@ -30,13 +32,7 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    expression = add_expression_container!(
-        container,
-        expression_type,
-        D,
-        #[PSIP.get_name(d) for d in devices],
-        time_steps,
-    )
+    expression = get_expression(container, T(), PSIP.Portfolio)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
     #TODO: Handle the timeseries in an actual generic way
@@ -62,12 +58,11 @@ function add_expression!(
                 IS.get_time_series(ts_type, d, ts_name; year=year).data,
             )
             time_steps_ix = mapping_ops[year]
-            time_step_inv = mapping_inv[year]
+            multiplier = -1.0
             for (ix, t) in enumerate(time_steps_ix)
                 _add_to_jump_expression!(
                     expression[t],
-                    ts_data[ix] * peak_load,
-                    #get_variable_multiplier(U(), V, W()),
+                    ts_data[ix] * peak_load * multiplier,
                 )
             end
         end
