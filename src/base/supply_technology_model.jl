@@ -9,29 +9,6 @@ mutable struct TechnologyModel{
     attributes::Dict{String, Any}
     subsystem::Union{Nothing, String}
 
-    function TechnologyModel(
-        ::Type{D},
-        ::Type{B},
-        ::Type{C};
-        use_slacks=false,
-        duals=Vector{DataType}(),
-        time_series_names=get_default_time_series_names(D, B, C),
-        attributes=Dict{String, Any}(),
-    ) where {
-        D <: PSIP.Technology,
-        B <: InvestmentTechnologyFormulation,
-        C <: OperationsTechnologyFormulation,
-    }
-        attributes_ = get_default_attributes(D, B, C)
-        for (k, v) in attributes
-            attributes_[k] = v
-        end
-
-        #_check_technology_formulation(D)
-        #_check_technology_formulation(B)
-        #_check_technology_formulation(C)
-        new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    end
 end
 
 function _set_model!(
@@ -73,3 +50,26 @@ get_operations_formulation(
     B <: InvestmentTechnologyFormulation,
     C <: OperationsTechnologyFormulation,
 } = C
+
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
