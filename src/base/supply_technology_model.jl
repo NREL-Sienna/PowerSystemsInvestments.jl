@@ -73,3 +73,113 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
 end
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: IntegerInvestment,
+    C <: BasicDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: ThermalNoDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: IntegerInvestment,
+    C <: ThermalNoDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: RenewableNoDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
+
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.SupplyTechnology,
+    B <: IntegerInvestment,
+    C <: RenewableNoDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
