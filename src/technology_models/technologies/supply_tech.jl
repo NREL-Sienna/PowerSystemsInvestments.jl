@@ -183,7 +183,6 @@ function add_constraints!(
     ::Type{T},
     ::V,
     devices::U,
-    model,
 ) where {
     T <: ActivePowerVariableLimitsConstraint,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -235,7 +234,6 @@ function add_constraints!(
     ::Type{T},
     ::V,
     devices::U,
-    model,
 ) where {
     T <: ActivePowerLimitsConstraint,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -249,7 +247,6 @@ function add_constraints!(
     device_names = PSIP.get_name.(devices)
     con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
 
-    @warn("We should use the expression TotalCapacity rather than BuildCapacity")
     installed_cap = get_expression(container, CumulativeCapacity(), D)
     active_power = get_variable(container, V(), D)
 
@@ -272,7 +269,6 @@ function add_constraints!(
     ::Type{T},
     ::V,
     devices::U,
-    model,
     #::NetworkModel{X},
 ) where {
     T <: MaximumCumulativeCapacity,
