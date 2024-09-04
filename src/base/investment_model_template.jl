@@ -25,7 +25,7 @@ end
 
 InvestmentModelTemplate(::Type{T}) where {T <: PM.AbstractPowerModel} =
     InvestmentModelTemplate(NetworkModel(T))
-InvestmentModelTemplate() = InvestmentModelTemplate(CopperPlatePowerModel)
+InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionBalanceModel)
 
 get_technology_models(template::InvestmentModelTemplate) = template.technologies
 get_network_model(template::InvestmentModelTemplate) = template.network_model
