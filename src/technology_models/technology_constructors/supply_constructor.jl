@@ -29,6 +29,9 @@ function construct_device!(
     #ActivePowerVariable
     add_variable!(container, ActivePowerVariable(), devices, C())
 
+    # SupplyTotal
+    add_expression!(container, SupplyTotal(), devices, C())
+
     return
 end
 
@@ -60,9 +63,6 @@ function construct_device!(
 
     # Dispatch constraint
     add_constraints!(container, ActivePowerLimitsConstraint(), ActivePowerVariable(), devices)
-
-    # SupplyTotal
-    add_expression!(container, SupplyTotal(), devices, C())
 
     # DemandTotal
     # TODO: Move to separate constructor for DemandRequirements
