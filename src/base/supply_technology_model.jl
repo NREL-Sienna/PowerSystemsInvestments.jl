@@ -61,7 +61,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{ThermalStandard},
+    D <: PSIP.SupplyTechnology{PSY.ThermalStandard},
     B <: ContinuousInvestment,
     C <: BasicDispatch,
 }
@@ -83,7 +83,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{ThermalStandard},
+    D <: PSIP.SupplyTechnology{PSY.ThermalStandard},
     B <: IntegerInvestment,
     C <: BasicDispatch,
 }
@@ -105,7 +105,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{RenewableDispatch},
+    D <: PSIP.SupplyTechnology{PSY.RenewableDispatch},
     B <: ContinuousInvestment,
     C <: BasicDispatch,
 }
@@ -127,7 +127,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{RenewableDispatch},
+    D <: PSIP.SupplyTechnology{PSY.RenewableDispatch},
     B <: IntegerInvestment,
     C <: BasicDispatch,
 }
@@ -149,7 +149,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{ThermalStandard},
+    D <: PSIP.SupplyTechnology{PSY.ThermalStandard},
     B <: ContinuousInvestment,
     C <: ThermalNoDispatch,
 }
@@ -171,7 +171,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{ThermalStandard},
+    D <: PSIP.SupplyTechnology{PSY.ThermalStandard},
     B <: IntegerInvestment,
     C <: ThermalNoDispatch,
 }
@@ -193,7 +193,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{RenewableDispatch},
+    D <: PSIP.SupplyTechnology{PSY.RenewableDispatch},
     B <: ContinuousInvestment,
     C <: RenewableNoDispatch,
 }
@@ -215,7 +215,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.SupplyTechnology{RenewableDispatch},
+    D <: PSIP.SupplyTechnology{PSY.RenewableDispatch},
     B <: IntegerInvestment,
     C <: RenewableNoDispatch,
 }
