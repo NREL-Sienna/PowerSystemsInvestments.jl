@@ -6,12 +6,12 @@ const TechnologiesModelContainer = Dict{Symbol, TechnologyModel}
 abstract type AbstractInvestmentModelTemplate end
 
 mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
-    network_model::NetworkModel{<:PM.AbstractPowerModel}
+    transport_model::TransportModel{<:AbstractTransportModel}
     technologies::TechnologiesModelContainer
     function InvestmentModelTemplate(
-        network::NetworkModel{T},
-    ) where {T <: PM.AbstractPowerModel}
-        new(network, TechnologiesModelContainer())
+        transport::TransportModel{T},
+    ) where {T <: AbstractTransportModel}
+        new(transport, TechnologiesModelContainer())
     end
 end
 
@@ -23,8 +23,8 @@ function Base.isempty(template::InvestmentModelTemplate)
     end
 end
 
-InvestmentModelTemplate(::Type{T}) where {T <: PM.AbstractPowerModel} =
-    InvestmentModelTemplate(NetworkModel(T))
+InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportModel} =
+    InvestmentModelTemplate(TransportModel(T))
 InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionPowerModel)
 
 get_technology_models(template::InvestmentModelTemplate) = template.technologies
@@ -35,11 +35,11 @@ get_network_formulation(template::InvestmentModelTemplate) =
 """
 Sets the network model in a template.
 """
-function set_network_model!(
+function set_transport_model!(
     template::InvestmentModelTemplate,
-    model::NetworkModel{<:PM.AbstractPowerModel},
+    model::TransportModel{<:AbstractTransportModel},
 )
-    template.network_model = model
+    template.transport_model = model
     return
 end
 
