@@ -24,7 +24,7 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: ActivePowerBalance,
+    T <: DemandTotal,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.DemandRequirement}
     @assert !isempty(devices)
@@ -32,15 +32,25 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    expression = get_expression(container, T(), PSIP.Portfolio)
+    #expression = get_expression(container, T(), PSIP.Portfolio)
 
-    #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
     #TODO: Handle the timeseries in an actual generic way
 
     # Hard Code Mapping #
     @warn("creating hard code mapping. Remove it later")
     mapping_ops = Dict("2030" => 1:24, "2035" => 25:48)
     mapping_inv = Dict("2030" => 1, "2035" => 2)
+
+    time_steps = get_time_steps(container)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        time_steps,
+    )
+
+    #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
 
     for d in devices
         name = PSIP.get_name(d)
@@ -90,13 +100,18 @@ function add_constraints!(
     energy_balance = add_constraints_container!(container, T(), U, time_steps)
 
     for t in time_steps
+        #TODO: Make this generic
         supply = get_expression(
             container,
             SupplyTotal(),
             PSIP.SupplyTechnology{PSY.RenewableDispatch},
         )
-        demand =
-            get_expression(container, DemandTotal(), PSIP.DemandRequirement{PSY.PowerLoad})
+        demand = get_expression(
+            container, 
+            DemandTotal(), 
+            PSIP.DemandRequirement{PSY.PowerLoad}
+        )
+        
         energy_balance[t] =
             JuMP.@constraint(get_jump_model(container), supply - demand >= 0)
     end
