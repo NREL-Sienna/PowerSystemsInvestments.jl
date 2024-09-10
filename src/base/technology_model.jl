@@ -276,3 +276,28 @@ function TechnologyModel(
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
     return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
 end
+
+#Move to different file later
+function TechnologyModel(
+    ::Type{D},
+    ::Type{B},
+    ::Type{C};
+    use_slacks=false,
+    duals=Vector{DataType}(),
+    time_series_names=get_default_time_series_names(D, B, C),
+    attributes=Dict{String, Any}(),
+) where {
+    D <: PSIP.DemandRequirement,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+}
+    attributes_ = get_default_attributes(D, B, C)
+    for (k, v) in attributes
+        attributes_[k] = v
+    end
+
+    _check_technology_formulation(D, B, C)
+    #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
+    #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+end
