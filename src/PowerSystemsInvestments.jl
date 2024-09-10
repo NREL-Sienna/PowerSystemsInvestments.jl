@@ -136,6 +136,9 @@ include("technology_models/technologies/supply_tech.jl")
 include("technology_models/technologies/demand_tech.jl")
 include("network_models/singleregion_model.jl")
 
+include("technology_models/technology_constructors/supply_constructor.jl")
+include("technology_models/technology_constructors/demand_constructor.jl")
+
 include("technology_models/technologies/common/objective_function.jl/common_capital.jl")
 include("technology_models/technologies/common/objective_function.jl/common_operations.jl")
 include("technology_models/technologies/common/objective_function.jl/linear_curve.jl")
