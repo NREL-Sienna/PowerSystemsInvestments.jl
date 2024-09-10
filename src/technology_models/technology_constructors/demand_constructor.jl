@@ -14,10 +14,10 @@ function construct_device!(
     devices = PSIP.get_technologies(T, p)
 
     # SupplyTotal, initialize expression, then add ActivePowerVariable in supply_constructor
-    add_expression!(container, SupplyTotal(), C())
+    add_expression!(container, SupplyTotal(), devices, C())
 
     # DemandTotal
-    add_expression!(container, SupplyTotal(), C())
+    add_expression!(container, DemandTotal(), devices, C())
 
     return
 end

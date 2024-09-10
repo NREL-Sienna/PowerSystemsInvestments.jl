@@ -13,13 +13,6 @@ function construct_device!(
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
 
-    #This goes in test function to build portfolio
-    #settings = PSIN.Settings(p_5bus)
-    #model = JuMP.Model(HiGHS.Optimizer)
-    #container = PSIN.SingleOptimizationContainer(settings, model)
-    #PSIN.set_time_steps!(container, 1:48)
-    #PSIN.set_time_steps_investments!(container, 1:2)
-
     # BuildCapacity variable
     add_variable!(container, BuildCapacity(), devices, B())
 
@@ -30,7 +23,9 @@ function construct_device!(
     add_variable!(container, ActivePowerVariable(), devices, C())
 
     # SupplyTotal
-    add_expression!(container, SupplyTotal(), devices, C())
+    #add_expression!(container, SupplyTotal(), devices, C())
+
+    add_to_expression!(container, SupplyTotal(), devices, C())
 
     return
 end
