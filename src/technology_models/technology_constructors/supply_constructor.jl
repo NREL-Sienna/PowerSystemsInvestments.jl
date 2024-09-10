@@ -48,7 +48,7 @@ function construct_device!(
     objective_function!(container, devices, B())
 
     # Operations Component of objective function
-    objective_function!(container, devices, D())
+    objective_function!(container, devices, C())
 
     # Add objective function from container to JuMP model
     update_objective_function!(container)
@@ -58,19 +58,6 @@ function construct_device!(
 
     # Dispatch constraint
     add_constraints!(container, ActivePowerLimitsConstraint(), ActivePowerVariable(), devices)
-
-    # DemandTotal
-    # TODO: Move to separate constructor for DemandRequirements
-    devices = PSIP.get_technologies(DemandRequirement{PowerLoad}, p)
-    add_expression!(container, DemandTotal(), devices, C())
-
-    #power balance
-    # TODO: Possibly move to DemandRequirements. Where should this be defined when it relies on SupplyTechnology and DemandRequirements?
-    add_constraints!(
-        container,
-        PSIN.SupplyDemandBalance,
-        PSIP.DemandRequirement{PowerLoad},
-    )
 
     return
 end

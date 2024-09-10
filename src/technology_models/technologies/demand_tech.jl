@@ -140,12 +140,12 @@ function add_constraints!(
         supply = get_expression(
             container,
             SupplyTotal(),
-            PSIP.SupplyTechnology{PSY.RenewableDispatch},
+            U,
         )
         demand = get_expression(
             container, 
             DemandTotal(), 
-            PSIP.DemandRequirement{PSY.PowerLoad}
+            U
         )
         
         energy_balance[t] =

@@ -34,13 +34,11 @@ function construct_device!(
     C <: BasicDispatch
 }
 
-    devices = PSIP.get_technologies(T, p)
-
     #power balance
     add_constraints!(
         container,
-        PSIN.SupplyDemandBalance,
-        PSIP.DemandRequirement{PowerLoad},
+        SupplyDemandBalance,
+        T,
     )
 
     return
