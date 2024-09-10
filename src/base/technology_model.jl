@@ -287,7 +287,7 @@ function TechnologyModel(
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {
-    D <: PSIP.DemandRequirement,
+    D <: PSIP.DemandRequirement{PSY.PowerLoad},
     B <: ContinuousInvestment,
     C <: BasicDispatch,
 }

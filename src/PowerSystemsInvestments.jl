@@ -118,7 +118,7 @@ include("base/settings.jl")
 include("base/solution_algorithms.jl")
 #include("base/operation_model.jl")
 #include("base/feasibility_model.jl")
-include("base/supply_technology_model.jl")
+include("base/technology_model.jl")
 include("base/investment_model_template.jl")
 
 include("base/objective_function.jl")
