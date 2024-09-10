@@ -106,7 +106,7 @@ function add_expression!(
     return
 end
 
-function add_expression!(
+function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
     devices::U,
@@ -120,16 +120,8 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    expression = add_expression_container!(
-        container,
-        expression_type,
-        D,
-        #[PSIP.get_name(d) for d in devices],
-        time_steps,
-    )
-
-    #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
     variable = get_variable(container, ActivePowerVariable(), D)
+    expression = get_expression(container, T(), PSIP.DemandRequirement{PSY.PowerLoad})
 
     for d in devices, t in time_steps
         name = PSIP.get_name(d)
