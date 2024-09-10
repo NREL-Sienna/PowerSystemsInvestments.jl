@@ -1,14 +1,24 @@
 function get_default_time_series_names(
     ::Type{U},
+    ::Type{V},
     ::Type{W},
-) where {U <: PSIP.DemandRequirement, W <: OperationsTechnologyFormulation}
+) where {
+    U <: PSIP.DemandRequirement,
+    V <: InvestmentTechnologyFormulation,
+    W <: OperationsTechnologyFormulation,
+}
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
 
 function get_default_attributes(
     ::Type{U},
+    ::Type{V},
     ::Type{W},
-) where {U <: PSIP.DemandRequirement, W <: OperationsTechnologyFormulation}
+) where {
+    U <: PSIP.DemandRequirement,
+    V <: InvestmentTechnologyFormulation,
+    W <: OperationsTechnologyFormulation,
+}
     return Dict{String, Any}()
 end
 
@@ -17,6 +27,8 @@ end
 get_variable_multiplier(::ActivePowerVariable, ::Type{PSIP.DemandRequirement}) = -1.0
 
 ################## Expressions ###################
+
+# TODO: SupplyTotal and DemandTotal should probably be defined for each zone/region/etc. later on
 
 function add_expression!(
     container::SingleOptimizationContainer,
@@ -77,6 +89,30 @@ function add_expression!(
             end
         end
     end
+
+    return
+end
+
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::BasicDispatch,
+) where {
+    T <: SupplyTotal,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+} where {D <: PSIP.DemandRequirement}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        time_steps,
+    )
 
     return
 end
