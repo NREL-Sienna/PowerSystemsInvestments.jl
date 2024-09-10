@@ -55,12 +55,7 @@ function add_expression!(
 
     time_steps = get_time_steps(container)
 
-    expression = add_expression_container!(
-        container,
-        expression_type,
-        D,
-        time_steps,
-    )
+    expression = add_expression_container!(container, expression_type, D, time_steps)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
 
@@ -107,12 +102,7 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    expression = add_expression_container!(
-        container,
-        expression_type,
-        D,
-        time_steps,
-    )
+    expression = add_expression_container!(container, expression_type, D, time_steps)
 
     return
 end
@@ -137,17 +127,9 @@ function add_constraints!(
 
     for t in time_steps
         #TODO: Make this generic
-        supply = get_expression(
-            container,
-            SupplyTotal(),
-            U,
-        )
-        demand = get_expression(
-            container, 
-            DemandTotal(), 
-            U
-        )
-        
+        supply = get_expression(container, SupplyTotal(), U)
+        demand = get_expression(container, DemandTotal(), U)
+
         energy_balance[t] =
             JuMP.@constraint(get_jump_model(container), supply - demand >= 0)
     end

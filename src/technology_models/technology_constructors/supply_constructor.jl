@@ -4,11 +4,7 @@ function construct_device!(
     ::ArgumentConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch
-}
+) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
@@ -36,12 +32,7 @@ function construct_device!(
     ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch
-}
-
+) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
     devices = PSIP.get_technologies(T, p)
 
     # Capital Component of objective function
@@ -57,7 +48,12 @@ function construct_device!(
     add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
 
     # Dispatch constraint
-    add_constraints!(container, ActivePowerLimitsConstraint(), ActivePowerVariable(), devices)
+    add_constraints!(
+        container,
+        ActivePowerLimitsConstraint(),
+        ActivePowerVariable(),
+        devices,
+    )
 
     return
 end

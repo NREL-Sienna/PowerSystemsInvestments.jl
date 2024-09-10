@@ -4,8 +4,6 @@ struct SingleRegionBalanceModel <: AbstractTransportModel end
 struct MultiRegionBalanceModel <: AbstractTransportModel end
 struct NodalBalanceModel <: AbstractTransportModel end
 
-
-
 function _check_pm_formulation(::Type{T}) where {T <: AbstractTransportModel}
     if !isconcretetype(T)
         throw(
@@ -50,7 +48,10 @@ get_PTDF_matrix(m::TransportModel) = m.PTDF_matrix
 get_duals(m::TransportModel) = m.duals
 get_network_formulation(::TransportModel{T}) where {T} = T
 
-function instantiate_network_model(::TransportModel{SingleRegionBalanceModel}, ::PSIP.Portfolio)
+function instantiate_network_model(
+    ::TransportModel{SingleRegionBalanceModel},
+    ::PSIP.Portfolio,
+)
     #=
     if isempty(model.subnetworks)
         model.subnetworks = PNM.find_subnetworks(sys)

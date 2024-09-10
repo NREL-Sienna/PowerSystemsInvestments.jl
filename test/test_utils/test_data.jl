@@ -39,7 +39,7 @@ function test_data()
     ##### Thermals #####
     ####################
 
-    thermals = collect(get_components(ThermalStandard, sys));
+    thermals = collect(get_components(ThermalStandard, sys))
     var_cost = get_variable.((get_operation_cost.((thermals))))
     op_cost = get_proportional_term.(get_value_curve.(var_cost))
 
@@ -107,7 +107,7 @@ function test_data()
     ##### Renewable #####
     #####################
 
-    renewables = collect(get_components(RenewableDispatch, sys));
+    renewables = collect(get_components(RenewableDispatch, sys))
     wind_op_costs =
         get_proportional_term.(
             get_value_curve.(get_variable.((get_operation_cost.((renewables)))))
@@ -175,7 +175,7 @@ function test_data()
     ######## Load #######
     #####################
 
-    loads = collect(get_components(PowerLoad, sys));
+    loads = collect(get_components(PowerLoad, sys))
     peak_load = sum(get_active_power.(loads))
 
     ts_load_2030 = zeros(length(tstamp_2030_ops))
@@ -241,7 +241,12 @@ function test_data()
 
     IS.add_time_series!(p_5bus.data, t_demand, ts_demand_2030; year="2030")
     IS.add_time_series!(p_5bus.data, t_demand, ts_demand_2035; year="2035")
-    t = IS.get_time_series(IS.SingleTimeSeries, t_re, "ops_variable_cap_factor"; year="2035")
+    t = IS.get_time_series(
+        IS.SingleTimeSeries,
+        t_re,
+        "ops_variable_cap_factor";
+        year="2035",
+    )
     load = IS.get_time_series(IS.SingleTimeSeries, t_demand, "ops_peak_load"; year="2030")
     #InfrastructureSystems.serialize(p_5bus)
 

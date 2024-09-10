@@ -8,7 +8,6 @@ mutable struct TechnologyModel{
     time_series_names::Dict{Type{<:TimeSeriesParameter}, String}
     attributes::Dict{String, Any}
     subsystem::Union{Nothing, String}
-
 end
 
 function _check_technology_formulation(
@@ -18,7 +17,8 @@ function _check_technology_formulation(
 ) where {
     D <: Union{AbstractTechnologyFormulation, PSIP.Technology},
     B <: Union{AbstractTechnologyFormulation, PSIP.Technology},
-    C <: Union{AbstractTechnologyFormulation, PSIP.Technology}}
+    C <: Union{AbstractTechnologyFormulation, PSIP.Technology},
+}
     if !isconcretetype(D)
         throw(
             ArgumentError(
@@ -84,7 +84,6 @@ get_operations_formulation(
     C <: OperationsTechnologyFormulation,
 } = C
 
-
 function TechnologyModel(
     ::Type{D},
     ::Type{B},
@@ -106,7 +105,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -130,7 +135,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -154,7 +165,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -178,7 +195,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -202,7 +225,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -226,7 +255,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -250,7 +285,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 function TechnologyModel(
@@ -274,7 +315,13 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
 
 #Move to different file later
@@ -299,5 +346,11 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
+    return TechnologyModel{D, B, C}(
+        use_slacks,
+        duals,
+        time_series_names,
+        attributes_,
+        nothing,
+    )
 end
