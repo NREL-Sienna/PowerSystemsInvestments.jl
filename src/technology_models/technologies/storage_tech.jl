@@ -400,6 +400,63 @@ function add_constraints!(
     end
 end
 
+function add_constraints!(
+    container::SingleOptimizationContainer,
+    ::T,
+    ::V,
+    devices::U,
+) where {
+    T <: EnergyBalanceConstraint,
+    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    V <: EnergyVariable,
+} where {D <: PSIP.StorageTechnology{PSY.EnergyReservoirStorage}}
+    time_steps = get_time_steps(container)
+    # Hard Code Mapping #
+    # TODO: Remove
+    @warn("creating hard code mapping. Remove it later")
+    mapping_ops = Dict(("2030", 1) => 1:24, ("2035", 1) => 25:48)
+    mapping_inv = Dict("2030" => 1, "2035" => 2)
+    device_names = PSIP.get_name.(devices)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+
+    charge = get_variable(container, ActiveInPowerVariable(), D)
+    discharge = get_variable(container, ActiveOutPowerVariable(), D)
+    storage_state = get_variable(container, V(), D)
+
+    for d in devices
+        name = PSIP.get_name(d)
+        ts_name = "ops_variable_cap_factor"
+        ts_keys = filter(x -> x.name == ts_name, IS.get_time_series_keys(d))
+        for ts_key in ts_keys
+            ts_type = ts_key.time_series_type
+            features = ts_key.features
+            year = features["year"]
+            #rep_day = features["rep_day"]
+            ts_data = TimeSeries.values(
+                #IS.get_time_series(ts_type, d, ts_name; year=year, rep_day=rep_day).data,
+                IS.get_time_series(ts_type, d, ts_name; year=year).data,
+            )
+            #time_steps_ix = mapping_ops[(year, rep_day)]
+            time_steps_ix = mapping_ops[(year, 1)]
+            time_step_inv = mapping_inv[year]
+            for (ix, t) in enumerate(time_steps_ix)
+                if ix==1
+                    con_ub[name, t] = JuMP.@constraint(
+                        get_jump_model(container),
+                        storage_state[name, t] == charge[name, t] - discharge[name, t]
+                    )
+                else
+                    con_ub[name, t] = JuMP.@constraint(
+                        get_jump_model(container),
+                        storage_state[name, t] == storage_state[name, t-1] + charge[name, t] - discharge[name, t]
+                    )
+                end
+                
+            end
+        end
+    end
+end
+
 # Maximum cumulative capacity
 function add_constraints!(
     container::SingleOptimizationContainer,

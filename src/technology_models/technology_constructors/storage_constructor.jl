@@ -81,6 +81,13 @@ function construct_technologies!(
         devices,
     )
 
+    #State of charge constraint
+    add_constraints!(
+        container,
+        EnergyBalanceConstraint(),
+        EnergyVariable(),
+        devices,
+    )
 
     return
 end
