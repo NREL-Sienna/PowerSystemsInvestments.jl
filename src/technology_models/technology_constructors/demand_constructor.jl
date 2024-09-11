@@ -4,7 +4,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
@@ -24,7 +24,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
 
     #power balance
     add_constraints!(container, SupplyDemandBalance, T)

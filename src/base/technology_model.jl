@@ -335,7 +335,7 @@ function TechnologyModel(
     attributes=Dict{String, Any}(),
 ) where {
     D <: PSIP.DemandRequirement{PSY.PowerLoad},
-    B <: ContinuousInvestment,
+    B <: StaticLoadInvestment,
     C <: BasicDispatch,
 }
     attributes_ = get_default_attributes(D, B, C)
