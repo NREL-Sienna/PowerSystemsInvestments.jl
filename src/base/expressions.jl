@@ -6,6 +6,10 @@ struct DemandTotal <: OperationsExpressionType end
 struct ActivePowerBalance <: OperationsExpressionType end
 
 struct CumulativeCapacity <: InvestmentExpressionType end
+
+struct CumulativePowerCapacity <: InvestmentExpressionType end
+struct CumulativeEnergyCapacity <: InvestmentExpressionType end
+
 struct CapitalCost <: InvestmentExpressionType end
 struct FixedOperationModelCost <: InvestmentExpressionType end
 
