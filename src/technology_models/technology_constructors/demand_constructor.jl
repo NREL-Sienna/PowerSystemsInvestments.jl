@@ -1,4 +1,4 @@
-function construct_device!(
+function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
@@ -18,7 +18,7 @@ function construct_device!(
     return
 end
 
-function construct_device!(
+function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
     ::ModelConstructStage,
