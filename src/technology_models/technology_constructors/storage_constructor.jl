@@ -39,28 +39,48 @@ function construct_technologies!(
     ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {T <: PSIP.StorageTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
     devices = PSIP.get_technologies(T, p)
 
+    # TODO: Add objective function to storage constructor after costs are added to storage in portfolio
     # Capital Component of objective function
-    objective_function!(container, devices, B())
+    #objective_function!(container, devices, B())
 
     # Operations Component of objective function
-    objective_function!(container, devices, C())
+    #objective_function!(container, devices, C())
 
     # Add objective function from container to JuMP model
-    update_objective_function!(container)
+    #update_objective_function!(container)
 
-    # Capacity constraint
-    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
+    # Capacity constraints
+    add_constraints!(container, MaximumCumulativePowerCapacity(), CumulativePowerCapacity(), devices)
 
-    # Dispatch constraint
+    add_constraints!(container, MaximumCumulativeEnergyCapacity(), CumulativeEnergyCapacity(), devices)
+
+    # Dispatch input power constraint
     add_constraints!(
         container,
-        ActivePowerLimitsConstraint(),
-        ActivePowerVariable(),
+        InputActivePowerVariableLimitsConstraint(),
+        ActiveInPowerVariable(),
         devices,
     )
+
+    # Dispatch output power constraint
+    add_constraints!(
+        container,
+        OutputActivePowerVariableLimitsConstraint(),
+        ActiveOutPowerVariable(),
+        devices,
+    )
+
+    # Energy storage constraint
+    add_constraints!(
+        container,
+        StateofChargeLimitsConstraint(),
+        EnergyVariable(),
+        devices,
+    )
+
 
     return
 end

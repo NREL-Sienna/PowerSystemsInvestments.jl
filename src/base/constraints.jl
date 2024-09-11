@@ -1,6 +1,10 @@
 ### Investment Constraints ###
 struct MaximumCumulativeCapacity <: ISOPT.ConstraintType end
 
+struct MaximumCumulativePowerCapacity <: ISOPT.ConstraintType end
+
+struct MaximumCumulativeEnergyCapacity <: ISOPT.ConstraintType end
+
 ### Operations Constraints ###
 
 struct SupplyDemandBalance <: ISOPT.ConstraintType end
