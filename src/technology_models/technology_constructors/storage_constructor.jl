@@ -53,9 +53,19 @@ function construct_technologies!(
     #update_objective_function!(container)
 
     # Capacity constraints
-    add_constraints!(container, MaximumCumulativePowerCapacity(), CumulativePowerCapacity(), devices)
+    add_constraints!(
+        container,
+        MaximumCumulativePowerCapacity(),
+        CumulativePowerCapacity(),
+        devices,
+    )
 
-    add_constraints!(container, MaximumCumulativeEnergyCapacity(), CumulativeEnergyCapacity(), devices)
+    add_constraints!(
+        container,
+        MaximumCumulativeEnergyCapacity(),
+        CumulativeEnergyCapacity(),
+        devices,
+    )
 
     # Dispatch input power constraint
     add_constraints!(
@@ -74,20 +84,10 @@ function construct_technologies!(
     )
 
     # Energy storage constraint
-    add_constraints!(
-        container,
-        StateofChargeLimitsConstraint(),
-        EnergyVariable(),
-        devices,
-    )
+    add_constraints!(container, StateofChargeLimitsConstraint(), EnergyVariable(), devices)
 
     #State of charge constraint
-    add_constraints!(
-        container,
-        EnergyBalanceConstraint(),
-        EnergyVariable(),
-        devices,
-    )
+    add_constraints!(container, EnergyBalanceConstraint(), EnergyVariable(), devices)
 
     return
 end

@@ -440,7 +440,7 @@ function add_constraints!(
             time_steps_ix = mapping_ops[(year, 1)]
             time_step_inv = mapping_inv[year]
             for (ix, t) in enumerate(time_steps_ix)
-                if ix==1
+                if ix == 1
                     con_ub[name, t] = JuMP.@constraint(
                         get_jump_model(container),
                         storage_state[name, t] == charge[name, t] - discharge[name, t]
@@ -448,10 +448,10 @@ function add_constraints!(
                 else
                     con_ub[name, t] = JuMP.@constraint(
                         get_jump_model(container),
-                        storage_state[name, t] == storage_state[name, t-1] + charge[name, t] - discharge[name, t]
+                        storage_state[name, t] ==
+                        storage_state[name, t - 1] + charge[name, t] - discharge[name, t]
                     )
                 end
-                
             end
         end
     end

@@ -355,7 +355,6 @@ function TechnologyModel(
     )
 end
 
-
 function TechnologyModel(
     ::Type{D},
     ::Type{B},
