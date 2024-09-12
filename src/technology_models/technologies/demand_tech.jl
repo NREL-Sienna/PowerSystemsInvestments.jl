@@ -3,11 +3,11 @@ function get_default_time_series_names(
     ::Type{V},
     ::Type{W},
 ) where {
-    U <: PSIP.DemandRequirement,
-    V <: InvestmentTechnologyFormulation,
-    W <: OperationsTechnologyFormulation,
+    U<:PSIP.DemandRequirement,
+    V<:InvestmentTechnologyFormulation,
+    W<:OperationsTechnologyFormulation,
 }
-    return Dict{Type{<:TimeSeriesParameter}, String}()
+    return Dict{Type{<:TimeSeriesParameter},String}()
 end
 
 function get_default_attributes(
@@ -15,11 +15,11 @@ function get_default_attributes(
     ::Type{V},
     ::Type{W},
 ) where {
-    U <: PSIP.DemandRequirement,
-    V <: InvestmentTechnologyFormulation,
-    W <: OperationsTechnologyFormulation,
+    U<:PSIP.DemandRequirement,
+    V<:InvestmentTechnologyFormulation,
+    W<:OperationsTechnologyFormulation,
 }
-    return Dict{String, Any}()
+    return Dict{String,Any}()
 end
 
 ################### Variables ####################
@@ -36,9 +36,9 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: DemandTotal,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.DemandRequirement}
+    T<:DemandTotal,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.DemandRequirement}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
@@ -94,9 +94,9 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: SupplyTotal,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.DemandRequirement}
+    T<:SupplyTotal,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.DemandRequirement}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
@@ -116,21 +116,22 @@ function add_constraints!(
     #model,
     #::NetworkModel{X},
 ) where {
-    T <: SupplyDemandBalance,
-    U <: PSIP.DemandRequirement{PSY.PowerLoad},
+    T<:SupplyDemandBalance,
+    U<:PSIP.DemandRequirement{PSY.PowerLoad},
     #X <: PM.AbstractPowerModel,
 }
     # TODO: Remove technologies from the expression definition for these and add corresponding get_expression functions
     time_steps = get_time_steps(container)
 
     energy_balance = add_constraints_container!(container, T(), U, time_steps)
+    supply = get_expression(container, SupplyTotal(), U)
+    demand = get_expression(container, DemandTotal(), U)
 
     for t in time_steps
         #TODO: Make this generic
-        supply = get_expression(container, SupplyTotal(), U)
-        demand = get_expression(container, DemandTotal(), U)
+
 
         energy_balance[t] =
-            JuMP.@constraint(get_jump_model(container), supply - demand >= 0)
+            JuMP.@constraint(get_jump_model(container), supply[t] - demand[t] >= 0)
     end
 end
