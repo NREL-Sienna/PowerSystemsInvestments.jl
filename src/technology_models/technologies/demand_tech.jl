@@ -75,7 +75,7 @@ function add_expression!(
                 IS.get_time_series(ts_type, d, ts_name; year=year).data,
             )
             time_steps_ix = mapping_ops[year]
-            multiplier = -1.0
+            multiplier = 1.0
             for (ix, t) in enumerate(time_steps_ix)
                 _add_to_jump_expression!(
                     expression[t],
