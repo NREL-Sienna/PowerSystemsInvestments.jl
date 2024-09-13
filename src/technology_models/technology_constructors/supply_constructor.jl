@@ -1,62 +1,58 @@
-function construct_device!(
-    container::OptimizationContainer,
-    sys::PSY.System,
+function construct_technologies!(
+    container::SingleOptimizationContainer,
+    p::PSIP.Portfolio,
     ::ArgumentConstructStage,
-    device_model::TechnologyModel{T, FixedOutput},
+    technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSY.ThermalGen}
+) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
 
-    settings = PSIN.Settings(p_5bus)
-    model = JuMP.Model(HiGHS.Optimizer)
-    container = PSIN.SingleOptimizationContainer(settings, model)
-    PSIN.set_time_steps!(container, 1:48)
-    PSIN.set_time_steps_investments!(container, 1:2)
+    #TODO: Port get_available_component functions from PSY
+    devices = PSIP.get_technologies(T, p)
 
-    devices = PSIP.get_technologies(SupplyTechnology{RenewableDispatch}, p_5bus)
-    variable_type = PSIN.BuildCapacity()
-    formulation = PSIN.ContinuousInvestment()
-    D = PSIP.SupplyTechnology
-    time_steps = PSIN.get_time_steps(container)
-    PSIN.add_variable!(container, variable_type, devices, formulation)
-    add_expression!(container, CumulativeCapacity(), devices, formulation)#, PSIN.AbstractTechnologyFormulation())
-    objective_function!(container, devices, formulation)
+    # BuildCapacity variable
+    add_variable!(container, BuildCapacity(), devices, B())
 
-    devices = PSIP.get_technologies(SupplyTechnology{RenewableDispatch}, p_5bus)
-    variable_type = ActivePowerVariable()
-    formulation = PSIN.BasicDispatch()
-    D = PSIP.SupplyTechnology
-    time_steps = PSIN.get_time_steps(container)
-    PSIN.add_variable!(container, variable_type, devices, formulation)
+    # CumulativeCapacity
+    add_expression!(container, CumulativeCapacity(), devices, B())
+
+    #ActivePowerVariable
+    add_variable!(container, ActivePowerVariable(), devices, C())
+
+    # SupplyTotal
+    #add_expression!(container, SupplyTotal(), devices, C())
+
+    add_to_expression!(container, SupplyTotal(), devices, C())
 
     return
 end
 
-function construct_device!(
-    ::SingleOptimizationContainer,
-    ::PSY.System,
+function construct_technologies!(
+    container::SingleOptimizationContainer,
+    p::PSIP.Portfolio,
     ::ModelConstructStage,
-    ::TechnologyModel{<:PSY.ThermalGen, FixedOutput},
-    # network_model::NetworkModel{<:PM.AbstractPowerModel},
-)
+    technology_model::TechnologyModel{T, B, C},
+    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+    devices = PSIP.get_technologies(T, p)
 
-    devices = PSIP.get_technologies(SupplyTechnology{RenewableDispatch}, p_5bus)
-    variable_type = ActivePowerVariable()
-    objective_function!(container, devices, formulation)
+    # Capital Component of objective function
+    objective_function!(container, devices, B())
 
-    PSIN.update_objective_function!(container)
+    # Operations Component of objective function
+    objective_function!(container, devices, C())
 
-    #testing SupplyTotal
-    add_expression!(container, SupplyTotal(), devices, formulation)
+    # Add objective function from container to JuMP model
+    update_objective_function!(container)
 
-    #testing DemandTotal
-    devices = PSIP.get_technologies(DemandRequirement{PowerLoad}, p_5bus)
-    add_expression!(container, DemandTotal(), devices, formulation)
+    # Capacity constraint
+    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
 
-    #power balance
-    PSIN.add_constraints!(
+    # Dispatch constraint
+    add_constraints!(
         container,
-        PSIN.SupplyDemandBalance,
-        PSIP.DemandRequirement{PowerLoad},
+        ActivePowerLimitsConstraint(),
+        ActivePowerVariable(),
+        devices,
     )
 
     return

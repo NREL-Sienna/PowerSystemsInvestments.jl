@@ -126,7 +126,7 @@ end
 
 function init_optimization_container!(
     container::MultiOptimizationContainer,
-    network_model::NetworkModel{<:PM.AbstractPowerModel},
+    transport_model::TransportModel{<:AbstractTransportModel},
     portfolio::PSIP.Portfolio,
 )
     PSY.set_units_base_system!(portfolio, "NATURAL_UNITS")
@@ -155,13 +155,13 @@ function init_optimization_container!(
 
     # need a special method for the main problem to initialize the optimization container
     # without actually caring about the subnetworks
-    # init_optimization_container!(subproblem, network_model, sys)
+    # init_optimization_container!(subproblem, transport_model, sys)
 
     for (index, subproblem) in container.subproblems
         @debug "Initializing Container Subproblem $index" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
         subproblem.settings = deepcopy(settings)
-        init_optimization_container!(subproblem, network_model, sys)
+        init_optimization_container!(subproblem, transport_model, sys)
         subproblem.built_for_recurrent_solves = true
     end
     _finalize_jump_model!(container, settings)

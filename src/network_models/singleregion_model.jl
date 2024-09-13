@@ -2,7 +2,7 @@ function add_constraints!(
     container::SingleOptimizationContainer,
     ::Type{T},
     sys::U,
-) where {T <: CopperPlateBalanceConstraint, U <: PSIP.Portfolio}
+) where {T <: SingleRegionBalanceConstraint, U <: PSIP.Portfolio}
     time_steps = get_time_steps(container)
     expressions = get_expression(container, ActivePowerBalance(), U)
     constraint = add_constraints_container!(container, T(), U, time_steps)
