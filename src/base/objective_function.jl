@@ -23,11 +23,7 @@ get_sense(v::ObjectiveFunction) = v.sense
 set_sense!(v::ObjectiveFunction, sense::MOI.OptimizationSense) = v.sense = sense
 
 function ObjectiveFunction()
-    return ObjectiveFunction(
-        zero(JuMP.AffExpr),
-        zero(JuMP.AffExpr),
-        MOI.MIN_SENSE,
-    )
+    return ObjectiveFunction(zero(JuMP.AffExpr), zero(JuMP.AffExpr), MOI.MIN_SENSE)
 end
 
 function add_to_capital_terms(v::ObjectiveFunction, val::Union{JuMP.AffExpr, Float64})
