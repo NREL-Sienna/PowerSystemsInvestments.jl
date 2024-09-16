@@ -683,10 +683,10 @@ function add_to_objective_investment_expression!(
     return
 end
 
-function build_impl!(
+function build_model!(
     container::SingleOptimizationContainer,
     template::InvestmentModelTemplate,
-    sys::PSIP.Portfolio,
+    port::PSIP.Portfolio,
 )
     transmission = get_network_formulation(template)
     transmission_model = get_network_model(template)

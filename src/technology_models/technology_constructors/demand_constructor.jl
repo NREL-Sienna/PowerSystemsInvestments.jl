@@ -2,6 +2,7 @@ function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
+    model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}

@@ -126,7 +126,7 @@ end
 
 function init_optimization_container!(
     container::MultiOptimizationContainer,
-    transport_model::TransportModel{<:AbstractTransportModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
     portfolio::PSIP.Portfolio,
 )
     PSY.set_units_base_system!(portfolio, "NATURAL_UNITS")

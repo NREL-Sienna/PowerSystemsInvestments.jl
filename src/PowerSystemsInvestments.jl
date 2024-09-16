@@ -22,6 +22,15 @@ const PNM = PowerNetworkMatrices
 
 ### Exports ###
 export InvestmentModel
+export InvestmentModelTemplate
+export TransportModel
+
+### Capital Model
+export DiscountedCashFlow
+export AggregateOperatingCost
+export RepresentativePeriods
+
+export SingleRegionBalanceModel
 
 ## Variables ##
 export BuildCapacity
@@ -130,6 +139,8 @@ include("base/multi_optimization_container.jl")
 
 include("investment_model/investment_model_store.jl")
 include("investment_model/investment_model.jl")
+
+include("model_build/SingleInstanceSolve.jl")
 
 include("utils/printing.jl")
 include("utils/jump_utils.jl")

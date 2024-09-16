@@ -59,7 +59,6 @@ function Settings(
         calculate_conflict,
         portfolio_to_file,
         deserialize_initial_conditions,
-        export_pwl_vars,
         store_variable_names,
         check_numerical_bounds,
         ext,

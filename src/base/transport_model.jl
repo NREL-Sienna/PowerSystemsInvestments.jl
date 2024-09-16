@@ -1,13 +1,15 @@
-abstract type AbstractTransportModel end
+abstract type AbstractTransportAggregation end
 
-struct SingleRegionBalanceModel <: AbstractTransportModel end
-struct MultiRegionBalanceModel <: AbstractTransportModel end
-struct NodalBalanceModel <: AbstractTransportModel end
+struct SingleRegionBalanceModel <: AbstractTransportAggregation end
+struct MultiRegionBalanceModel <: AbstractTransportAggregation end
+struct NodalBalanceModel <: AbstractTransportAggregation end
 
-mutable struct TransportModel{T <: AbstractTransportModel}
+mutable struct TransportModel{T <: AbstractTransportAggregation}
     use_slacks::Bool
-    function TransportModel(::Type{T}; use_slacks=false) where {T <: AbstractTransportModel}
-        _check_pm_formulation(T)
+    function TransportModel(
+        ::Type{T};
+        use_slacks=false,
+    ) where {T <: AbstractTransportAggregation}
         new{T}(use_slacks)
     end
 end

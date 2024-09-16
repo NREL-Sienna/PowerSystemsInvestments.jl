@@ -3,20 +3,17 @@ abstract type AbstractInvestmentModelTemplate end
 mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
     capital_model::CapitalCostModel
     operation_model::OperationCostModel
-    transport_model::TransportModel{<:AbstractTransportModel}
+    feasibility_model::FeasibilityModel
+    transport_model::TransportModel{<:AbstractTransportAggregation}
     technology_models::Dict # Type to be refined later
 
     function InvestmentModelTemplate(
         capital_model::CapitalCostModel,
         operation_model::OperationCostModel,
-        transport_model::TransportModel{T}
-    ) where {T <: AbstractTransportModel}
-        new(
-            capital_model,
-            operation_model,
-            transport_model,
-            Dict()
-        )
+        feasibility_model::FeasibilityModel,
+        transport_model::TransportModel{T},
+    ) where {T <: AbstractTransportAggregation}
+        new(capital_model, operation_model, feasibility_model, transport_model, Dict())
     end
 end
 
@@ -28,7 +25,7 @@ function Base.isempty(template::InvestmentModelTemplate)
     end
 end
 
-InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportModel} =
+InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportAggregation} =
     InvestmentModelTemplate(TransportModel(T))
 InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionPowerModel)
 
@@ -42,7 +39,7 @@ Sets the network model in a template.
 """
 function set_transport_model!(
     template::InvestmentModelTemplate,
-    model::TransportModel{<:AbstractTransportModel},
+    model::TransportModel{<:AbstractTransportAggregation},
 )
     template.transport_model = model
     return
