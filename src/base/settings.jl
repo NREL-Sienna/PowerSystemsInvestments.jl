@@ -10,7 +10,6 @@ struct Settings
     calculate_conflict::Bool
     portfolio_to_file::Bool
     deserialize_initial_conditions::Bool
-    export_pwl_vars::Bool
     store_variable_names::Bool
     check_numerical_bounds::Bool
     ext::Dict{String, Any}
@@ -29,7 +28,6 @@ function Settings(
     calculate_conflict::Bool=false,
     portfolio_to_file::Bool=true,
     deserialize_initial_conditions::Bool=false,
-    export_pwl_vars::Bool=false,
     check_numerical_bounds=true,
     store_variable_names=false,
     ext=Dict{String, Any}(),
