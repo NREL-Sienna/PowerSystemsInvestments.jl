@@ -4,10 +4,8 @@ mutable struct TechnologyModel{
     C <: OperationsTechnologyFormulation,
 }
     use_slacks::Bool
-    duals::Vector{DataType}
     time_series_names::Dict{Type{<:TimeSeriesParameter}, String}
     attributes::Dict{String, Any}
-    subsystem::Union{Nothing, String}
 end
 
 function _check_technology_formulation(
@@ -390,7 +388,6 @@ function TechnologyModel(
     ::Type{B},
     ::Type{C};
     use_slacks=false,
-    duals=Vector{DataType}(),
     time_series_names=get_default_time_series_names(D, B, C),
     attributes=Dict{String, Any}(),
 ) where {

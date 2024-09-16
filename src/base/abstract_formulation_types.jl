@@ -1,5 +1,5 @@
 abstract type AbstractTechnologyFormulation end
 
 abstract type InvestmentTechnologyFormulation <: AbstractTechnologyFormulation end
-abstract type OperationsTechnologyFormulation <: AbstractTechnologyFormulation end
-abstract type FeasibilityTechnologyFormulation <: AbstractTechnologyFormulation end
+abstract type TechnologyOperationsFormulation <: AbstractTechnologyFormulation end
+abstract type TechnologyFeasibilityFormulation <: AbstractTechnologyFormulation end

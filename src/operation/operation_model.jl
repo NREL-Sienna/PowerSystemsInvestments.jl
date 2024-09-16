@@ -1,1 +1,3 @@
-abstract type OperationModel end
+abstract type OperationCostModel end
+
+struct AggregateOperatingCost <: OperationCostModel end

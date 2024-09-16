@@ -682,3 +682,133 @@ function add_to_objective_investment_expression!(
     end
     return
 end
+
+function build_impl!(
+    container::SingleOptimizationContainer,
+    template::InvestmentModelTemplate,
+    sys::PSIP.Portfolio,
+)
+    transmission = get_network_formulation(template)
+    transmission_model = get_network_model(template)
+    initialize_system_expressions!(
+        container,
+        get_network_model(template),
+        transmission_model.subnetworks,
+        sys,
+        transmission_model.radial_network_reduction.bus_reduction_map,
+    )
+
+    # Order is required
+    for device_model in values(template.devices)
+        @debug "Building Arguments for $(get_component_type(device_model)) with $(get_formulation(device_model)) formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(device_model))" begin
+            if validate_available_devices(device_model, sys)
+                construct_device!(
+                    container,
+                    sys,
+                    ArgumentConstructStage(),
+                    device_model,
+                    transmission_model,
+                )
+            end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
+        end
+    end
+
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
+        construct_services!(
+            container,
+            sys,
+            ArgumentConstructStage(),
+            get_service_models(template),
+            get_device_models(template),
+            transmission_model,
+        )
+    end
+
+    for branch_model in values(template.branches)
+        @debug "Building Arguments for $(get_component_type(branch_model)) with $(get_formulation(branch_model)) formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(branch_model))" begin
+            if validate_available_devices(branch_model, sys)
+                construct_device!(
+                    container,
+                    sys,
+                    ArgumentConstructStage(),
+                    branch_model,
+                    transmission_model,
+                )
+            end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
+        end
+    end
+
+    for device_model in values(template.devices)
+        @debug "Building Model for $(get_component_type(device_model)) with $(get_formulation(device_model)) formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(device_model))" begin
+            if validate_available_devices(device_model, sys)
+                construct_device!(
+                    container,
+                    sys,
+                    ModelConstructStage(),
+                    device_model,
+                    transmission_model,
+                )
+            end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
+        end
+    end
+
+    # This function should be called after construct_device ModelConstructStage
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transmission)" begin
+        @debug "Building $(transmission) network formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        construct_network!(container, sys, transmission_model, template)
+        @debug "Problem size:" get_problem_size(container) _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+    end
+
+    for branch_model in values(template.branches)
+        @debug "Building Model for $(get_component_type(branch_model)) with $(get_formulation(branch_model)) formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(branch_model))" begin
+            if validate_available_devices(branch_model, sys)
+                construct_device!(
+                    container,
+                    sys,
+                    ModelConstructStage(),
+                    branch_model,
+                    transmission_model,
+                )
+            end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
+        end
+    end
+
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
+        construct_services!(
+            container,
+            sys,
+            ModelConstructStage(),
+            get_service_models(template),
+            get_device_models(template),
+            transmission_model,
+        )
+    end
+
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Objective" begin
+        @debug "Building Objective" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+        update_objective_function!(container)
+    end
+    @debug "Total operation count $(PSI.get_jump_model(container).operator_counter)" _group =
+        LOG_GROUP_OPTIMIZATION_CONTAINER
+
+    check_optimization_container(container)
+    return
+end

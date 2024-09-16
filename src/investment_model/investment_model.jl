@@ -1,5 +1,6 @@
 mutable struct InvestmentModel{S <: SolutionAlgorithm}
     name::Symbol
+    template::InvestmentModelTemplate
     portfolio::PSIP.Portfolio
     internal::Union{Nothing, ISOPT.ModelInternal}
     store::InvestmentModelStore
@@ -8,7 +9,7 @@ end
 
 function InvestmentModel(
     template::AbstractInvestmentModelTemplate,
-    algorithm::SolutionAlgorithm,
+    ::Type{SingleInstanceSolve},
     portfolio::PSIP.Portfolio,
     settings::Settings,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
@@ -20,25 +21,22 @@ function InvestmentModel(
         name = Symbol(name)
     end
     internal = ISOPT.ModelInternal(
-        MultiOptimizationContainer(portfolio, settings, jump_model, PSY.Deterministic),
+        SingleOptimizationContainer(portfolio, settings, jump_model, PSY.Deterministic),
     )
 
-    template_ = deepcopy(template)
-    finalize_template!(template_, sys)
     model = InvestmentModel(
         name,
-        template_,
-        sys,
+        template,
+        portfolio,
         internal,
-        SimulationInfo(),
-        DecisionModelStore(),
+        InvestmentsModelStore(),
         Dict{String, Any}(),
     )
     #PSI.validate_time_series!(model)
     return model
 end
 
-function InvestmentModel{M}(
+function InvestmentModel(
     template::AbstractInvestmentModelTemplate,
     portfolio::PSIP.Portfolio,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
@@ -47,7 +45,6 @@ function InvestmentModel{M}(
     horizon=UNSET_HORIZON,
     resolution=UNSET_RESOLUTION,
     portfolio_to_file=true,
-    export_pwl_vars=false,
     optimizer_solve_log_print=false,
     detailed_optimizer_stats=false,
     calculate_conflict=false,
@@ -56,7 +53,7 @@ function InvestmentModel{M}(
     check_numerical_bounds=true,
     initial_time=UNSET_INI_TIME,
     time_series_cache_size::Int=IS.TIME_SERIES_CACHE_SIZE_BYTES,
-) where {M <: InvestmentModel}
+)
     settings = Settings(
         portfolio;
         initial_time=initial_time,
@@ -69,11 +66,10 @@ function InvestmentModel{M}(
         detailed_optimizer_stats=detailed_optimizer_stats,
         calculate_conflict=calculate_conflict,
         portfolio_to_file=portfolio_to_file,
-        export_pwl_vars=export_pwl_vars,
         check_numerical_bounds=check_numerical_bounds,
         store_variable_names=store_variable_names,
     )
-    return DecisionModel{M}(template, sys, settings, jump_model; name=name)
+    return DecisionModel(template, sys, settings, jump_model; name=name)
 end
 
 function InvestmentModel(

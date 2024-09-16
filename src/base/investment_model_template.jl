@@ -1,13 +1,11 @@
-#const DeviceModelForBranches = DeviceModel{<:PSY.Branch, <:AbstractDeviceFormulation}
-const TechnologiesModelContainer = Dict{Symbol, TechnologyModel}
-#const BranchModelContainer = Dict{Symbol, DeviceModelForBranches}
-#const ServicesModelContainer = Dict{Tuple{String, Symbol}, ServiceModel}
-
 abstract type AbstractInvestmentModelTemplate end
 
 mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
+    capital_model::CapitalCostModel
+    operation_model::OperationCostModel
     transport_model::TransportModel{<:AbstractTransportModel}
-    technologies::TechnologiesModelContainer
+    technology_models::TechnologiesModelContainer
+
     function InvestmentModelTemplate(
         transport::TransportModel{T},
     ) where {T <: AbstractTransportModel}

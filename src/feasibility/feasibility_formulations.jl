@@ -1,1 +1,0 @@
-struct BasicFeasibility <: FeasibilityTechnologyFormulation end

@@ -100,6 +100,9 @@ import InfrastructureSystems.Optimization:
     convert_result_to_natural_units,
     to_matrix,
     get_store_container_type
+
+import TimerOutputs
+
 ####
 # Order Required
 include("utils/mpi_utils.jl")
