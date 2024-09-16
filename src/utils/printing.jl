@@ -9,6 +9,7 @@ function Base.show(io::IO, ::MIME"text/html", input::InvestmentModelTemplate)
 end
 
 function _show_method(io::IO, template::InvestmentModelTemplate, backend::Symbol; kwargs...)
+    #=
     table = [
         "Network Model" string(get_network_formulation(template.network_model))
         "Slacks" get_use_slacks(template.network_model)
@@ -46,5 +47,6 @@ function _show_method(io::IO, template::InvestmentModelTemplate, backend::Symbol
         title="Technology Models",
         alignment=:l,
     )
+    =#
     return
 end
