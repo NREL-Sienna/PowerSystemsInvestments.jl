@@ -1,3 +1,3 @@
 ### Operations Formulations ###
 
-struct BasicDispatch <: TechnologyOperationsFormulation end
+struct BasicDispatch <: FeasibilityTechnologyFormulation end

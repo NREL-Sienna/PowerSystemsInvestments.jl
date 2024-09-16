@@ -4,12 +4,19 @@ mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
     capital_model::CapitalCostModel
     operation_model::OperationCostModel
     transport_model::TransportModel{<:AbstractTransportModel}
-    technology_models::TechnologiesModelContainer
+    technology_models::Dict # Type to be refined later
 
     function InvestmentModelTemplate(
-        transport::TransportModel{T},
+        capital_model::CapitalCostModel,
+        operation_model::OperationCostModel,
+        transport_model::TransportModel{T}
     ) where {T <: AbstractTransportModel}
-        new(transport, TechnologiesModelContainer())
+        new(
+            capital_model,
+            operation_model,
+            transport_model,
+            Dict()
+        )
     end
 end
 

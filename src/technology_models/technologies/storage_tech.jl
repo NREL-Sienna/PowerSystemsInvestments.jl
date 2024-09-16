@@ -136,32 +136,6 @@ function add_expression!(
     return
 end
 
-function add_expression!(
-    container::SingleOptimizationContainer,
-    expression_type::T,
-    devices::U,
-    formulation::AbstractTechnologyFormulation,
-) where {
-    T <: VariableOMCost,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
-    @assert !isempty(devices)
-    time_steps = get_time_steps(container)
-    binary = false
-
-    var = get_variable(container, BuildCapacity(), D)
-
-    expression = add_expression_container!(
-        container,
-        expression_type,
-        D,
-        [PSIP.get_name(d) for d in devices],
-        time_steps,
-    )
-
-    return
-end
-
 function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
@@ -230,7 +204,7 @@ function add_expression!(
 ) where {
     T <: ActivePowerBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
+} where {D <: PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
@@ -531,7 +505,7 @@ function objective_function!(
     devices::IS.FlattenIteratorWrapper{T},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
-) where {T <: PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
+) where {T <: PSIP.StorageTechnology}#, U <: ActivePowerVariable}
     add_variable_cost!(container, ActivePowerVariable(), devices, formulation) #U()
     #add_start_up_cost!(container, StartVariable(), devices, U())
     #add_shut_down_cost!(container, StopVariable(), devices, U())

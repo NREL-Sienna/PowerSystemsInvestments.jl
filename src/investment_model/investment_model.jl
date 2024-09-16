@@ -69,30 +69,5 @@ function InvestmentModel(
         check_numerical_bounds=check_numerical_bounds,
         store_variable_names=store_variable_names,
     )
-    return DecisionModel(template, sys, settings, jump_model; name=name)
-end
-
-function InvestmentModel(
-    ::Type{I},
-    ::Type{S},
-    template::AbstractInvestmentModelTemplate,
-    portfolio::PSIP.Portfolio,
-    jump_model::Union{Nothing, JuMP.Model}=nothing;
-    kwargs...,
-) where {I <: InvestmentModel, S <: SolutionAlgorithm}
-    return InvestmentModel{I, S}(template, portfolio, jump_model; kwargs...)
-end
-
-function InvestmentModel(
-    template::AbstractInvestmentModelTemplate,
-    portfolio::PSIP.Portfolio,
-    jump_model::Union{Nothing, JuMP.Model}=nothing;
-    kwargs...,
-)
-    return InvestmentModel{GenericCapacityExpansion, SingleInstanceSolve}(
-        template,
-        portfolio,
-        jump_model;
-        kwargs...,
-    )
+    return InvestmentModel(template, sys, settings, jump_model; name=name)
 end
