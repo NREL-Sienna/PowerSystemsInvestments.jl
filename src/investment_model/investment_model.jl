@@ -100,7 +100,7 @@ function build!(
         Logging.with_logger(logger) do
             try
                 TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
-                    _build!(model)
+                    build_impl!(model)
                 end
                 set_status!(model, ModelBuildStatus.BUILT)
                 @info "\n$(BUILD_PROBLEMS_TIMER)\n"
