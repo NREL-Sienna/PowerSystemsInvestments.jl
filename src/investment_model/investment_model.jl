@@ -61,7 +61,7 @@ function InvestmentModel(
         check_numerical_bounds=check_numerical_bounds,
         store_variable_names=store_variable_names,
     )
-    return InvestmentModel(template, alg, portfolio, settings, jump_model; name=name)
+    return InvestmentModel(template, alg, portfolio, settings, jump_model)
 end
 
 function build_impl!(::InvestmentModel{T}) where {T}
