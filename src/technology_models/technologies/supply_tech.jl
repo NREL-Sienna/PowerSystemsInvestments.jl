@@ -17,7 +17,7 @@ function get_default_time_series_names(
 ) where {
     U <: PSIP.SupplyTechnology,
     V <: InvestmentTechnologyFormulation,
-    W <: FeasibilityTechnologyFormulation,
+    W <: OperationsTechnologyFormulation,
 }
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
@@ -29,7 +29,7 @@ function get_default_attributes(
 ) where {
     U <: PSIP.SupplyTechnology,
     V <: InvestmentTechnologyFormulation,
-    W <: FeasibilityTechnologyFormulation,
+    W <: OperationsTechnologyFormulation,
 }
     return Dict{String, Any}()
 end
