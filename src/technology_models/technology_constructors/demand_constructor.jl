@@ -55,7 +55,6 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
-
     return
 end
 
@@ -83,6 +82,5 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
-
     return
 end

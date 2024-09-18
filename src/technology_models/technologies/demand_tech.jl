@@ -76,10 +76,7 @@ function add_expression!(
             time_steps_ix = mapping_ops[year]
             multiplier = 1.0
             for (ix, t) in enumerate(time_steps_ix)
-                _add_to_jump_expression!(
-                    expression[t],
-                    ts_data[ix] * multiplier,
-                )
+                _add_to_jump_expression!(expression[t], ts_data[ix] * multiplier)
             end
         end
     end
