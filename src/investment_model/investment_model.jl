@@ -61,7 +61,7 @@ function InvestmentModel(
         check_numerical_bounds=check_numerical_bounds,
         store_variable_names=store_variable_names,
     )
-    return InvestmentModel(template, alg, portfolio, settings, jump_model; name=name)
+    return InvestmentModel(template, alg, portfolio, settings, jump_model)
 end
 
 function build_impl!(::InvestmentModel{T}) where {T}
@@ -100,7 +100,7 @@ function build!(
         Logging.with_logger(logger) do
             try
                 TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
-                    _build!(model)
+                    build_impl!(model)
                 end
                 set_status!(model, ModelBuildStatus.BUILT)
                 @info "\n$(BUILD_PROBLEMS_TIMER)\n"

@@ -11,6 +11,7 @@ import DataStructures
 import PowerNetworkMatrices
 import PrettyTables
 import TimeSeries
+import Logging
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization
@@ -51,6 +52,9 @@ export add_expression!
 export add_to_expression!
 
 using DocStringExtensions
+
+# methods
+export build!
 
 @template (FUNCTIONS, METHODS) = """
                                  $(TYPEDSIGNATURES)

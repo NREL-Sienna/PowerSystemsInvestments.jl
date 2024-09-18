@@ -17,7 +17,6 @@ function construct_technologies!(
     # CumulativeCapacity expressions
     add_expression!(container, CumulativePowerCapacity(), devices, B())
     add_expression!(container, CumulativeEnergyCapacity(), devices, B())
-
     return
 end
 
@@ -32,7 +31,6 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
-
     #ActivePowerVariables
     add_variable!(container, ActiveInPowerVariable(), devices, C())
     add_variable!(container, ActiveOutPowerVariable(), devices, C())
@@ -67,6 +65,7 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::CapitalCostModel,
+    ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {T <: PSIP.StorageTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
@@ -96,7 +95,6 @@ function construct_technologies!(
         CumulativeEnergyCapacity(),
         devices,
     )
-
     return
 end
 

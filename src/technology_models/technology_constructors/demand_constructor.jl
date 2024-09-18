@@ -9,7 +9,6 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
-
     return
 end
 
@@ -24,7 +23,6 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
-
     # SupplyTotal, initialize expression, then add ActivePowerVariable in supply_constructor
     add_expression!(container, SupplyTotal(), devices, C())
 
@@ -66,6 +64,7 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::OperationCostModel,
+    ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
