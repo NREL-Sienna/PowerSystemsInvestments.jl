@@ -149,6 +149,7 @@ include("model_build/SingleInstanceSolve.jl")
 
 include("utils/printing.jl")
 include("utils/jump_utils.jl")
+include("utils/logging.jl")
 include("technology_models/technologies/common/add_variable.jl")
 include("technology_models/technologies/common/add_to_expression.jl")
 include("technology_models/technologies/supply_tech.jl")

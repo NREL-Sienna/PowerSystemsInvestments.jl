@@ -25,10 +25,12 @@ function get_default_time_series_names(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.StorageTechnology,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
@@ -37,10 +39,12 @@ function get_default_attributes(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.StorageTechnology,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{String, Any}()
 end
@@ -202,7 +206,7 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: ActivePowerBalance,
+    T <: EnergyBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.StorageTechnology}
     @assert !isempty(devices)

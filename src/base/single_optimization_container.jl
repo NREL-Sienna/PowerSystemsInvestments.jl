@@ -683,39 +683,79 @@ function add_to_objective_investment_expression!(
     return
 end
 
+##### Initialize Expressions #####
+
+function _make_container_array(ax...)
+    return remove_undef!(DenseAxisArray{GAE}(undef, ax...))
+end
+
+function _make_system_expressions!(
+    container::SingleOptimizationContainer,
+    ::Type{SingleRegionBalanceModel},
+)
+    @error "Hard Code TimeSteps"
+    time_steps = 1:48
+    container.time_steps = 1:48
+    container.time_steps_investments = 1:2
+    container.expressions = Dict(
+        ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
+            _make_container_array(["SingleRegion"], time_steps),
+    )
+    return
+end
+
+function initialize_system_expressions!(
+    container::SingleOptimizationContainer,
+    transport_model::TransportModel{T},
+    port::PSIP.Portfolio,
+) where {T <: SingleRegionBalanceModel}
+    _make_system_expressions!(container, T)
+    return
+end
+
+##### Build Models #######
+
 function build_model!(
     container::SingleOptimizationContainer,
     template::InvestmentModelTemplate,
     port::PSIP.Portfolio,
 )
-    transmission = get_network_formulation(template)
-    transmission_model = get_network_model(template)
-    initialize_system_expressions!(
-        container,
-        get_network_model(template),
-        transmission_model.subnetworks,
-        sys,
-        transmission_model.radial_network_reduction.bus_reduction_map,
-    )
+    #transmission = get_transport_formulation(template)
+    transport_model = get_transport_model(template)
+    initialize_system_expressions!(container, transport_model, port)
 
     # Order is required
-    for device_model in values(template.devices)
-        @debug "Building Arguments for $(get_component_type(device_model)) with $(get_formulation(device_model)) formulation" _group =
-            LOG_GROUP_OPTIMIZATION_CONTAINER
-        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(device_model))" begin
-            if validate_available_devices(device_model, sys)
-                construct_device!(
+    for (tech_model, tech_names) in template.technology_models
+        #@debug "Building Arguments for $(get_technology_type(tech_model)) with $(get_formulation(device_model)) formulation" _group =
+        #    LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
+            #if validate_available_devices(device_model, sys)
+            for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                construct_technologies!(
                     container,
-                    sys,
+                    port,
                     ArgumentConstructStage(),
-                    device_model,
-                    transmission_model,
+                    mod,
+                    tech_model,
+                    #transmission_model,
                 )
             end
-            @debug "Problem size:" get_problem_size(container) _group =
-                LOG_GROUP_OPTIMIZATION_CONTAINER
+            #end
+            #@debug "Problem size:" get_problem_size(container) _group =
+            #    LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
+    @show container.variables
+    #@show container.expressions["SingleRegion", 1]
+    @show container.expressions[InfrastructureSystems.Optimization.ExpressionKey{
+        PowerSystemsInvestments.EnergyBalance,
+        PSIP.Portfolio,
+    }(
+        "",
+    )][
+        "SingleRegion",
+        48,
+    ]
 
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(

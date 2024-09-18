@@ -52,7 +52,7 @@ function add_to_expression!(
     ::Type{T},
     ::Type{U},
     devices::IS.FlattenIteratorWrapper{V},
-) where {T <: ActivePowerBalance, U <: OperationsVariableType, V <: PSIP.Technology}
+) where {T <: EnergyBalance, U <: OperationsVariableType, V <: PSIP.Technology}
     variable = get_variable(container, U(), V)
     expression = get_expression(container, T(), PSIP.Portfolio)
     multiplier = get_variable_multiplier(U(), V)

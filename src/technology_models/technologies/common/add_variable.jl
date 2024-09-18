@@ -7,7 +7,7 @@ function add_variable!(
     T <: InvestmentVariableType,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
 
@@ -45,7 +45,7 @@ function add_variable!(
     T <: OperationsVariableType,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
 

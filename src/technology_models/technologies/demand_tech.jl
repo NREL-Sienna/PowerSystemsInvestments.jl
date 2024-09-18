@@ -2,10 +2,12 @@ function get_default_time_series_names(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.DemandRequirement,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
@@ -14,10 +16,12 @@ function get_default_attributes(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.DemandRequirement,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{String, Any}()
 end
@@ -30,16 +34,16 @@ get_variable_multiplier(::ActivePowerVariable, ::Type{PSIP.DemandRequirement}) =
 
 # TODO: SupplyTotal and DemandTotal should probably be defined for each zone/region/etc. later on
 
-function add_expression!(
+function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: DemandTotal,
+    T <: EnergyBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.DemandRequirement}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
@@ -54,14 +58,13 @@ function add_expression!(
     mapping_inv = Dict("2030" => 1, "2035" => 2)
 
     time_steps = get_time_steps(container)
-
-    expression = add_expression_container!(container, expression_type, D, time_steps)
+    expression = get_expression(container, T(), PSIP.Portfolio)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
 
     for d in devices
         name = PSIP.get_name(d)
-        peak_load = PSIP.get_peak_load(d)
+        #peak_load = PSIP.get_peak_load(d)
         ts_name = "ops_peak_load"
         ts_keys = filter(x -> x.name == ts_name, IS.get_time_series_keys(d))
         for ts_key in ts_keys
@@ -74,9 +77,13 @@ function add_expression!(
                 IS.get_time_series(ts_type, d, ts_name; year=year).data,
             )
             time_steps_ix = mapping_ops[year]
-            multiplier = 1.0
+
+            multiplier = -1.0
             for (ix, t) in enumerate(time_steps_ix)
-                _add_to_jump_expression!(expression[t], ts_data[ix] * multiplier)
+                _add_to_jump_expression!(
+                    expression["SingleRegion", t],
+                    ts_data[ix] * multiplier,
+                )
             end
         end
     end
@@ -84,16 +91,17 @@ function add_expression!(
     return
 end
 
+#=
 function add_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: SupplyTotal,
+    T <: EnergyBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.DemandRequirement}
-    @assert !isempty(devices)
+   # @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
@@ -102,6 +110,7 @@ function add_expression!(
 
     return
 end
+=#
 
 ################### Constraints ##################
 

@@ -14,10 +14,12 @@ function get_default_time_series_names(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.SupplyTechnology,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{Type{<:TimeSeriesParameter}, String}()
 end
@@ -26,10 +28,12 @@ function get_default_attributes(
     ::Type{U},
     ::Type{V},
     ::Type{W},
+    ::Type{X},
 ) where {
     U <: PSIP.SupplyTechnology,
     V <: InvestmentTechnologyFormulation,
     W <: OperationsTechnologyFormulation,
+    X <: FeasibilityTechnologyFormulation,
 }
     return Dict{String, Any}()
 end
@@ -47,7 +51,7 @@ function add_expression!(
     T <: CumulativeCapacity,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.SupplyTechnology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
 
@@ -112,22 +116,22 @@ function add_to_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: SupplyTotal,
+    T <: EnergyBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.SupplyTechnology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
     variable = get_variable(container, ActivePowerVariable(), D)
-    expression = get_expression(container, T(), PSIP.DemandRequirement{PSY.PowerLoad})
+    expression = get_expression(container, T(), PSIP.Portfolio)
 
     for d in devices, t in time_steps
         name = PSIP.get_name(d)
         #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
         _add_to_jump_expression!(
-            expression[t],
+            expression["SingleRegion", t],
             variable[name, t],
             1.0, #get_variable_multiplier(U(), V, W()),
         )
@@ -142,7 +146,7 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: ActivePowerBalance,
+    T <: EnergyBalance,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.SupplyTechnology}
     @assert !isempty(devices)

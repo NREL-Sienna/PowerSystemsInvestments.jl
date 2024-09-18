@@ -3,9 +3,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
@@ -23,9 +28,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
@@ -33,7 +43,7 @@ function construct_technologies!(
     add_variable!(container, ActivePowerVariable(), devices, C())
 
     # SupplyTotal
-    add_to_expression!(container, SupplyTotal(), devices, C())
+    add_to_expression!(container, EnergyBalance(), devices, C())
 
     return
 end
@@ -43,9 +53,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
     devices = PSIP.get_technologies(T, p)
@@ -60,9 +75,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
     devices = PSIP.get_technologies(T, p)
 
     # Capital Component of objective function
@@ -81,9 +101,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
     devices = PSIP.get_technologies(T, p)
     # Operations Component of objective function
     objective_function!(container, devices, C())
@@ -108,9 +133,14 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.SupplyTechnology, B <: ContinuousInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.SupplyTechnology,
+    B <: ContinuousInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
     devices = PSIP.get_technologies(T, p)
 
     return
