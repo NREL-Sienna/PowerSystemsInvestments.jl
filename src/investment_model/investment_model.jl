@@ -102,10 +102,10 @@ function build!(
                 TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
                     build_impl!(model)
                 end
-                set_status!(model, ModelBuildStatus.BUILT)
+                set_status!(model, ISOPT.ModelBuildStatus.BUILT)
                 @info "\n$(BUILD_PROBLEMS_TIMER)\n"
             catch e
-                set_status!(model, ModelBuildStatus.FAILED)
+                set_status!(model, ISOPT.ModelBuildStatus.FAILED)
                 bt = catch_backtrace()
                 @error "InvestmentModel Build Failed" exception = e, bt
             end
@@ -123,7 +123,6 @@ is_built(model::InvestmentModel) =
 isempty(model::InvestmentModel) =
     IS.Optimization.get_status(get_internal(model)) == ModelBuildStatus.EMPTY
 
-
 get_constraints(model::InvestmentModel) =
     IS.Optimization.get_constraints(get_internal(model))
 get_internal(model::InvestmentModel) = model.internal
@@ -139,30 +138,32 @@ function get_optimization_container(model::InvestmentModel)
     return IS.Optimization.get_optimization_container(get_internal(model))
 end
 
-
 function get_timestamps(model::InvestmentModel)
     optimization_container = get_optimization_container(model)
     start_time = get_initial_time(optimization_container)
     resolution = get_resolution(model)
     horizon_count = get_time_steps(optimization_container)[end]
-    return range(start_time; length = horizon_count, step = resolution)
+    return range(start_time; length=horizon_count, step=resolution)
 end
 
 get_problem_base_power(model::InvestmentModel) = PSY.get_base_power(model.portfolio)
 get_settings(model::InvestmentModel) = get_optimization_container(model).settings
-get_optimizer_stats(model::InvestmentModel) = get_optimizer_stats(get_optimization_container(model))
+get_optimizer_stats(model::InvestmentModel) =
+    get_optimizer_stats(get_optimization_container(model))
 
 get_status(model::InvestmentModel) = IS.Optimization.get_status(get_internal(model))
 get_portfolio(model::InvestmentModel) = model.portfolio
 get_template(model::InvestmentModel) = model.template
 
-get_store_params(model::InvestmentModel) = IS.Optimization.get_store_params(get_internal(model))
+get_store_params(model::InvestmentModel) =
+    IS.Optimization.get_store_params(get_internal(model))
 get_output_dir(model::InvestmentModel) = IS.Optimization.get_output_dir(get_internal(model))
-    
+
 get_variables(model::InvestmentModel) = get_variables(get_optimization_container(model))
 get_parameters(model::InvestmentModel) = get_parameters(get_optimization_container(model))
 get_duals(model::InvestmentModel) = get_duals(get_optimization_container(model))
-get_initial_conditions(model::InvestmentModel) =  get_initial_conditions(get_optimization_container(model))
+get_initial_conditions(model::InvestmentModel) =
+    get_initial_conditions(get_optimization_container(model))
 
 get_run_status(model::InvestmentModel) = get_run_status(get_simulation_info(model))
 set_run_status!(model::InvestmentModel, status) =
@@ -188,13 +189,13 @@ function solve_impl!(model::InvestmentModel)
     end
     return
 end
-    
+
 set_console_level!(model::InvestmentModel, val) =
     IS.Optimization.set_console_level!(get_internal(model), val)
 set_file_level!(model::InvestmentModel, val) =
     IS.Optimization.set_file_level!(get_internal(model), val)
 
-function set_status!(model::InvestmentModel, status::ModelBuildStatus)
+function set_status!(model::InvestmentModel, status::ISOPT.ModelBuildStatus)
     IS.Optimization.set_status!(get_internal(model), status)
     return
 end
@@ -235,7 +236,6 @@ end
 
 read_optimizer_stats(model::InvestmentModel) = read_optimizer_stats(get_store(model))
 
-
 list_aux_variable_keys(x::InvestmentModel) =
     IS.Optimization.list_keys(get_store(x), STORE_CONTAINER_AUX_VARIABLES)
 list_aux_variable_names(x::InvestmentModel) = _list_names(x, STORE_CONTAINER_AUX_VARIABLES)
@@ -262,4 +262,10 @@ function _list_names(model::InvestmentModel, container_type)
     return encode_keys_as_strings(
         IS.Optimization.list_keys(get_store(model), container_type),
     )
+end
+
+function unregister_recorders!(model::InvestmentModel)
+    for name in IS.Optimization.get_recorders(get_internal(model))
+        IS.unregister_recorder!(name)
+    end
 end

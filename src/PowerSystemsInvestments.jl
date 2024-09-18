@@ -12,6 +12,7 @@ import PowerNetworkMatrices
 import PrettyTables
 import TimeSeries
 import Logging
+import TimerOutputs
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization

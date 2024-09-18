@@ -30,9 +30,9 @@ InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportAggregation} =
 InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionPowerModel)
 
 get_technology_models(template::InvestmentModelTemplate) = template.technologies
-get_network_model(template::InvestmentModelTemplate) = template.network_model
-get_network_formulation(template::InvestmentModelTemplate) =
-    get_network_formulation(get_network_model(template))
+get_transport_model(template::InvestmentModelTemplate) = template.transport_model
+get_transport_formulation(template::InvestmentModelTemplate) =
+    get_transport_formulation(get_transport_model(template))
 
 """
 Sets the network model in a template.
