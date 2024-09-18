@@ -4,6 +4,7 @@ mutable struct TechnologyModel{
     C <: OperationsTechnologyFormulation,
 }
     use_slacks::Bool
+    duals::Vector{DataType}
     time_series_names::Dict{Type{<:TimeSeriesParameter}, String}
     attributes::Dict{String, Any}
 end
@@ -108,7 +109,7 @@ function TechnologyModel(
         duals,
         time_series_names,
         attributes_,
-        nothing,
+        #nothing,
     )
 end
 
@@ -138,7 +139,7 @@ function TechnologyModel(
         duals,
         time_series_names,
         attributes_,
-        nothing,
+        #nothing,
     )
 end
 
@@ -168,7 +169,7 @@ function TechnologyModel(
         duals,
         time_series_names,
         attributes_,
-        nothing,
+        #nothing,
     )
 end
 
@@ -182,7 +183,7 @@ function TechnologyModel(
     attributes=Dict{String, Any}(),
 ) where {
     D <: PSIP.DemandRequirement{T},
-    B <: ContinuousInvestment,
+    B <: StaticLoadInvestment,
     C <: BasicDispatch,
 } where {T <: PSY.PowerLoad}
     attributes_ = get_default_attributes(D, B, C)
@@ -198,6 +199,6 @@ function TechnologyModel(
         duals,
         time_series_names,
         attributes_,
-        nothing,
+        #nothing,
     )
 end
