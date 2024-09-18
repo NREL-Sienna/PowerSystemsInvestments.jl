@@ -725,6 +725,7 @@ function build_model!(
     initialize_system_expressions!(container, transport_model, port)
 
     # Order is required
+    @error "Remember to restore availability code here"
     for (tech_model, tech_names) in template.technology_models
         #@debug "Building Arguments for $(get_technology_type(tech_model)) with $(get_formulation(device_model)) formulation" _group =
         #    LOG_GROUP_OPTIMIZATION_CONTAINER
@@ -745,18 +746,6 @@ function build_model!(
             #    LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-    @show container.variables
-    #@show container.expressions["SingleRegion", 1]
-    @show container.expressions[InfrastructureSystems.Optimization.ExpressionKey{
-        PowerSystemsInvestments.EnergyBalance,
-        PSIP.Portfolio,
-    }(
-        "",
-    )][
-        "SingleRegion",
-        48,
-    ]
-
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(
             container,
