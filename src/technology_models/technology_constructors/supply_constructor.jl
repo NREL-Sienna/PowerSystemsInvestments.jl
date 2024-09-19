@@ -3,13 +3,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -28,13 +28,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -53,13 +53,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ArgumentConstructStage,
     ::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -75,13 +75,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     devices = PSIP.get_technologies(T, p)
 
@@ -101,13 +101,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     devices = PSIP.get_technologies(T, p)
     # Operations Component of objective function
@@ -116,7 +116,7 @@ function construct_technologies!(
     # Add objective function from container to JuMP model
     update_objective_function!(container)
     # Capacity constraint
-    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
+    # add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
     # Dispatch constraint
     add_constraints!(
         container,
@@ -133,13 +133,13 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     devices = PSIP.get_technologies(T, p)
 

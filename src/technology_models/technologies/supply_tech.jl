@@ -16,12 +16,12 @@ function get_default_time_series_names(
     ::Type{W},
     ::Type{X},
 ) where {
-    U <: PSIP.SupplyTechnology,
-    V <: InvestmentTechnologyFormulation,
-    W <: OperationsTechnologyFormulation,
-    X <: FeasibilityTechnologyFormulation,
+    U<:PSIP.SupplyTechnology,
+    V<:InvestmentTechnologyFormulation,
+    W<:OperationsTechnologyFormulation,
+    X<:FeasibilityTechnologyFormulation,
 }
-    return Dict{Type{<:TimeSeriesParameter}, String}()
+    return Dict{Type{<:TimeSeriesParameter},String}()
 end
 
 function get_default_attributes(
@@ -30,12 +30,12 @@ function get_default_attributes(
     ::Type{W},
     ::Type{X},
 ) where {
-    U <: PSIP.SupplyTechnology,
-    V <: InvestmentTechnologyFormulation,
-    W <: OperationsTechnologyFormulation,
-    X <: FeasibilityTechnologyFormulation,
+    U<:PSIP.SupplyTechnology,
+    V<:InvestmentTechnologyFormulation,
+    W<:OperationsTechnologyFormulation,
+    X<:FeasibilityTechnologyFormulation,
 }
-    return Dict{String, Any}()
+    return Dict{String,Any}()
 end
 
 ################### Variables ####################
@@ -48,9 +48,9 @@ function add_expression!(
     devices::U,
     formulation::AbstractTechnologyFormulation,
 ) where {
-    T <: CumulativeCapacity,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
+    T<:CumulativeCapacity,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.SupplyTechnology}
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
@@ -90,9 +90,9 @@ function add_expression!(
     devices::U,
     formulation::AbstractTechnologyFormulation,
 ) where {
-    T <: VariableOMCost,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
+    T<:VariableOMCost,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.SupplyTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
@@ -116,22 +116,22 @@ function add_to_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: EnergyBalance,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
+    T<:EnergyBalance,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.SupplyTechnology}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
     variable = get_variable(container, ActivePowerVariable(), D)
-    expression = get_expression(container, T(), PSIP.Portfolio)
-
+    # expression = get_expression(container, T(), PSIP.Portfolio)
+    expression = add_expression_container!(container, expression_type, D, time_steps)
     for d in devices, t in time_steps
         name = PSIP.get_name(d)
         #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
         _add_to_jump_expression!(
-            expression["SingleRegion", t],
+            expression[t],
             variable[name, t],
             1.0, #get_variable_multiplier(U(), V, W()),
         )
@@ -146,9 +146,9 @@ function add_expression!(
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T <: EnergyBalance,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.SupplyTechnology}
+    T<:EnergyBalance,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.SupplyTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
@@ -180,10 +180,10 @@ function add_constraints!(
     ::V,
     devices::U,
 ) where {
-    T <: ActivePowerLimitsConstraint,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-    V <: ActivePowerVariable,
-} where {D <: PSIP.SupplyTechnology{PSY.RenewableDispatch}}
+    T<:ActivePowerLimitsConstraint,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActivePowerVariable,
+} where {D<:PSIP.SupplyTechnology{PSY.RenewableDispatch}}
     time_steps = get_time_steps(container)
     # Hard Code Mapping #
     # TODO: Remove
@@ -232,10 +232,10 @@ function add_constraints!(
     ::V,
     devices::U,
 ) where {
-    T <: ActivePowerLimitsConstraint,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-    V <: ActivePowerVariable,
-} where {D <: PSIP.SupplyTechnology{PSY.ThermalStandard}}
+    T<:ActivePowerLimitsConstraint,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActivePowerVariable,
+} where {D<:PSIP.SupplyTechnology{PSY.ThermalStandard}}
     time_steps = get_time_steps(container)
     # Hard Code Mapping #
     # TODO: Remove
@@ -282,11 +282,11 @@ function add_constraints!(
     devices::U,
     #::NetworkModel{X},
 ) where {
-    T <: MaximumCumulativeCapacity,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
-    V <: CumulativeCapacity,
+    T<:MaximumCumulativeCapacity,
+    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:CumulativeCapacity,
     #X <: PM.AbstractPowerModel,
-} where {D <: PSIP.SupplyTechnology}
+} where {D<:PSIP.SupplyTechnology}
     time_steps = get_time_steps_investments(container)
 
     device_names = PSIP.get_name.(devices)
@@ -314,7 +314,7 @@ function objective_function!(
     devices::IS.FlattenIteratorWrapper{T},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
-) where {T <: PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
+) where {T<:PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
     add_variable_cost!(container, ActivePowerVariable(), devices, formulation) #U()
     #add_start_up_cost!(container, StartVariable(), devices, U())
     #add_shut_down_cost!(container, StopVariable(), devices, U())
@@ -327,7 +327,7 @@ function objective_function!(
     devices::IS.FlattenIteratorWrapper{T},
     #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
-) where {T <: PSIP.SupplyTechnology}#, U <: BuildCapacity}
+) where {T<:PSIP.SupplyTechnology}#, U <: BuildCapacity}
     add_capital_cost!(container, BuildCapacity(), devices, formulation) #U()
     add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation)
     return
