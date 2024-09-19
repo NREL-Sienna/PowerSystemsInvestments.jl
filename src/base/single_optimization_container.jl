@@ -746,6 +746,9 @@ function build_model!(
             #    LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
+
+    # Requirements Arguments Eventually
+    #=
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(
             container,
@@ -756,7 +759,10 @@ function build_model!(
             transmission_model,
         )
     end
+    =#
 
+    # Transportation Model Arguments
+    #= Transportation Model Arguments
     for branch_model in values(template.branches)
         @debug "Building Arguments for $(get_component_type(branch_model)) with $(get_formulation(branch_model)) formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
@@ -774,7 +780,9 @@ function build_model!(
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
+    =#
 
+    # TODO: Add Constraints for this
     for device_model in values(template.devices)
         @debug "Building Model for $(get_component_type(device_model)) with $(get_formulation(device_model)) formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
