@@ -57,6 +57,7 @@ using DocStringExtensions
 
 # methods
 export build!
+export solve!
 
 @template (FUNCTIONS, METHODS) = """
                                  $(TYPEDSIGNATURES)
@@ -118,13 +119,19 @@ import InfrastructureSystems.Optimization:
     convert_result_to_natural_units,
     to_matrix,
     get_store_container_type
+import InfrastructureSystems.Optimization:
+    OptimizationProblemResults, 
+    OptimizationProblemResultsExport, 
+    OptimizerStats
 
 import TimerOutputs
 
 ####
 # Order Required
 include("utils/mpi_utils.jl")
+include("utils/jump_utils.jl")
 include("base/definitions.jl")
+include("base/simulation.jl")
 
 include("base/abstract_formulation_types.jl")
 include("capital/technology_capital_formulations.jl")
@@ -150,9 +157,7 @@ include("investment_model/investment_model_store.jl")
 include("investment_model/investment_model.jl")
 
 include("model_build/SingleInstanceSolve.jl")
-
 include("utils/printing.jl")
-include("utils/jump_utils.jl")
 include("utils/logging.jl")
 include("utils/psip_utils.jl")
 include("technology_models/technologies/common/add_variable.jl")
