@@ -34,6 +34,10 @@ get_transport_model(template::InvestmentModelTemplate) = template.transport_mode
 get_transport_formulation(template::InvestmentModelTemplate) =
     get_transport_formulation(get_transport_model(template))
 
+get_capital_model(template::InvestmentModelTemplate) = template.capital_model
+get_operation_model(template::InvestmentModelTemplate) = template.operation_model
+get_feasibility_model(template::InvestmentModelTemplate) = template.feasibility_model
+
 """
 Sets the network model in a template.
 """
