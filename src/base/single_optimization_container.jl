@@ -89,6 +89,25 @@ get_aux_variables(container::SingleOptimizationContainer) = container.aux_variab
 get_base_power(container::SingleOptimizationContainer) = container.base_power
 get_constraints(container::SingleOptimizationContainer) = container.constraints
 
+function check_parameter_multiplier_values(multiplier_array::DenseAxisArray)
+    return !all(isnan.(multiplier_array.data))
+end
+
+function check_parameter_multiplier_values(multiplier_array::SparseAxisArray)
+    return !all(isnan.(values(multiplier_array.data)))
+end
+
+function check_optimization_container(container::SingleOptimizationContainer)
+    for (k, param_container) in container.parameters
+        valid = check_parameter_multiplier_values(param_container.multiplier_array)
+        if !valid
+            error("The model container has invalid values in $(encode_key_as_string(k))")
+        end
+    end
+    container.settings_copy = copy_for_serialization(container.settings)
+    return
+end
+
 function _assign_container!(container::Dict, key::OptimizationContainerKey, value)
     if haskey(container, key)
         @error "$(IS.Optimization.encode_key(key)) is already stored" sort!(
@@ -803,12 +822,12 @@ function build_model!(
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-
+    #=
     # This function should be called after construct_device ModelConstructStage
-    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transmission)" begin
-        @debug "Building $(transmission) network formulation" _group =
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transport_model)" begin
+        @debug "Building $(transport_model) transport formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
-        construct_network!(container, sys, transmission_model, template)
+        construct_network!(container, sys, transport_model, template)
         @debug "Problem size:" get_problem_size(container) _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
     end
@@ -830,7 +849,7 @@ function build_model!(
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-
+    
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(
             container,
@@ -841,7 +860,7 @@ function build_model!(
             transmission_model,
         )
     end
-
+    =#
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Objective" begin
         @debug "Building Objective" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
         update_objective_function!(container)
