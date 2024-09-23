@@ -871,3 +871,63 @@ function build_model!(
     check_optimization_container(container)
     return
 end
+
+"""
+Default solve method for OptimizationContainer
+"""
+function solve_model!(
+    container::SingleOptimizationContainer,
+    port::PSIP.Portfolio
+)
+    optimizer_stats = get_optimizer_stats(container)
+
+    jump_model = get_jump_model(container)
+
+    model_status = MOI.NO_SOLUTION::MOI.ResultStatusCode
+    conflict_status = MOI.COMPUTE_CONFLICT_NOT_CALLED
+
+    try_count = 0
+    while model_status != MOI.FEASIBLE_POINT::MOI.ResultStatusCode
+        _,
+        optimizer_stats.timed_solve_time,
+        optimizer_stats.solve_bytes_alloc,
+        optimizer_stats.sec_in_gc = @timed JuMP.optimize!(jump_model)
+        model_status = JuMP.primal_status(jump_model)
+
+        if model_status != MOI.FEASIBLE_POINT::MOI.ResultStatusCode
+            if get_calculate_conflict(get_settings(container))
+                @warn "Optimizer returned $model_status computing conflict"
+                conflict_status = compute_conflict!(container)
+                if conflict_status == MOI.CONFLICT_FOUND
+                    return RunStatus.FAILED
+                end
+            else
+                @warn "Optimizer returned $model_status trying optimize! again"
+            end
+
+            try_count += 1
+            if try_count > MAX_OPTIMIZE_TRIES
+                @error "Optimizer returned $model_status after $MAX_OPTIMIZE_TRIES optimize! attempts"
+                return RunStatus.FAILED
+            end
+        end
+    end
+
+    _, optimizer_stats.timed_calculate_aux_variables =
+        @timed calculate_aux_variables!(container, portfolio)
+
+    # Needs to be called here to avoid issues when getting duals from MILPs
+    write_optimizer_stats!(container)
+
+    _, optimizer_stats.timed_calculate_dual_variables =
+        @timed calculate_dual_variables!(container, portfolio, is_milp(container))
+
+    status = RunStatus.SUCCESSFULLY_FINALIZED
+
+    return status
+end
+
+function write_optimizer_stats!(container::SingleOptimizationContainer)
+    write_optimizer_stats!(get_optimizer_stats(container), get_jump_model(container))
+    return
+end

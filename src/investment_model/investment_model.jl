@@ -3,6 +3,7 @@ mutable struct InvestmentModel{S <: SolutionAlgorithm}
     template::InvestmentModelTemplate
     portfolio::PSIP.Portfolio
     internal::Union{Nothing, ISOPT.ModelInternal}
+    simulation_info::SimulationInfo
     store::InvestmentModelStore
     ext::Dict{String, Any}
 end
@@ -21,6 +22,7 @@ function InvestmentModel(
         template,
         portfolio,
         internal,
+        SimulationInfo(),
         InvestmentModelStore(),
         Dict{String, Any}(),
     )
@@ -69,52 +71,22 @@ function build_impl!(::InvestmentModel{T}) where {T}
     return
 end
 
-"""
-Build the Invesment Model.
-
-# Arguments
-
-  - `model::InvestmentModel{<:SolutionAlgorithm}`: InvestmentModel object
-  - `output_dir::String`: Output directory for results
-  - `console_level = Logging.Error`:
-  - `file_level = Logging.Info`:
-  - `disable_timer_outputs = false` : Enable/Disable timing outputs
-"""
-function build!(
-    model::InvestmentModel{<:SolutionAlgorithm};
-    output_dir::String,
-    console_level=Logging.Error,
-    file_level=Logging.Info,
-    disable_timer_outputs=false,
-)
-    mkpath(output_dir)
-    set_output_dir!(model, output_dir)
-    set_console_level!(model, console_level)
-    set_file_level!(model, file_level)
-    TimerOutputs.reset_timer!(BUILD_PROBLEMS_TIMER)
-    disable_timer_outputs && TimerOutputs.disable_timer!(BUILD_PROBLEMS_TIMER)
-    file_mode = "w"
-
-    logger = IS.configure_logging(get_internal(model), PROBLEM_LOG_FILENAME, file_mode)
-    try
-        Logging.with_logger(logger) do
-            try
-                TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
-                    build_impl!(model)
-                end
-                set_status!(model, ISOPT.ModelBuildStatus.BUILT)
-                @info "\n$(BUILD_PROBLEMS_TIMER)\n"
-            catch e
-                set_status!(model, ISOPT.ModelBuildStatus.FAILED)
-                bt = catch_backtrace()
-                @error "InvestmentModel Build Failed" exception = e, bt
-            end
+function build_if_not_already_built!(model::InvestmentModel{<:SolutionAlgorithm}; kwargs...)
+    status = get_status(model)
+    if status == ModelBuildStatus.EMPTY
+        if !haskey(kwargs, :output_dir)
+            error(
+                "'output_dir' must be provided as a kwarg if the model build status is $status",
+            )
+        else
+            new_kwargs = Dict(k => v for (k, v) in kwargs if k != :optimizer)
+            status = build!(model; new_kwargs...)
         end
-    finally
-        unregister_recorders!(model)
-        close(logger)
     end
-    return get_status(model)
+    if status != ModelBuildStatus.BUILT
+        error("build! of the $(typeof(model)) $(get_name(model)) failed: $status")
+    end
+    return
 end
 
 # Default implementations of getter/setter functions for InvestmentModel.
@@ -158,6 +130,7 @@ get_template(model::InvestmentModel) = model.template
 get_store_params(model::InvestmentModel) =
     IS.Optimization.get_store_params(get_internal(model))
 get_output_dir(model::InvestmentModel) = IS.Optimization.get_output_dir(get_internal(model))
+get_recorder_dir(model::InvestmentModel) = joinpath(get_output_dir(model), "recorder")
 
 get_variables(model::InvestmentModel) = get_variables(get_optimization_container(model))
 get_parameters(model::InvestmentModel) = get_parameters(get_optimization_container(model))
@@ -165,9 +138,186 @@ get_duals(model::InvestmentModel) = get_duals(get_optimization_container(model))
 get_initial_conditions(model::InvestmentModel) =
     get_initial_conditions(get_optimization_container(model))
 
+get_simulation_info(model::InvestmentModel) = model.simulation_info
+get_executions(model::InvestmentModel) = IS.Optimization.get_executions(get_internal(model))
+
 get_run_status(model::InvestmentModel) = get_run_status(get_simulation_info(model))
 set_run_status!(model::InvestmentModel, status) =
     set_run_status!(get_simulation_info(model), status)
+
+function init_model_store_params!(model::InvestmentModel)
+    num_executions = get_executions(model)
+    horizon = get_horizon(get_settings(model))
+    resolution = get_resolution(get_settings(model))
+    @warn "Update interval once it is in Portfolios"
+    #portfolio = get_system(model)
+    #interval = PSIP.get_forecast_interval(portfolio)
+    interval = resolution
+    @warn "Update base_power and sys_uuid once it is in Portfolios"
+    base_power = 100.0 #PSIP.get_base_power(portfolio)
+    port_uuid = IS.make_uuid()#IS.get_uuid(system)
+    @show horizon
+    store_params = ModelStoreParams(
+        num_executions,
+        horizon,
+        iszero(interval) ? resolution : interval,
+        resolution,
+        base_power,
+        port_uuid,
+        get_metadata(get_optimization_container(model)),
+    )
+    IS.Optimization.set_store_params!(get_internal(model), store_params)
+    return
+end
+
+
+function build_pre_step!(model::InvestmentModel)
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Build pre-step" begin
+        @warn "to-do: add template validation"
+        #validate_template(model)
+        if !isempty(model)
+            @info "OptimizationProblem status not ModelBuildStatus.EMPTY. Resetting"
+
+            reset!(model)
+        end
+        # Initial time are set here because the information is specified in the
+        # Simulation Sequence object and not at the problem creation.
+        @warn "to-do: add init_optimization_container!"
+        #@info "Initializing Optimization Container For an InvestmentModel"
+        #init_optimization_container!(
+        #    get_optimization_container(model),
+        #    get_network_model(get_template(model)),
+        #    get_system(model),
+        #)
+        @info "Initializing ModelStoreParams"
+        init_model_store_params!(model)
+        set_status!(model, ModelBuildStatus.IN_PROGRESS)
+    end
+    return
+end
+"""
+Build the Investment Model.
+
+# Arguments
+
+    - `model::InvestmentModel{<:SolutionAlgorithm}`: InvestmentModel object
+    - `output_dir::String`: Output directory for results
+    - `console_level = Logging.Error`:
+    - `file_level = Logging.Info`:
+    - `disable_timer_outputs = false` : Enable/Disable timing outputs
+"""
+function build!(
+    model::InvestmentModel{<:SolutionAlgorithm};
+    output_dir::String,
+    console_level=Logging.Error,
+    file_level=Logging.Info,
+    disable_timer_outputs=false,
+)
+    mkpath(output_dir)
+    set_output_dir!(model, output_dir)
+    set_console_level!(model, console_level)
+    set_file_level!(model, file_level)
+    TimerOutputs.reset_timer!(BUILD_PROBLEMS_TIMER)
+    disable_timer_outputs && TimerOutputs.disable_timer!(BUILD_PROBLEMS_TIMER)
+    file_mode = "w"
+
+    logger = IS.configure_logging(get_internal(model), PROBLEM_LOG_FILENAME, file_mode)
+    try
+        Logging.with_logger(logger) do
+            try
+                TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
+                    build_impl!(model)
+                end
+                set_status!(model, ISOPT.ModelBuildStatus.BUILT)
+                @info "\n$(BUILD_PROBLEMS_TIMER)\n"
+            catch e
+                set_status!(model, ISOPT.ModelBuildStatus.FAILED)
+                bt = catch_backtrace()
+                @error "InvestmentModel Build Failed" exception = e, bt
+            end
+        end
+    finally
+        unregister_recorders!(model)
+        close(logger)
+    end
+    return get_status(model)
+end
+
+function solve!(
+    model::InvestmentModel{<:SolutionAlgorithm};
+    export_problem_results = false,
+    console_level = Logging.Error,
+    file_level = Logging.Info,
+    disable_timer_outputs = false,
+    export_optimization_problem = true,
+    kwargs...,
+)
+    build_if_not_already_built!(
+        model;
+        console_level = console_level,
+        file_level = file_level,
+        disable_timer_outputs = disable_timer_outputs,
+        kwargs...,
+    )
+    set_console_level!(model, console_level)
+    set_file_level!(model, file_level)
+    TimerOutputs.reset_timer!(RUN_OPERATION_MODEL_TIMER)
+    disable_timer_outputs && TimerOutputs.disable_timer!(RUN_OPERATION_MODEL_TIMER)
+    file_mode = "a"
+    register_recorders!(model, file_mode)
+    logger = IS.Optimization.configure_logging(
+        get_internal(model),
+        PROBLEM_LOG_FILENAME,
+        file_mode,
+    )
+    optimizer = get(kwargs, :optimizer, nothing)
+    try
+        Logging.with_logger(logger) do
+            try
+                initialize_storage!(
+                    get_store(model),
+                    get_optimization_container(model),
+                    get_store_params(model),
+                )
+                TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Solve" begin
+                    @warn "todo: add pre-solve model check back in"
+                    #_pre_solve_model_checks(model, optimizer)
+                    solve_impl!(model)
+                    current_time = get_initial_time(model)
+                    write_results!(get_store(model), model, current_time, current_time)
+                    write_optimizer_stats!(
+                        get_store(model),
+                        get_optimizer_stats(model),
+                        current_time,
+                    )
+                end
+                if export_optimization_problem
+                    TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Serialize" begin
+                        serialize_problem(model; optimizer = optimizer)
+                        serialize_optimization_model(model)
+                    end
+                end
+                TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Results processing" begin
+                    # TODO: This could be more complicated than it needs to be
+                    results = OptimizationProblemResults(model)
+                    serialize_results(results, get_output_dir(model))
+                    export_problem_results && export_results(results)
+                end
+                @info "\n$(RUN_OPERATION_MODEL_TIMER)\n"
+            catch e
+                @error "Decision Problem solve failed" exception = (e, catch_backtrace())
+                set_run_status!(model, RunStatus.FAILED)
+            end
+        end
+    finally
+        unregister_recorders!(model)
+        close(logger)
+    end
+
+    return get_run_status(model)
+end
+
+
 
 function solve_impl!(model::InvestmentModel)
     container = get_optimization_container(model)
@@ -262,6 +412,14 @@ function _list_names(model::InvestmentModel, container_type)
     return encode_keys_as_strings(
         IS.Optimization.list_keys(get_store(model), container_type),
     )
+end
+
+function register_recorders!(model::InvestmentModel, file_mode)
+    recorder_dir = get_recorder_dir(model)
+    mkpath(recorder_dir)
+    for name in IS.Optimization.get_recorders(get_internal(model))
+        IS.register_recorder!(name; mode = file_mode, directory = recorder_dir)
+    end
 end
 
 function unregister_recorders!(model::InvestmentModel)
