@@ -37,7 +37,7 @@ function construct_technologies!(
     add_to_expression!(container, EnergyBalance(), devices, C())
 
     # DemandTotal
-    # add_expression!(container, DemandTotal(), devices, C())
+    # add_to_expression!(container, DemandTotal(), devices, C())
 
     return
 end
@@ -83,7 +83,6 @@ function construct_technologies!(
     p::PSIP.Portfolio,
     ::ModelConstructStage,
     model::OperationCostModel,
-    ::ModelConstructStage,
     technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {

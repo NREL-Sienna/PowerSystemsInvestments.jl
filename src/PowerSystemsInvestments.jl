@@ -46,6 +46,7 @@ export FixedOperationModelCost
 export VariableOMCost
 export SupplyTotal
 export DemandTotal
+export EnergyBalance
 
 #remove later, just for testing
 export objective_function!

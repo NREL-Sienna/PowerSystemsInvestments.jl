@@ -116,7 +116,7 @@ function construct_technologies!(
     # Add objective function from container to JuMP model
     update_objective_function!(container)
     # Capacity constraint
-    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
+    # add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices)
     # Dispatch constraint
     add_constraints!(
         container,
