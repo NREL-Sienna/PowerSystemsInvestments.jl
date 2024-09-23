@@ -72,6 +72,9 @@ import JuMP: optimizer_with_attributes
 import JuMP.Containers: DenseAxisArray, SparseAxisArray
 export optimizer_with_attributes
 
+# Base imports
+import Base.isempty
+
 # IS.Optimization imports that stay private, may or may not be additional methods in PowerSimulations
 import InfrastructureSystems.Optimization: ArgumentConstructStage, ModelConstructStage
 import InfrastructureSystems.Optimization:
@@ -151,6 +154,7 @@ include("model_build/SingleInstanceSolve.jl")
 include("utils/printing.jl")
 include("utils/jump_utils.jl")
 include("utils/logging.jl")
+include("utils/psip_utils.jl")
 include("technology_models/technologies/common/add_variable.jl")
 include("technology_models/technologies/common/add_to_expression.jl")
 include("technology_models/technologies/supply_tech.jl")
@@ -161,6 +165,7 @@ include("network_models/singleregion_model.jl")
 include("technology_models/technology_constructors/supply_constructor.jl")
 include("technology_models/technology_constructors/demand_constructor.jl")
 include("technology_models/technology_constructors/storage_constructor.jl")
+include("technology_models/technology_constructors/constructor_validations.jl")
 
 include("technology_models/technologies/common/objective_function.jl/common_capital.jl")
 include("technology_models/technologies/common/objective_function.jl/common_operations.jl")
