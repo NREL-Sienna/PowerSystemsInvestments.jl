@@ -727,23 +727,23 @@ function build_model!(
     # Order is required
     @error "Remember to restore availability code here"
     for (tech_model, tech_names) in template.technology_models
-        #@debug "Building Arguments for $(get_technology_type(tech_model)) with $(get_formulation(device_model)) formulation" _group =
-        #    LOG_GROUP_OPTIMIZATION_CONTAINER
+        @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
+        LOG_GROUP_OPTIMIZATION_CONTAINER
         TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
-            #if validate_available_devices(device_model, sys)
-            for mod in [template.capital_model, template.operation_model] # template.feasibility_model
-                construct_technologies!(
-                    container,
-                    port,
-                    ArgumentConstructStage(),
-                    mod,
-                    tech_model,
-                    #transmission_model,
-                )
+            if validate_available_technologies(tech_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        ArgumentConstructStage(),
+                        mod,
+                        tech_model,
+                        #transmission_model,
+                    )
+                end
             end
-            #end
-            #@debug "Problem size:" get_problem_size(container) _group =
-            #    LOG_GROUP_OPTIMIZATION_CONTAINER
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
 
@@ -783,18 +783,21 @@ function build_model!(
     =#
 
     # TODO: Add Constraints for this
-    for device_model in values(template.devices)
-        @debug "Building Model for $(get_component_type(device_model)) with $(get_formulation(device_model)) formulation" _group =
+    for (tech_model, tech_names) in template.technology_models
+        @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
-        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(device_model))" begin
-            if validate_available_devices(device_model, sys)
-                construct_device!(
-                    container,
-                    sys,
-                    ModelConstructStage(),
-                    device_model,
-                    transmission_model,
-                )
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
+            if validate_available_technologies(tech_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        ModelConstructStage(),
+                        mod,
+                        tech_model,
+                        #transmission_model,
+                    )
+                end
             end
             @debug "Problem size:" get_problem_size(container) _group =
                 LOG_GROUP_OPTIMIZATION_CONTAINER
