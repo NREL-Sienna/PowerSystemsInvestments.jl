@@ -58,8 +58,8 @@ function add_to_expression!(
     mapping_inv = Dict("2030" => 1, "2035" => 2)
 
     time_steps = get_time_steps(container)
-    # expression = get_expression(container, T(), PSIP.Portfolio)
-    expression = add_expression_container!(container, expression_type, D, time_steps)
+    expression = get_expression(container, T(), PSIP.Portfolio)
+    # expression = add_expression_container!(container, expression_type, D, time_steps)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
 
@@ -81,10 +81,7 @@ function add_to_expression!(
 
             multiplier = -1.0
             for (ix, t) in enumerate(time_steps_ix)
-                _add_to_jump_expression!(
-                    expression[t],
-                    ts_data[ix] * multiplier,
-                )
+                _add_to_jump_expression!(expression["SingleRegion", t], ts_data[ix] * multiplier)
             end
         end
     end
@@ -135,8 +132,6 @@ function add_constraints!(
     for t in time_steps
         #TODO: Make this generic
 
-
-        energy_balance[t] =
-            JuMP.@constraint(get_jump_model(container), supply[t] >= 0)
+        energy_balance[t] = JuMP.@constraint(get_jump_model(container), supply[t] >= 0)
     end
 end
