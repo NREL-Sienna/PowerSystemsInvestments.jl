@@ -127,11 +127,11 @@ function add_constraints!(
     time_steps = get_time_steps(container)
 
     energy_balance = add_constraints_container!(container, T(), U, time_steps)
-    supply = get_expression(container, EnergyBalance(), U)
+    supply = get_expression(container, EnergyBalance(), PSIP.Portfolio)
     # demand = get_expression(container, DemandTotal(), U)
     for t in time_steps
         #TODO: Make this generic
 
-        energy_balance[t] = JuMP.@constraint(get_jump_model(container), supply[t] >= 0)
+        energy_balance[t] = JuMP.@constraint(get_jump_model(container), supply["SingleRegion", t] >= 0)
     end
 end
