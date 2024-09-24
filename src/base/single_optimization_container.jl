@@ -1,3 +1,19 @@
+struct PrimalValuesCache
+    variables_cache::Dict{VariableKey, AbstractArray}
+    expressions_cache::Dict{ExpressionKey, AbstractArray}
+end
+
+function PrimalValuesCache()
+    return PrimalValuesCache(
+        Dict{VariableKey, AbstractArray}(),
+        Dict{ExpressionKey, AbstractArray}(),
+    )
+end
+
+function Base.isempty(pvc::PrimalValuesCache)
+    return isempty(pvc.variables_cache) && isempty(pvc.expressions_cache)
+end
+
 Base.@kwdef mutable struct SingleOptimizationContainer <:
                            ISOPT.AbstractOptimizationContainer
     JuMPmodel::JuMP.Model
@@ -12,9 +28,11 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
     objective_function::ObjectiveFunction
     expressions::Dict{ISOPT.ExpressionKey, AbstractArray}
     parameters::Dict{ISOPT.ParameterKey, ParameterContainer}
+    primal_values_cache::PrimalValuesCache
     infeasibility_conflict::Dict{Symbol, Array}
     optimizer_stats::ISOPT.OptimizerStats
     metadata::ISOPT.OptimizationContainerMetadata
+    #default_time_series_type::Type{<:PSY.TimeSeriesData}
 end
 
 function SingleOptimizationContainer(
@@ -42,6 +60,7 @@ function SingleOptimizationContainer(
         ObjectiveFunction(),
         Dict{ExpressionKey, AbstractArray}(),
         Dict{ParameterKey, ParameterContainer}(),
+        PrimalValuesCache(),
         Dict{Symbol, Array}(),
         ISOPT.OptimizerStats(),
         ISOPT.OptimizationContainerMetadata(),
@@ -88,6 +107,137 @@ set_time_steps_investments!(
 get_aux_variables(container::SingleOptimizationContainer) = container.aux_variables
 get_base_power(container::SingleOptimizationContainer) = container.base_power
 get_constraints(container::SingleOptimizationContainer) = container.constraints
+
+function is_milp(container::SingleOptimizationContainer)::Bool
+    !supports_milp(container) && return false
+    if !isempty(
+        JuMP.all_constraints(
+            PSIN.get_jump_model(container),
+            JuMP.VariableRef,
+            JuMP.MOI.ZeroOne,
+        ),
+    )
+        return true
+    end
+    return false
+end
+
+function supports_milp(container::SingleOptimizationContainer)
+    jump_model = get_jump_model(container)
+    return supports_milp(jump_model)
+end
+
+function _validate_warm_start_support(JuMPmodel::JuMP.Model, warm_start_enabled::Bool)
+    !warm_start_enabled && return warm_start_enabled
+    solver_supports_warm_start =
+        MOI.supports(JuMP.backend(JuMPmodel), MOI.VariablePrimalStart(), MOI.VariableIndex)
+    if !solver_supports_warm_start
+        solver_name = JuMP.solver_name(JuMPmodel)
+        @warn("$(solver_name) does not support warm start")
+    end
+    return solver_supports_warm_start
+end
+
+function _finalize_jump_model!(container::SingleOptimizationContainer, settings::Settings)
+    @debug "Instantiating the JuMP model" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+    @warn "add recurrent solves back in"
+    #if built_for_recurrent_solves(container) && get_optimizer(settings) === nothing
+    #    throw(
+    #        IS.ConflictingInputsError(
+    #            "Optimizer can not be nothing when building for recurrent solves",
+    #        ),
+    #    )
+    #end
+
+    if get_direct_mode_optimizer(settings)
+        optimizer = () -> MOI.instantiate(get_optimizer(settings))
+        container.JuMPmodel = JuMP.direct_model(optimizer())
+    elseif get_optimizer(settings) === nothing
+        @debug "The optimization model has no optimizer attached" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+    else
+        JuMP.set_optimizer(PSIN.get_jump_model(container), get_optimizer(settings))
+    end
+
+    JuMPmodel = PSIN.get_jump_model(container)
+    warm_start_enabled = get_warm_start(settings)
+    solver_supports_warm_start = _validate_warm_start_support(JuMPmodel, warm_start_enabled)
+    set_warm_start!(settings, solver_supports_warm_start)
+
+    JuMP.set_string_names_on_creation(JuMPmodel, get_store_variable_names(settings))
+
+    @debug begin
+        JuMP.set_string_names_on_creation(JuMPmodel, true)
+    end
+    if get_optimizer_solve_log_print(settings)
+        JuMP.unset_silent(JuMPmodel)
+        @debug "optimizer unset to silent" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+    else
+        JuMP.set_silent(JuMPmodel)
+        @debug "optimizer set to silent" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+    end
+    return
+end
+
+function init_optimization_container!(
+    container::SingleOptimizationContainer,
+    transport_model::TransportModel{T},
+    port::PSIP.Portfolio,
+) where {T <: AbstractTransportAggregation}
+    @warn "add system units back in"
+    #PSY.set_units_base_system!(sys, "SYSTEM_BASE")
+    # The order of operations matter
+    settings = get_settings(container)
+
+    #=
+    if get_initial_time(settings) == UNSET_INI_TIME
+        if get_default_time_series_type(container) <: PSY.AbstractDeterministic
+            set_initial_time!(settings, PSY.get_forecast_initial_timestamp(sys))
+        elseif get_default_time_series_type(container) <: PSY.SingleTimeSeries
+            ini_time, _ = PSY.check_time_series_consistency(sys, PSY.SingleTimeSeries)
+            set_initial_time!(settings, ini_time)
+        end
+    end
+    =#
+
+    if get_resolution(settings) == UNSET_RESOLUTION
+        error("Resolution not set in the model. Can't continue with the build.")
+    end
+
+    horizon_count = (get_horizon(settings) ÷ get_resolution(settings))
+    @assert horizon_count > 0
+    container.time_steps = 1:horizon_count
+
+    #=
+    if T <: SingleRegionBalanceModel #|| T <: AreaBalancePowerModel
+        total_number_of_devices =
+            length(get_available_technologies(PSIP.SupplyTechnology, port))
+    else
+        total_number_of_devices =
+            length(get_available_technologies(PSIP.SupplyTechnology, port))
+        total_number_of_devices +=
+            length(get_available_technologies(PSIP.TransportTechnology, port))
+    end
+
+    # The 10e6 limit is based on the sizes of the lp benchmark problems http://plato.asu.edu/ftp/lpcom.html
+    # The maximum numbers of constraints and variables in the benchmark problems is 1,918,399 and 1,259,121,
+    # respectively. See also https://prod-ng.sandia.gov/techlib-noauth/access-control.cgi/2013/138847.pdf
+    variable_count_estimate = length(container.time_steps) * total_number_of_devices
+
+    if variable_count_estimate > 10e6
+        @warn(
+            "The lower estimate of total number of variables that will be created in the model is $(variable_count_estimate). \\
+            The total number of variables might be larger than 10e6 and could lead to large build or solve times."
+        )
+    end
+    =#
+
+    stats = get_optimizer_stats(container)
+    stats.detailed_stats = get_detailed_optimizer_stats(settings)
+
+    _finalize_jump_model!(container, settings)
+    return
+end
 
 function check_parameter_multiplier_values(multiplier_array::DenseAxisArray)
     return !all(isnan.(multiplier_array.data))
@@ -732,6 +882,37 @@ function initialize_system_expressions!(
     return
 end
 
+###################################Initial Conditions Containers############################
+
+function calculate_aux_variables!(container::SingleOptimizationContainer, port::PSIP.Portfolio)
+    aux_vars = get_aux_variables(container)
+    for key in keys(aux_vars)
+        calculate_aux_variable_value!(container, key, port)
+    end
+    return RunStatus.SUCCESSFULLY_FINALIZED
+end
+
+function _calculate_dual_variables_discrete_model!(
+    container::SingleOptimizationContainer,
+    ::PSIP.Portfolio,
+)
+    return _process_duals(container, container.settings.optimizer)
+end
+
+function calculate_dual_variables!(
+    container::SingleOptimizationContainer,
+    port::PSIP.Portfolio,
+    is_milp::Bool,
+)
+    isempty(get_duals(container)) && return RunStatus.SUCCESSFULLY_FINALIZED
+    if is_milp
+        status = _calculate_dual_variables_discrete_model!(container, port)
+    else
+        status = _calculate_dual_variables_continous_model!(container, port)
+    end
+    return
+end
+
 ##### Build Models #######
 
 function build_model!(
@@ -914,13 +1095,13 @@ function solve_model!(
     end
 
     _, optimizer_stats.timed_calculate_aux_variables =
-        @timed calculate_aux_variables!(container, portfolio)
+        @timed calculate_aux_variables!(container, port)
 
     # Needs to be called here to avoid issues when getting duals from MILPs
     write_optimizer_stats!(container)
 
     _, optimizer_stats.timed_calculate_dual_variables =
-        @timed calculate_dual_variables!(container, portfolio, is_milp(container))
+        @timed calculate_dual_variables!(container, port, is_milp(container))
 
     status = RunStatus.SUCCESSFULLY_FINALIZED
 
