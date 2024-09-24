@@ -643,3 +643,13 @@ function unregister_recorders!(model::InvestmentModel)
         IS.unregister_recorder!(name)
     end
 end
+
+const _JUMP_MODEL_FILENAME = "jump_model.json"
+
+function serialize_optimization_model(model::InvestmentModel)
+    serialize_optimization_model(
+        get_optimization_container(model),
+        joinpath(get_output_dir(model), _JUMP_MODEL_FILENAME),
+    )
+    return
+end
