@@ -143,18 +143,20 @@ end
 function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
+    var::V,
     devices::U,
     formulation::BasicDispatch,
 ) where {
     T<:EnergyBalance,
     U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActiveOutPowerVariable,
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    variable = get_variable(container, ActiveOutPowerVariable(), D)
+    variable = get_variable(container, V(), D)
     expression = get_expression(container, T(), PSIP.Portfolio)
 
     for d in devices, t in time_steps
@@ -173,18 +175,20 @@ end
 function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
+    var::V,
     devices::U,
     formulation::BasicDispatch,
 ) where {
-    T<:DemandTotal,
+    T<:EnergyBalance,
     U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActiveInPowerVariable,
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    variable = get_variable(container, ActiveInPowerVariable(), D)
+    variable = get_variable(container, V(), D)
     expression = get_expression(container, T(), PSIP.Portfolio)
 
     for d in devices, t in time_steps

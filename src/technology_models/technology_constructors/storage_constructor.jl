@@ -41,7 +41,8 @@ function construct_technologies!(
     add_variable!(container, EnergyVariable(), devices, C())
 
     # EnergyBalance
-    add_to_expression!(container, EnergyBalance(), devices, C())
+    add_to_expression!(container, EnergyBalance(), ActiveInPowerVariable(), devices, C())
+    add_to_expression!(container, EnergyBalance(), ActiveOutPowerVariable(), devices, C())
     # add_to_expression!(container, DemandTotal(), devices, C())
 
     return
