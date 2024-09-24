@@ -14,6 +14,7 @@ import TimeSeries
 import Logging
 import TimerOutputs
 import Serialization
+import DataFrames
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization
@@ -126,7 +127,13 @@ import InfrastructureSystems.Optimization:
     OptimizationProblemResults, 
     OptimizationProblemResultsExport, 
     OptimizerStats
-
+import InfrastructureSystems.Optimization: 
+    read_optimizer_stats, 
+    get_optimizer_stats,
+    export_results, 
+    serialize_results, 
+    get_timestamps, 
+    get_model_base_power
 import TimerOutputs
 
 ####
