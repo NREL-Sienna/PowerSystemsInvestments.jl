@@ -19,6 +19,7 @@ const ISOPT = InfrastructureSystems.Optimization
 const PSY = PowerSystems
 const MOI = MathOptInterface
 const PSIP = PowerSystemsInvestmentsPortfolios
+const PSIN = PowerSystemsInvestments
 const PM = PowerModels
 const PNM = PowerNetworkMatrices
 
