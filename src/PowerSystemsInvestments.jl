@@ -38,6 +38,11 @@ export SingleRegionBalanceModel
 ## Variables ##
 export BuildCapacity
 export ActivePowerVariable
+export BuildEnergyCapacity
+export BuildPowerCapacity
+export ActiveInPowerVariable
+export ActiveOutPowerVariable
+export EnergyVariable
 
 ## Expressions ##
 export CumulativeCapacity
@@ -48,6 +53,9 @@ export VariableOMCost
 export SupplyTotal
 export DemandTotal
 export EnergyBalance
+export CumulativePowerCapacity
+export CumulativeEnergyCapacity
+
 
 #remove later, just for testing
 export objective_function!
@@ -121,8 +129,8 @@ import InfrastructureSystems.Optimization:
     to_matrix,
     get_store_container_type
 import InfrastructureSystems.Optimization:
-    OptimizationProblemResults, 
-    OptimizationProblemResultsExport, 
+    OptimizationProblemResults,
+    OptimizationProblemResultsExport,
     OptimizerStats
 
 import TimerOutputs
