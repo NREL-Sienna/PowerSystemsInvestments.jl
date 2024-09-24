@@ -1112,3 +1112,11 @@ function write_optimizer_stats!(container::SingleOptimizationContainer)
     write_optimizer_stats!(get_optimizer_stats(container), get_jump_model(container))
     return
 end
+
+"""
+Exports the OpModel JuMP object in MathOptFormat
+"""
+function serialize_optimization_model(container::SingleOptimizationContainer, save_path::String)
+    serialize_jump_optimization_model(get_jump_model(container), save_path)
+    return
+end
