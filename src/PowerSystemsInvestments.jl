@@ -13,6 +13,8 @@ import PrettyTables
 import TimeSeries
 import Logging
 import TimerOutputs
+import Serialization
+import DataFrames
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization
@@ -22,6 +24,7 @@ const PSIP = PowerSystemsInvestmentsPortfolios
 const PSIN = PowerSystemsInvestments
 const PM = PowerModels
 const PNM = PowerNetworkMatrices
+const MOPFM = MOI.FileFormats.Model
 
 ### Exports ###
 export InvestmentModel
@@ -132,7 +135,13 @@ import InfrastructureSystems.Optimization:
     OptimizationProblemResults,
     OptimizationProblemResultsExport,
     OptimizerStats
-
+import InfrastructureSystems.Optimization: 
+    read_optimizer_stats, 
+    get_optimizer_stats,
+    export_results, 
+    serialize_results, 
+    get_timestamps, 
+    get_model_base_power
 import TimerOutputs
 
 ####
@@ -164,6 +173,9 @@ include("base/multi_optimization_container.jl")
 
 include("investment_model/investment_model_store.jl")
 include("investment_model/investment_model.jl")
+include("investment_model/investment_problem_results.jl")
+
+include("base/serialization.jl")
 
 include("model_build/SingleInstanceSolve.jl")
 include("utils/printing.jl")

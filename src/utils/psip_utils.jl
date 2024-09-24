@@ -17,3 +17,6 @@ function get_available_technologies(
     )
 
 end
+
+make_portfolio_filename(port::PSIP.Portfolio) = make_portfolio_filename(IS.get_uuid(port))
+make_portfolio_filename(port_uuid::Union{Base.UUID, AbstractString}) = "portfolio-$(port_uuid).json"

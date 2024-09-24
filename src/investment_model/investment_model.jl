@@ -123,7 +123,8 @@ function get_timestamps(model::InvestmentModel)
     return range(start_time; length=horizon_count, step=resolution)
 end
 
-get_problem_base_power(model::InvestmentModel) = PSY.get_base_power(model.portfolio)
+@warn "Update once portfolio has base power or we decide what to do with it"
+get_problem_base_power(model::InvestmentModel) = 100.0 #PSIP.get_base_power(model.portfolio)
 get_settings(model::InvestmentModel) = get_optimization_container(model).settings
 get_optimizer_stats(model::InvestmentModel) =
     get_optimizer_stats(get_optimization_container(model))
@@ -151,7 +152,7 @@ set_run_status!(model::InvestmentModel, status) =
     set_run_status!(get_simulation_info(model), status)
 
 get_initial_time(model::InvestmentModel) = get_initial_time(get_settings(model))
-
+get_resolution(model::InvestmentModel) = get_resolution(get_settings(model))
 
 function write_results!(
     store,
@@ -516,6 +517,7 @@ function solve!(
                 TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Results processing" begin
                     # TODO: This could be more complicated than it needs to be
                     results = OptimizationProblemResults(model)
+                    @show results
                     serialize_results(results, get_output_dir(model))
                     export_problem_results && export_results(results)
                 end
@@ -642,4 +644,14 @@ function unregister_recorders!(model::InvestmentModel)
     for name in IS.Optimization.get_recorders(get_internal(model))
         IS.unregister_recorder!(name)
     end
+end
+
+const _JUMP_MODEL_FILENAME = "jump_model.json"
+
+function serialize_optimization_model(model::InvestmentModel)
+    serialize_optimization_model(
+        get_optimization_container(model),
+        joinpath(get_output_dir(model), _JUMP_MODEL_FILENAME),
+    )
+    return
 end
