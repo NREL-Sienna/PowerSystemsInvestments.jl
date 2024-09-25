@@ -373,7 +373,6 @@ function init_model_store_params!(model::InvestmentModel)
     @warn "Update base_power and sys_uuid once it is in Portfolios"
     base_power = 100.0 #PSIP.get_base_power(portfolio)
     port_uuid = IS.make_uuid()#IS.get_uuid(system)
-    @show horizon
     store_params = ModelStoreParams(
         num_executions,
         horizon,
@@ -517,7 +516,6 @@ function solve!(
                 TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Results processing" begin
                     # TODO: This could be more complicated than it needs to be
                     results = OptimizationProblemResults(model)
-                    @show results
                     serialize_results(results, get_output_dir(model))
                     export_problem_results && export_results(results)
                 end
