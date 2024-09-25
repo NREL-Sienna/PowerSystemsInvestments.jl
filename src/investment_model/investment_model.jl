@@ -539,7 +539,7 @@ end
 
 function solve_impl!(model::InvestmentModel)
     container = get_optimization_container(model)
-    status = solve_impl!(container, get_portfolio(model))
+    status = solve_model!(container, get_portfolio(model))
     set_run_status!(model, status)
     if status != RunStatus.SUCCESSFULLY_FINALIZED
         settings = get_settings(model)

@@ -8,11 +8,3 @@ function build_impl!(model::InvestmentModel{SingleInstanceSolve})
     )
     return
 end
-
-function solve_impl!(model::InvestmentModel{SingleInstanceSolve})
-    solve_model!(
-        get_optimization_container(model),
-        get_portfolio(model),
-    )
-    return
-end

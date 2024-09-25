@@ -1,7 +1,7 @@
 function OptimizationProblemResults(model::InvestmentModel)
     status = get_run_status(model)
-    #status != RunStatus.SUCCESSFULLY_FINALIZED &&
-    #    error("problem was not solved successfully: $status")
+    status != RunStatus.SUCCESSFULLY_FINALIZED &&
+        error("problem was not solved successfully: $status")
 
     model_store = get_store(model)
 

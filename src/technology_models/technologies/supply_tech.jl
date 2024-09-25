@@ -65,7 +65,7 @@ function add_expression!(
         time_steps,
     )
 
-    # TODO: Move to add_to_expression!
+    # TODO: Move to add_to_expression?
     for t in time_steps, d in devices
         name = PSIP.get_name(d)
         init_cap = PSIP.get_initial_capacity(d)
