@@ -140,14 +140,6 @@ end
 
 function _finalize_jump_model!(container::SingleOptimizationContainer, settings::Settings)
     @debug "Instantiating the JuMP model" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
-    @warn "add recurrent solves back in"
-    #if built_for_recurrent_solves(container) && get_optimizer(settings) === nothing
-    #    throw(
-    #        IS.ConflictingInputsError(
-    #            "Optimizer can not be nothing when building for recurrent solves",
-    #        ),
-    #    )
-    #end
 
     if get_direct_mode_optimizer(settings)
         optimizer = () -> MOI.instantiate(get_optimizer(settings))
@@ -160,6 +152,7 @@ function _finalize_jump_model!(container::SingleOptimizationContainer, settings:
     end
 
     JuMPmodel = PSIN.get_jump_model(container)
+    @warn "possibly remove"
     warm_start_enabled = get_warm_start(settings)
     solver_supports_warm_start = _validate_warm_start_support(JuMPmodel, warm_start_enabled)
     set_warm_start!(settings, solver_supports_warm_start)
@@ -924,6 +917,8 @@ function build_model!(
     transport_model = get_transport_model(template)
     initialize_system_expressions!(container, transport_model, port)
 
+    tech_names = collect(values(template.technology_models))
+    tech_templates = collect(keys(template.technology_models))
     # Order is required
     @error "Remember to restore availability code here"
     for (i, name_list) in enumerate(tech_names)
@@ -936,6 +931,7 @@ function build_model!(
                     construct_technologies!(
                         container,
                         port,
+                        name_list,
                         ArgumentConstructStage(),
                         mod,
                         tech_model,
@@ -984,7 +980,11 @@ function build_model!(
     =#
 
     # TODO: Add Constraints for this
-    for (tech_model, tech_names) in template.technology_models
+    # iterate over tech_names and pull corresponding technologymodel
+    # pass both tech model and name to construct_technologies
+
+    for (i, name_list) in enumerate(tech_names)
+        tech_model = tech_templates[i]
         @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
         TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
@@ -993,6 +993,7 @@ function build_model!(
                     construct_technologies!(
                         container,
                         port,
+                        name_list,
                         ModelConstructStage(),
                         mod,
                         tech_model,

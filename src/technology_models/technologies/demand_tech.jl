@@ -41,7 +41,7 @@ function add_to_expression!(
     formulation::BasicDispatch,
 ) where {
     T<:EnergyBalance,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D<:PSIP.DemandRequirement}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
@@ -62,6 +62,10 @@ function add_to_expression!(
     # expression = add_expression_container!(container, expression_type, D, time_steps)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
+
+    if U <: D
+        devices = [devices]
+    end
 
     for d in devices
         name = PSIP.get_name(d)
@@ -97,7 +101,7 @@ function add_expression!(
     formulation::BasicDispatch,
 ) where {
     T <: EnergyBalance,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.DemandRequirement}
    # @assert !isempty(devices)
     time_steps = get_time_steps(container)

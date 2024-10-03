@@ -5,12 +5,16 @@ function add_variable!(
     formulation::AbstractTechnologyFormulation,
 ) where {
     T <: InvestmentVariableType,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
 
+    if U <: D
+        devices = [devices]
+    end
+    
     variable = add_variable_container!(
         container,
         variable_type,
@@ -43,11 +47,15 @@ function add_variable!(
     formulation::AbstractTechnologyFormulation,
 ) where {
     T <: OperationsVariableType,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
+
+    if U <: D
+        devices = [devices]
+    end
 
     variable = add_variable_container!(
         container,
