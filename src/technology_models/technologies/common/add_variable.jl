@@ -10,10 +10,6 @@ function add_variable!(
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
-
-    if U <: D
-        devices = [devices]
-    end
     
     variable = add_variable_container!(
         container,
@@ -52,10 +48,6 @@ function add_variable!(
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
-
-    if U <: D
-        devices = [devices]
-    end
 
     variable = add_variable_container!(
         container,

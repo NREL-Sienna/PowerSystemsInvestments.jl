@@ -110,10 +110,6 @@ function add_expression!(
     time_steps = get_time_steps_investments(container)
     binary = false
 
-    if U <: D
-        devices = [devices]
-    end
-    
     var = get_variable(container, BuildEnergyCapacity(), D)
 
     expression = add_expression_container!(

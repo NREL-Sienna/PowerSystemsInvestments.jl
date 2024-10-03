@@ -55,10 +55,6 @@ function add_expression!(
     time_steps = get_time_steps_investments(container)
     binary = false
 
-    if U <: D
-        devices = [devices]
-    end
-
     var = get_variable(container, BuildCapacity(), D)
 
     expression = add_expression_container!(
@@ -100,10 +96,6 @@ function add_expression!(
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
-
-    if U <: D
-        devices = [devices]
-    end
     
     var = get_variable(container, BuildCapacity(), D)
 
@@ -131,10 +123,6 @@ function add_to_expression!(
     time_steps = get_time_steps(container)
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
-
-    if U <: D
-        devices = [devices]
-    end
 
     variable = get_variable(container, ActivePowerVariable(), D)
     expression = get_expression(container, T(), PSIP.Portfolio)
