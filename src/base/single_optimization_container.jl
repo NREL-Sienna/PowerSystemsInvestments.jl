@@ -926,7 +926,8 @@ function build_model!(
 
     # Order is required
     @error "Remember to restore availability code here"
-    for (tech_model, tech_names) in template.technology_models
+    for (i, name_list) in enumerate(tech_names)
+        tech_model = tech_templates[i]
         @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
         LOG_GROUP_OPTIMIZATION_CONTAINER
         TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin

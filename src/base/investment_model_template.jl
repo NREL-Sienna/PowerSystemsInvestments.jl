@@ -49,25 +49,27 @@ function set_transport_model!(
     return
 end
 
-function set_device_model!(
+function set_technology_model!(
     template::InvestmentModelTemplate,
     component_type::Type{<:PSIP.Technology},
     investment_formulation::Type{<:InvestmentTechnologyFormulation},
     operations_formulation::Type{<:OperationsTechnologyFormulation},
+    feasibility_formulation::Type{<:FeasibilityTechnologyFormulation}
 )
-    set_device_model!(
+    set_technology_model!(
         template,
-        TechnologyModel(component_type, investment_formulation, operations_formulation),
+        TechnologyModel(component_type, investment_formulation, operations_formulation, feasibility_formulation),
     )
     return
 end
 
-function set_device_model!(
+function set_technology_model!(
     template::InvestmentModelTemplate,
     model::TechnologyModel{
         <:PSIP.Technology,
         <:InvestmentTechnologyFormulation,
         <:OperationsTechnologyFormulation,
+        <:FeasibilityTechnologyFormulation
     },
 )
     _set_model!(template.technologies, model)
