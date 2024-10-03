@@ -370,11 +370,13 @@ function init_model_store_params!(model::InvestmentModel)
     #portfolio = get_system(model)
     #interval = PSIP.get_forecast_interval(portfolio)
     interval = resolution
-    @warn "Update base_power and sys_uuid once it is in Portfolios"
+    @warn "update PSIP to get base power from attached system"
     base_power = 100.0 #PSIP.get_base_power(portfolio)
     port_uuid = IS.make_uuid()#IS.get_uuid(system)
+
+    # will probably need to include time mapping object here as well
     store_params = ModelStoreParams(
-        num_executions,
+        num_executions, # remove num_executions
         horizon,
         iszero(interval) ? resolution : interval,
         resolution,
@@ -385,7 +387,28 @@ function init_model_store_params!(model::InvestmentModel)
     IS.Optimization.set_store_params!(get_internal(model), store_params)
     return
 end
+#=
+function reset!(model::InvestmentModel)
 
+    IS.Optimization.set_container!(
+        get_internal(model),
+        OptimizationContainer(
+            get_portfolio(model),
+            get_settings(model),
+            nothing,
+            PSY.Deterministic,
+        ),
+    )
+    get_optimization_container(model).built_for_recurrent_solves =
+        was_built_for_recurrent_solves
+    internal = get_internal(model)
+    IS.Optimization.set_initial_conditions_model_container!(internal, nothing)
+    empty_time_series_cache!(model)
+    empty!(get_store(model))
+    set_status!(model, ModelBuildStatus.EMPTY)
+    return
+end
+=#
 
 function build_pre_step!(model::InvestmentModel)
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Build pre-step" begin
@@ -436,11 +459,12 @@ function build!(
     disable_timer_outputs && TimerOutputs.disable_timer!(BUILD_PROBLEMS_TIMER)
     file_mode = "w"
 
+    @warn "remove recorders"
     logger = IS.configure_logging(get_internal(model), PROBLEM_LOG_FILENAME, file_mode)
     try
         Logging.with_logger(logger) do
             try
-                TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Problem $(get_name(model))" begin
+                TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Model $(get_name(model))" begin
                     build_impl!(model)
                 end
                 set_status!(model, ISOPT.ModelBuildStatus.BUILT)

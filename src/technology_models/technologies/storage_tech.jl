@@ -60,7 +60,7 @@ function add_expression!(
     formulation::AbstractTechnologyFormulation,
 ) where {
     T<:CumulativePowerCapacity,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
@@ -104,12 +104,16 @@ function add_expression!(
     formulation::AbstractTechnologyFormulation,
 ) where {
     T<:CumulativeEnergyCapacity,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
 
+    if U <: D
+        devices = [devices]
+    end
+    
     var = get_variable(container, BuildEnergyCapacity(), D)
 
     expression = add_expression_container!(
@@ -148,7 +152,7 @@ function add_to_expression!(
     formulation::BasicDispatch,
 ) where {
     T<:EnergyBalance,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:ActiveOutPowerVariable,
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
@@ -180,7 +184,7 @@ function add_to_expression!(
     formulation::BasicDispatch,
 ) where {
     T<:EnergyBalance,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:ActiveInPowerVariable,
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
@@ -211,7 +215,7 @@ function add_expression!(
     formulation::BasicDispatch,
 ) where {
     T<:EnergyBalance,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D<:PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_steps = get_time_steps(container)
@@ -245,7 +249,7 @@ function add_constraints!(
     devices::U,
 ) where {
     T<:OutputActivePowerVariableLimitsConstraint,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:ActiveOutPowerVariable,
 } where {D<:PSIP.StorageTechnology{PSY.EnergyReservoirStorage}}
     time_steps = get_time_steps(container)
@@ -293,7 +297,7 @@ function add_constraints!(
     devices::U,
 ) where {
     T<:InputActivePowerVariableLimitsConstraint,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:ActiveInPowerVariable,
 } where {D<:PSIP.StorageTechnology{PSY.EnergyReservoirStorage}}
     time_steps = get_time_steps(container)
@@ -341,7 +345,7 @@ function add_constraints!(
     devices::U,
 ) where {
     T<:StateofChargeLimitsConstraint,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:EnergyVariable,
 } where {D<:PSIP.StorageTechnology{PSY.EnergyReservoirStorage}}
     time_steps = get_time_steps(container)
@@ -389,7 +393,7 @@ function add_constraints!(
     devices::U,
 ) where {
     T<:EnergyBalanceConstraint,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:EnergyVariable,
 } where {D<:PSIP.StorageTechnology{PSY.EnergyReservoirStorage}}
     time_steps = get_time_steps(container)
@@ -448,7 +452,7 @@ function add_constraints!(
     #::NetworkModel{X},
 ) where {
     T<:MaximumCumulativePowerCapacity,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:CumulativePowerCapacity,
     #X <: PM.AbstractPowerModel,
 } where {D<:PSIP.StorageTechnology}
@@ -481,7 +485,7 @@ function add_constraints!(
     #::NetworkModel{X},
 ) where {
     T<:MaximumCumulativeEnergyCapacity,
-    U<:Union{Vector{D},IS.FlattenIteratorWrapper{D}},
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
     V<:CumulativeEnergyCapacity,
     #X <: PM.AbstractPowerModel,
 } where {D<:PSIP.StorageTechnology}
@@ -509,7 +513,7 @@ end
 
 function objective_function!(
     container::SingleOptimizationContainer,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{T, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
 ) where {T<:PSIP.StorageTechnology}#, U <: ActivePowerVariable}
@@ -520,7 +524,7 @@ end
 
 function objective_function!(
     container::SingleOptimizationContainer,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{T, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
 ) where {T<:PSIP.StorageTechnology}#, U <: BuildCapacity}

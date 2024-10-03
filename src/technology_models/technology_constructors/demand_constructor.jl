@@ -1,6 +1,7 @@
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ArgumentConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -13,13 +14,16 @@ function construct_technologies!(
 }
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = PSIP.get_technology(T, p, name)
+
     return
 end
 
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ArgumentConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -32,7 +36,9 @@ function construct_technologies!(
 }
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = PSIP.get_technology(T, p, name)
+
     # SupplyTotal, initialize expression, then add ActivePowerVariable in supply_constructor
     add_to_expression!(container, EnergyBalance(), devices, C())
 
@@ -45,6 +51,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ArgumentConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -57,7 +64,9 @@ function construct_technologies!(
 }
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = PSIP.get_technology(T, p, name)
+
 
     return
 end
@@ -65,6 +74,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ModelConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -81,6 +91,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ModelConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -101,6 +112,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    name::String,
     ::ModelConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
