@@ -5,7 +5,7 @@
 function add_capital_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.SupplyTechnology,U<:BuildCapacity,V<:ContinuousInvestment}
     for d in devices
@@ -37,7 +37,7 @@ end
 function add_fixed_om_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.SupplyTechnology,U<:CumulativeCapacity,V<:ContinuousInvestment}
     for d in devices
@@ -50,7 +50,7 @@ end
 function add_fixed_om_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.StorageTechnology,U<:CumulativeEnergyCapacity,V<:ContinuousInvestment}
     for d in devices
@@ -63,7 +63,7 @@ end
 function add_fixed_om_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.StorageTechnology,U<:CumulativePowerCapacity,V<:ContinuousInvestment}
     for d in devices
@@ -96,7 +96,7 @@ end
 function add_capital_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.StorageTechnology,U<:BuildEnergyCapacity,V<:ContinuousInvestment}
     for d in devices
@@ -113,7 +113,7 @@ end
 function add_capital_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.StorageTechnology,U<:BuildPowerCapacity,V<:ContinuousInvestment}
     for d in devices
