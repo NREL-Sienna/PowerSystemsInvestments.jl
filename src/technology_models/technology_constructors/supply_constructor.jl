@@ -1,7 +1,7 @@
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ArgumentConstructStage,
     ::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -15,7 +15,7 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     # filter based on technology names passed
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
     #PSIP.get_technologies(T, p)
 
     # BuildCapacity variable
@@ -30,7 +30,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ArgumentConstructStage,
     ::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -44,7 +44,7 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     #devices = PSIP.get_technologies(T, p)
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #ActivePowerVariable
     add_variable!(container, ActivePowerVariable(), devices, C())
@@ -58,7 +58,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ArgumentConstructStage,
     ::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -72,7 +72,7 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     #devices = PSIP.get_technologies(T, p)
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
     #add_expression!(container, SupplyTotal(), devices, C())
 
     add_to_expression!(container, SupplyTotal(), devices, C())
@@ -82,7 +82,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ModelConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -94,7 +94,7 @@ function construct_technologies!(
     D <: FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
 
     # Capital Component of objective function
     objective_function!(container, devices, B())
@@ -110,7 +110,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ModelConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -122,7 +122,7 @@ function construct_technologies!(
     D <: FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
     # Operations Component of objective function
     objective_function!(container, devices, C())
 
@@ -144,7 +144,7 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
-    name::String,
+    names::Vector{String},
     ::ModelConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
@@ -156,7 +156,7 @@ function construct_technologies!(
     D <: FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
-    devices = PSIP.get_technology(T, p, name)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
 
     return
 end

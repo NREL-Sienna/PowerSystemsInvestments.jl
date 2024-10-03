@@ -513,7 +513,7 @@ end
 
 function objective_function!(
     container::SingleOptimizationContainer,
-    devices::Union{T, IS.FlattenIteratorWrapper{T}},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
 ) where {T<:PSIP.StorageTechnology}#, U <: ActivePowerVariable}
@@ -524,7 +524,7 @@ end
 
 function objective_function!(
     container::SingleOptimizationContainer,
-    devices::Union{T, IS.FlattenIteratorWrapper{T}},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
 ) where {T<:PSIP.StorageTechnology}#, U <: BuildCapacity}

@@ -921,29 +921,27 @@ function build_model!(
     tech_templates = collect(keys(template.technology_models))
     # Order is required
     @error "Remember to restore availability code here"
-    for (i, names_lists) in enumerate(tech_names)
+    for (i, name_list) in enumerate(tech_names)
         tech_model = tech_templates[i]
-        for tech_name in names_lists
-            @show tech_name
-            @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
-            LOG_GROUP_OPTIMIZATION_CONTAINER
-            TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
-                if validate_available_technologies(tech_model, port)
-                    for mod in [template.capital_model, template.operation_model] # template.feasibility_model
-                        construct_technologies!(
-                            container,
-                            port,
-                            tech_name,
-                            ArgumentConstructStage(),
-                            mod,
-                            tech_model,
-                            #transmission_model,
-                        )
-                    end
+        @show name_list
+        @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
+        LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
+            if validate_available_technologies(tech_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        name_list,
+                        ArgumentConstructStage(),
+                        mod,
+                        tech_model,
+                        #transmission_model,
+                    )
                 end
-                @debug "Problem size:" get_problem_size(container) _group =
-                    LOG_GROUP_OPTIMIZATION_CONTAINER
             end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
 
@@ -986,28 +984,26 @@ function build_model!(
     # iterate over tech_names and pull corresponding technologymodel
     # pass both tech model and name to construct_technologies
 
-    for (i, names_lists) in enumerate(tech_names)
+    for (i, name_list) in enumerate(tech_names)
         tech_model = tech_templates[i]
-        for tech_name in names_lists
-            @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
-                LOG_GROUP_OPTIMIZATION_CONTAINER
-            TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
-                if validate_available_technologies(tech_model, port)
-                    for mod in [template.capital_model, template.operation_model] # template.feasibility_model
-                        construct_technologies!(
-                            container,
-                            port,
-                            tech_name,
-                            ModelConstructStage(),
-                            mod,
-                            tech_model,
-                            #transmission_model,
-                        )
-                    end
+        @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
+            if validate_available_technologies(tech_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        name_list,
+                        ModelConstructStage(),
+                        mod,
+                        tech_model,
+                        #transmission_model,
+                    )
                 end
-                @debug "Problem size:" get_problem_size(container) _group =
-                    LOG_GROUP_OPTIMIZATION_CONTAINER
             end
+            @debug "Problem size:" get_problem_size(container) _group =
+                LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
     #=

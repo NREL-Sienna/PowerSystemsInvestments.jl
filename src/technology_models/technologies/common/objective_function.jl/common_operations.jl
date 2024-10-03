@@ -5,7 +5,7 @@
 function add_variable_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.SupplyTechnology,U<:ActivePowerVariable,V<:BasicDispatch}
     for d in devices
@@ -19,7 +19,7 @@ end
 function add_proportional_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T <: PSY.ThermalGen, U <: OnVariable, V <: AbstractCompactUnitCommitment}
     multiplier = objective_function_multiplier(U(), V())
@@ -102,7 +102,7 @@ end
 function add_variable_cost!(
     container::SingleOptimizationContainer,
     ::U,
-    devices::IS.FlattenIteratorWrapper{T},
+    devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     ::V,
 ) where {T<:PSIP.StorageTechnology,U<:Union{ActiveOutPowerVariable,ActiveInPowerVariable},V<:BasicDispatch}
     for d in devices
