@@ -32,8 +32,12 @@ struct TimeMapping
         time_stamps = Vector{Dates.DateTime}(undef, total_count)
         consecutive_slices = Vector{Vector{Int}}(undef, total_slice_count)
         inverse_invest_mapping = Vector{Vector{Int}}(undef, total_slice_count)
-        map_to_operational_slices = Dict{Int, Vector{Int}}(i => Vector{Int}() for i in 1:length(investment_intervals))
-        map_to_feasibility_slices = Dict{Int, Vector{Int}}(i => Vector{Int}() for i in 1:length(investment_intervals))
+        map_to_operational_slices = Dict{Int, Vector{Int}}(
+            i => Vector{Int}() for i in 1:length(investment_intervals)
+        )
+        map_to_feasibility_slices = Dict{Int, Vector{Int}}(
+            i => Vector{Int}() for i in 1:length(investment_intervals)
+        )
 
         ix = 1
         slice_running_count = 0
@@ -41,13 +45,15 @@ struct TimeMapping
             slice_length = length(slice)
             slice_found_in_interval = false
             for (ivx, investment_interval) in enumerate(investment_intervals)
-                if first(slice) >= investment_interval[1] && last(slice) <= investment_interval[2]
+                if first(slice) >= investment_interval[1] &&
+                   last(slice) <= investment_interval[2]
                     if sx <= op_index_last_slice
                         push!(map_to_operational_slices[ivx], sx)
                     else
                         push!(map_to_feasibility_slices[ivx], sx)
                     end
-                    inverse_invest_mapping[sx] = fill!(Vector{Int}(undef, slice_length), ivx)
+                    inverse_invest_mapping[sx] =
+                        fill!(Vector{Int}(undef, slice_length), ivx)
                     slice_found_in_interval = true
                     break
                 end
@@ -56,7 +62,7 @@ struct TimeMapping
                 error()
             end
             slice_length = length(slice)
-            slice_indeces = range(slice_running_count + 1, length = slice_length)
+            slice_indeces = range(slice_running_count + 1, length=slice_length)
             consecutive_slices[sx] = collect(slice_indeces)
             slice_running_count = last(slice_indeces)
             for time_stamp in slice
@@ -69,14 +75,14 @@ struct TimeMapping
             time_stamps,
             consecutive_slices,
             inverse_invest_mapping,
-            collect(range(start = op_index_last_slice + 1, stop = total_slice_count)),
-            collect(range(1, op_index_last_slice))
+            collect(range(start=op_index_last_slice + 1, stop=total_slice_count)),
+            collect(range(1, op_index_last_slice)),
         )
 
         inv_periods = InvestmentIntervals(
             investment_intervals,
             map_to_operational_slices,
-            map_to_feasibility_slices
+            map_to_feasibility_slices,
         )
 
         new(inv_periods, op_periods)
