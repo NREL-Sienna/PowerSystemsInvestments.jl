@@ -90,3 +90,4 @@ struct TimeMapping
 end
 
 get_total_operation_period_count(tm::TimeMapping) = length(tm.operation.time_stamps)
+# TODO: use more accessors to get the problem times
