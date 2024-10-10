@@ -1,33 +1,49 @@
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ArgumentConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
+
     return
 end
 
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ArgumentConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
+
     # SupplyTotal, initialize expression, then add ActivePowerVariable in supply_constructor
-    add_expression!(container, SupplyTotal(), devices, C())
+    add_to_expression!(container, EnergyBalance(), devices, C())
 
     # DemandTotal
-    add_expression!(container, DemandTotal(), devices, C())
+    # add_to_expression!(container, DemandTotal(), devices, C())
 
     return
 end
@@ -35,14 +51,22 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ArgumentConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #TODO: Port get_available_component functions from PSY
-    devices = PSIP.get_technologies(T, p)
+    #devices = PSIP.get_technologies(T, p)
+    devices = [PSIP.get_technology(T, p, n) for n in names]
+
 
     return
 end
@@ -50,24 +74,34 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ModelConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
-
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
     return
 end
 
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ModelConstructStage,
     model::OperationCostModel,
-    ::ModelConstructStage,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
 
     #power balance
     add_constraints!(container, SupplyDemandBalance, T)
@@ -78,11 +112,16 @@ end
 function construct_technologies!(
     container::SingleOptimizationContainer,
     p::PSIP.Portfolio,
+    names::Vector{String},
     ::ModelConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C},
+    technology_model::TechnologyModel{T, B, C, D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
-) where {T <: PSIP.DemandRequirement, B <: StaticLoadInvestment, C <: BasicDispatch}
-
+) where {
+    T <: PSIP.DemandRequirement,
+    B <: StaticLoadInvestment,
+    C <: BasicDispatch,
+    D <: FeasibilityTechnologyFormulation,
+}
     return
 end
