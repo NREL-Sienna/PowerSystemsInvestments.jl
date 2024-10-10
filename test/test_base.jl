@@ -189,3 +189,76 @@ end
     @test length(c["cheap_thermal", :]) ==
           length(PSIN.get_time_steps_investments(container))
 end
+
+@testset "Time Mappings" begin
+    investments = [
+        (Date(Month(1), Year(2025)), Date(Month(1), Year(2026))),
+        (Date(Month(1), Year(2026)), Date(Month(1), Year(2027))),
+    ]
+
+    operations = [
+        [DateTime(Month(1), Day(25), Year(2025))],
+        collect(
+            range(
+                start=DateTime(Day(1), Month(3), Year(2025)),
+                stop=start = DateTime(Day(7), Month(3), Year(2025)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(7), Year(2025)),
+                stop=start = DateTime(Day(13), Month(7), Year(2025)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(9), Year(2025)),
+                stop=start = DateTime(Day(10), Month(9), Year(2025)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(3), Year(2026)),
+                stop=start = DateTime(Day(8), Month(3), Year(2026)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(7), Year(2026)),
+                stop=start = DateTime(Day(6), Month(7), Year(2026)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(9), Year(2026)),
+                stop=start = DateTime(Day(10), Month(9), Year(2026)),
+                step=Hour(1),
+            ),
+        ),
+    ]
+
+    feasibility = [
+        collect(
+            range(
+                start=DateTime(Day(1), Month(4), Year(2025)),
+                stop=start = DateTime(Day(15), Month(4), Year(2025)),
+                step=Hour(1),
+            ),
+        ),
+        collect(
+            range(
+                start=DateTime(Day(1), Month(6), Year(2026)),
+                stop=start = DateTime(Day(5), Month(6), Year(2026)),
+                step=Hour(1),
+            ),
+        ),
+    ]
+
+    res = PSINV.TimeMapping(investments, operations, feasibility)
+    # TODO: add more tests
+end

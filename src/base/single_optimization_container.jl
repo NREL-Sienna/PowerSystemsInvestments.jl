@@ -1,8 +1,7 @@
 Base.@kwdef mutable struct SingleOptimizationContainer <:
                            ISOPT.AbstractOptimizationContainer
     JuMPmodel::JuMP.Model
-    time_steps::UnitRange{Int}
-    time_steps_investments::UnitRange{Int}
+    time_mapping::TimeMapping
     settings::Settings
     settings_copy::Settings
     variables::Dict{ISOPT.VariableKey, AbstractArray}

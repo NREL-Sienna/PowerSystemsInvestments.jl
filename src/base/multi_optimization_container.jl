@@ -2,8 +2,7 @@ Base.@kwdef mutable struct MultiOptimizationContainer{T <: SolutionAlgorithm} <:
                            ISOPT.AbstractOptimizationContainer
     main_problem::SingleOptimizationContainer
     subproblems::Union{Nothing, Dict{String, SingleOptimizationContainer}}
-    time_steps::UnitRange{Int}
-    time_steps_operation::UnitRange{Int}
+    time_mapping::TimeMapping
     resolution::Dates.TimePeriod
     settings::Settings
     settings_copy::Settings

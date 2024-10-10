@@ -136,6 +136,7 @@ include("base/settings.jl")
 include("base/solution_algorithms.jl")
 include("base/technology_model.jl")
 include("base/investment_model_template.jl")
+include("base/time_mapping.jl")
 
 include("base/objective_function.jl")
 include("base/single_optimization_container.jl")

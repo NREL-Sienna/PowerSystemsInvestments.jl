@@ -69,10 +69,5 @@ function TechnologyModel(
     _check_technology_formulation(D, B, C)
     #TODO: new is only defined for inner constructors, replace for now but we might want to reorganize this file later
     #new{D, B, C}(use_slacks, duals, time_series_names, attributes_, nothing)
-    return TechnologyModel{D, B, C}(
-        use_slacks,
-        duals,
-        time_series_names,
-        attributes_,
-    )
+    return TechnologyModel{D, B, C}(use_slacks, duals, time_series_names, attributes_)
 end
