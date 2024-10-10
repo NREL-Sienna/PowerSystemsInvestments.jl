@@ -186,6 +186,7 @@ function construct_technologies!(
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
+    
     add_variable!(container, BuildCapacity(), devices, B(), technology_model.group_name)
 
     # CumulativeCapacity

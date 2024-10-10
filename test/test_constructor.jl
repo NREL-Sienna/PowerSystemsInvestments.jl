@@ -165,15 +165,6 @@ end
 
     c = PSINV.get_constraint(
         container,
-        PSINV.ActivePowerLimitsConstraint(),
-        PSIP.SupplyTechnology{PSY.ThermalStandard},
-    )
-    @show c[:,:]
-    #@test length(c["expensive_thermal", :]) == length(PSINV.get_time_steps(container))
-    #@test length(c["cheaper_thermal", :]) == length(PSINV.get_time_steps(container))
-
-    c = PSINV.get_constraint(
-        container,
         PSINV.MaximumCumulativeCapacity(),
         PSIP.SupplyTechnology{PSY.ThermalStandard},
     )
@@ -181,4 +172,16 @@ end
           length(PSINV.get_time_steps_investments(container))
     @test length(c["cheap_thermal", :]) ==
           length(PSINV.get_time_steps_investments(container))
+
+    #passing same technology name with different model to constructor
+    unit_thermal_model = PSINV.TechnologyModel(
+        PSIP.SupplyTechnology{PSY.ThermalStandard},
+        PSINV.IntegerInvestment,
+        PSINV.BasicDispatch,
+        PSINV.BasicDispatchFeasibility;
+        group_name = "test"
+    )
+
+    @test_throws ArgumentError PSINV.construct_technologies!(container, p_5bus, ["cheap_thermal"], PSINV.ArgumentConstructStage(), DiscountedCashFlow(0.07), unit_thermal_model)
+
 end

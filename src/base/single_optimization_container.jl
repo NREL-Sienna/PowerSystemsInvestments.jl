@@ -978,10 +978,8 @@ function build_model!(
         end
     end
     =#
-
+    #@show container.variables
     # TODO: Add Constraints for this
-    # iterate over tech_names and pull corresponding technologymodel
-    # pass both tech model and name to construct_technologies
 
     for (i, name_list) in enumerate(tech_names)
         tech_model = tech_templates[i]
@@ -1005,6 +1003,7 @@ function build_model!(
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
+
     #=
     # This function should be called after construct_device ModelConstructStage
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transport_model)" begin
@@ -1121,4 +1120,50 @@ Exports the OpModel JuMP object in MathOptFormat
 function serialize_optimization_model(container::SingleOptimizationContainer, save_path::String)
     serialize_jump_optimization_model(get_jump_model(container), save_path)
     return
+end
+
+"""
+Each Tuple corresponds to (con_name, internal_index, moi_index)
+"""
+function get_all_variable_index(container::SingleOptimizationContainer)
+    var_keys = get_all_variable_keys(container)
+    return [IS.Optimization.encode_key(v) for v in var_keys]
+end
+
+# Probably a more efficiency way of doing this
+function get_all_variable_keys(container::SingleOptimizationContainer)
+    var_index = Vector{VariableKey}()
+    for (key, value) in get_variables(container)
+        push!(var_index, key)
+    end
+    return var_index
+end
+
+function check_duplicate_names(
+    names::Vector{String}, 
+    container::SingleOptimizationContainer,
+    variable_type::T,
+    tech_type::Type{D}
+) where {
+    T <: ISOPT.VariableType,
+    D <: PSIP.Technology
+}
+    duplicate = false
+    n = ""
+    try 
+        variable = get_variable(container, variable_type, tech_type)
+        ax = axes(variable)
+        for name in names
+            if (name in ax[1])
+                duplicate = true
+                n = name
+            end
+        end
+    catch
+        true
+    end
+
+    if duplicate
+        throw(ArgumentError("$n is already being used with another technology model"))
+    end
 end

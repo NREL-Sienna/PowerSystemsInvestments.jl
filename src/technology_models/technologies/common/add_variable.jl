@@ -11,12 +11,15 @@ function add_variable!(
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
-    
+
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
+
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
         meta=group_name
     )
@@ -52,14 +55,18 @@ function add_variable!(
     time_steps = get_time_steps(container)
     binary = false
 
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
+
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
         meta = group_name
     )
+
 
     for t in time_steps, d in devices
         name = PSY.get_name(d)
