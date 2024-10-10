@@ -3,6 +3,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
+    group_name::String
 ) where {
     T <: InvestmentVariableType,
     U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -17,6 +18,7 @@ function add_variable!(
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
+        meta=group_name
     )
 
     for t in time_steps, d in devices
@@ -41,6 +43,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
+    group_name::String
 ) where {
     T <: OperationsVariableType,
     U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -55,6 +58,7 @@ function add_variable!(
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
+        meta = group_name
     )
 
     for t in time_steps, d in devices
