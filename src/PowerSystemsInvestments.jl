@@ -30,6 +30,7 @@ const MOPFM = MOI.FileFormats.Model
 export InvestmentModel
 export InvestmentModelTemplate
 export TransportModel
+export OptimizationProblemResults
 
 ### Capital Model
 export DiscountedCashFlow
@@ -141,7 +142,8 @@ import InfrastructureSystems.Optimization:
     export_results, 
     serialize_results, 
     get_timestamps, 
-    get_model_base_power
+    get_model_base_power,
+    get_objective_value
 import TimerOutputs
 
 ####

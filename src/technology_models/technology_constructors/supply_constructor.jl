@@ -15,6 +15,7 @@ function construct_technologies!(
 
     #TODO: Port get_available_component functions from PSY
     # filter based on technology names passed
+    #TODO: Review when we start working with larger models
     devices = [PSIP.get_technology(T, p, n) for n in names]
     #PSIP.get_technologies(T, p)
 
