@@ -195,7 +195,7 @@ set_console_level!(model::InvestmentModel, val) =
 set_file_level!(model::InvestmentModel, val) =
     IS.Optimization.set_file_level!(get_internal(model), val)
 
-function set_status!(model::InvestmentModel, status::ModelBuildStatus)
+function set_status!(model::InvestmentModel, status::ISOPT.ModelBuildStatus)
     IS.Optimization.set_status!(get_internal(model), status)
     return
 end
