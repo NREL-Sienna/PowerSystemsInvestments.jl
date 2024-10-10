@@ -7,7 +7,7 @@ end
 struct OperationalPeriods
     time_stamps::Vector{Dates.DateTime}
     consecutive_slices::Vector{Vector{Int}}
-    inverse_invest_mapping::Vector{Vector{Int}}
+    inverse_invest_mapping::Vector{Int}
     feasibility_indexes::Vector{Int}
     operational_indexes::Vector{Int}
 end
@@ -18,8 +18,8 @@ struct TimeMapping
 
     function TimeMapping(
         investment_intervals::Vector{NTuple{2, Dates.Date}},
-        operational_periods::Vector{Vector{DateTime}},
-        feasibility_periods::Vector{Vector{DateTime}},
+        operational_periods::Vector{Vector{Dates.DateTime}},
+        feasibility_periods::Vector{Vector{Dates.DateTime}},
     )
         # TODO:
         # Validation of the dates to avoid overlaps
@@ -52,8 +52,7 @@ struct TimeMapping
                     else
                         push!(map_to_feasibility_slices[ivx], sx)
                     end
-                    inverse_invest_mapping[sx] =
-                        fill!(Vector{Int}(undef, slice_length), ivx)
+                    inverse_invest_mapping[sx] = ivx
                     slice_found_in_interval = true
                     break
                 end
