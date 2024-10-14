@@ -111,6 +111,28 @@ function test_data()
         outage_factor=0.95,
     )
 
+    t_th_mid = SupplyTechnology{ThermalStandard}(;
+    base_power=1.0, # Natural Units
+    prime_mover_type=PrimeMovers.ST,
+    capital_costs=LinearCurve(coal_igcc_capex * 1000.0),
+    minimum_required_capacity=0.0,
+    gen_ID=1,
+    available=true,
+    name="mid_thermal",
+    initial_capacity= 0.0,#initial_cap_cheap,
+    fuel=ThermalFuels.COAL,
+    power_systems_type="ThermalStandard",
+    balancing_topology="Region",
+    operation_costs=ThermalGenerationCost(
+        variable=CostCurve(LinearCurve(cheap_th_var_cost)),
+        fixed=0.0,
+        start_up=0.0,
+        shut_down=0.0,
+    ),#LinearCurve(0.0),
+    maximum_capacity=1e8,
+    outage_factor=0.92,
+)
+
     #####################
     ##### Renewable #####
     #####################
@@ -264,6 +286,7 @@ function test_data()
     PSIP.add_technology!(p_5bus, t_th_exp)
     PSIP.add_technology!(p_5bus, t_demand)
     PSIP.add_technology!(p_5bus, t_stor)
+    PSIP.add_technology!(p_5bus, t_th_mid)
 
     PSIP.add_time_series!(p_5bus, t_th, ts_th_cheap_inv_capex)
     PSIP.add_time_series!(p_5bus, t_th_exp, ts_th_exp_inv_capex)

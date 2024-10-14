@@ -2,7 +2,8 @@ function add_variable!(
     container::SingleOptimizationContainer,
     variable_type::T,
     devices::U,
-    formulation::AbstractTechnologyFormulation;
+    formulation::AbstractTechnologyFormulation,
+    group_name::String;
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {
     T<:InvestmentVariableType,
@@ -11,14 +12,14 @@ function add_variable!(
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
-
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
-        meta=meta,
     )
 
     for t in time_steps, d in devices
@@ -42,7 +43,8 @@ function add_variable!(
     container::SingleOptimizationContainer,
     variable_type::T,
     devices::U,
-    formulation::AbstractTechnologyFormulation;
+    formulation::AbstractTechnologyFormulation,
+    group_name::String;
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {
     T<:OperationsVariableType,
@@ -52,14 +54,18 @@ function add_variable!(
     time_steps = get_time_steps(container)
     binary = false
 
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
+
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
         meta=meta,
     )
+
 
     for t in time_steps, d in devices
         name = PSY.get_name(d)
