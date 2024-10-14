@@ -2,21 +2,23 @@ function add_variable!(
     container::SingleOptimizationContainer,
     variable_type::T,
     devices::U,
-    formulation::AbstractTechnologyFormulation,
+    formulation::AbstractTechnologyFormulation;
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {
-    T <: InvestmentVariableType,
-    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.Technology}
+    T<:InvestmentVariableType,
+    U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.Technology}
     #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
-    
+
     variable = add_variable_container!(
         container,
         variable_type,
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
+        meta=meta,
     )
 
     for t in time_steps, d in devices
@@ -40,11 +42,12 @@ function add_variable!(
     container::SingleOptimizationContainer,
     variable_type::T,
     devices::U,
-    formulation::AbstractTechnologyFormulation,
+    formulation::AbstractTechnologyFormulation;
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {
-    T <: OperationsVariableType,
-    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
-} where {D <: PSIP.Technology}
+    T<:OperationsVariableType,
+    U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
+} where {D<:PSIP.Technology}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
@@ -55,6 +58,7 @@ function add_variable!(
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
+        meta=meta,
     )
 
     for t in time_steps, d in devices

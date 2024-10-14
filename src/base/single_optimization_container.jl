@@ -1,12 +1,12 @@
 struct PrimalValuesCache
-    variables_cache::Dict{VariableKey, AbstractArray}
-    expressions_cache::Dict{ExpressionKey, AbstractArray}
+    variables_cache::Dict{VariableKey,AbstractArray}
+    expressions_cache::Dict{ExpressionKey,AbstractArray}
 end
 
 function PrimalValuesCache()
     return PrimalValuesCache(
-        Dict{VariableKey, AbstractArray}(),
-        Dict{ExpressionKey, AbstractArray}(),
+        Dict{VariableKey,AbstractArray}(),
+        Dict{ExpressionKey,AbstractArray}(),
     )
 end
 
@@ -21,15 +21,15 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
     time_steps_investments::UnitRange{Int}
     settings::Settings
     settings_copy::Settings
-    variables::Dict{ISOPT.VariableKey, AbstractArray}
-    aux_variables::Dict{ISOPT.AuxVarKey, AbstractArray}
-    duals::Dict{ISOPT.ConstraintKey, AbstractArray}
-    constraints::Dict{ISOPT.ConstraintKey, AbstractArray}
+    variables::Dict{ISOPT.VariableKey,AbstractArray}
+    aux_variables::Dict{ISOPT.AuxVarKey,AbstractArray}
+    duals::Dict{ISOPT.ConstraintKey,AbstractArray}
+    constraints::Dict{ISOPT.ConstraintKey,AbstractArray}
     objective_function::ObjectiveFunction
-    expressions::Dict{ISOPT.ExpressionKey, AbstractArray}
-    parameters::Dict{ISOPT.ParameterKey, ParameterContainer}
+    expressions::Dict{ISOPT.ExpressionKey,AbstractArray}
+    parameters::Dict{ISOPT.ParameterKey,ParameterContainer}
     primal_values_cache::PrimalValuesCache
-    infeasibility_conflict::Dict{Symbol, Array}
+    infeasibility_conflict::Dict{Symbol,Array}
     optimizer_stats::ISOPT.OptimizerStats
     metadata::ISOPT.OptimizationContainerMetadata
     #default_time_series_type::Type{<:PSY.TimeSeriesData}
@@ -37,7 +37,7 @@ end
 
 function SingleOptimizationContainer(
     settings::Settings,
-    jump_model::Union{Nothing, JuMP.Model},
+    jump_model::Union{Nothing,JuMP.Model},
 )
     if jump_model !== nothing && get_direct_mode_optimizer(settings)
         throw(
@@ -53,15 +53,15 @@ function SingleOptimizationContainer(
         1:1,
         settings,
         copy_for_serialization(settings),
-        Dict{VariableKey, AbstractArray}(),
-        Dict{AuxVarKey, AbstractArray}(),
-        Dict{ConstraintKey, AbstractArray}(),
-        Dict{ConstraintKey, AbstractArray}(),
+        Dict{VariableKey,AbstractArray}(),
+        Dict{AuxVarKey,AbstractArray}(),
+        Dict{ConstraintKey,AbstractArray}(),
+        Dict{ConstraintKey,AbstractArray}(),
         ObjectiveFunction(),
-        Dict{ExpressionKey, AbstractArray}(),
-        Dict{ParameterKey, ParameterContainer}(),
+        Dict{ExpressionKey,AbstractArray}(),
+        Dict{ParameterKey,ParameterContainer}(),
         PrimalValuesCache(),
-        Dict{Symbol, Array}(),
+        Dict{Symbol,Array}(),
         ISOPT.OptimizerStats(),
         ISOPT.OptimizationContainerMetadata(),
     )
@@ -176,7 +176,7 @@ function init_optimization_container!(
     container::SingleOptimizationContainer,
     transport_model::TransportModel{T},
     port::PSIP.Portfolio,
-) where {T <: AbstractTransportAggregation}
+) where {T<:AbstractTransportAggregation}
     @warn "add system units back in"
     #PSY.set_units_base_system!(sys, "SYSTEM_BASE")
     # The order of operations matter
@@ -269,7 +269,7 @@ function has_container_key(
     ::Type{T},
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ExpressionType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     key = ExpressionKey(T, U, meta)
     return haskey(container.expressions, key)
 end
@@ -279,7 +279,7 @@ function has_container_key(
     ::Type{T},
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:VariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     key = VariableKey(T, U, meta)
     return haskey(container.variables, key)
 end
@@ -289,7 +289,7 @@ function has_container_key(
     ::Type{T},
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: AuxVariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:AuxVariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     key = AuxVarKey(T, U, meta)
     return haskey(container.aux_variables, key)
 end
@@ -299,7 +299,7 @@ function has_container_key(
     ::Type{T},
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ConstraintType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     key = ConstraintKey(T, U, meta)
     return haskey(container.constraints, key)
 end
@@ -309,7 +309,7 @@ function has_container_key(
     ::Type{T},
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     key = ParameterKey(T, U, meta)
     return haskey(container.parameters, key)
 end
@@ -329,10 +329,10 @@ end
 ####################################### Variable Container #################################
 function _add_variable_container!(
     container::SingleOptimizationContainer,
-    var_key::VariableKey{T, U},
+    var_key::VariableKey{T,U},
     sparse::Bool,
     axs...,
-) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:VariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     if sparse
         var_container = sparse_container_spec(JuMP.VariableRef, axs...)
     else
@@ -349,7 +349,7 @@ function add_variable_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:VariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     return _add_variable_container!(container, var_key, sparse, axs...)
 end
@@ -361,13 +361,13 @@ function add_variable_container!(
     meta::String,
     axs...;
     sparse=false,
-) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:VariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     return _add_variable_container!(container, var_key, sparse, axs...)
 end
 
 function _get_pwl_variables_container()
-    contents = Dict{Tuple{String, Int, Int}, Any}()
+    contents = Dict{Tuple{String,Int,Int},Any}()
     return SparseAxisArray(contents)
 end
 
@@ -376,7 +376,7 @@ function add_variable_container!(
     ::T,
     ::Type{U};
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: SparseVariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:SparseVariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     var_key = VariableKey(T, U, meta)
     _assign_container!(container.variables, var_key, _get_pwl_variables_container())
     return container.variables[var_key]
@@ -401,7 +401,7 @@ function get_variable(
     ::T,
     ::Type{U},
     meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:VariableType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_variable(container, VariableKey(T, U, meta))
 end
 
@@ -428,7 +428,7 @@ function add_constraints_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ConstraintType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     cons_key = ConstraintKey(T, U, meta)
     return _add_constraints_container!(container, cons_key, axs...; sparse=sparse)
 end
@@ -453,7 +453,7 @@ function get_constraint(
     ::T,
     ::Type{U},
     meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ConstraintType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_constraint(container, ConstraintKey(T, U, meta))
 end
 
@@ -466,12 +466,12 @@ end
 ##################################### Parameter Container ##################################
 function _add_param_container!(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
+    key::ParameterKey{T,U},
     attribute::VariableValueAttributes{<:OptimizationContainerKey},
     param_type::DataType,
     axs...;
     sparse=false,
-) where {T <: VariableValueParameter, U <: PSY.Component}
+) where {T<:VariableValueParameter,U<:PSY.Component}
     if sparse
         param_array = sparse_container_spec(param_type, axs...)
         multiplier_array = sparse_container_spec(Float64, axs...)
@@ -486,11 +486,11 @@ end
 
 function _add_param_container!(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
+    key::ParameterKey{T,U},
     attribute::VariableValueAttributes{<:OptimizationContainerKey},
     axs...;
     sparse=false,
-) where {T <: VariableValueParameter, U <: PSY.Component}
+) where {T<:VariableValueParameter,U<:PSY.Component}
     if built_for_recurrent_solves(container) && !get_rebuild_model(get_settings(container))
         param_type = JuMP.VariableRef
     else
@@ -508,13 +508,13 @@ end
 
 function _add_param_container!(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
+    key::ParameterKey{T,U},
     attribute::TimeSeriesAttributes{V},
     param_axs,
     multiplier_axs,
     time_steps;
     sparse=false,
-) where {T <: TimeSeriesParameter, U <: PSY.Component, V <: PSY.TimeSeriesData}
+) where {T<:TimeSeriesParameter,U<:PSY.Component,V<:PSY.TimeSeriesData}
     if built_for_recurrent_solves(container) && !get_rebuild_model(get_settings(container))
         param_type = JuMP.VariableRef
     else
@@ -536,11 +536,11 @@ end
 
 function _add_param_container!(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
+    key::ParameterKey{T,U},
     attributes::CostFunctionAttributes{R},
     axs...;
     sparse=false,
-) where {R, T <: ObjectiveFunctionParameter, U <: PSY.Component}
+) where {R,T<:ObjectiveFunctionParameter,U<:PSY.Component}
     if sparse
         param_array = sparse_container_spec(R, axs...)
         multiplier_array = sparse_container_spec(Float64, axs...)
@@ -564,7 +564,7 @@ function add_param_container!(
     time_steps;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: TimeSeriesParameter, U <: PSY.Component, V <: PSY.TimeSeriesData}
+) where {T<:TimeSeriesParameter,U<:PSY.Component,V<:PSY.TimeSeriesData}
     param_key = ParameterKey(T, U, meta)
     if isabstracttype(V)
         error("$V can't be abstract: $param_key")
@@ -592,7 +592,7 @@ function add_param_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ObjectiveFunctionParameter, U <: PSY.Component, W <: VariableType}
+) where {T<:ObjectiveFunctionParameter,U<:PSY.Component,W<:VariableType}
     param_key = ParameterKey(T, U, meta)
     attributes =
         CostFunctionAttributes{data_type}(variable_type, sos_variable, uses_compact_power)
@@ -607,7 +607,7 @@ function add_param_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: VariableValueParameter, U <: PSY.Component, V <: OptimizationContainerKey}
+) where {T<:VariableValueParameter,U<:PSY.Component,V<:OptimizationContainerKey}
     param_key = ParameterKey(T, U, meta)
     attributes = VariableValueAttributes(source_key)
     return _add_param_container!(container, param_key, attributes, axs...; sparse=sparse)
@@ -624,7 +624,7 @@ function add_param_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: FixValueParameter, U <: PSY.Component, V <: OptimizationContainerKey}
+) where {T<:FixValueParameter,U<:PSY.Component,V<:OptimizationContainerKey}
     if meta == IS.Optimization.CONTAINER_KEY_EMPTY_META
         error("$T parameters require passing the VariableType to the meta field")
     end
@@ -662,7 +662,7 @@ function get_parameter(
     ::T,
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_parameter(container, ParameterKey(T, U, meta))
 end
 
@@ -672,22 +672,22 @@ end
 
 function get_parameter_array(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    key::ParameterKey{T,U},
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_parameter_array(get_parameter(container, key))
 end
 
 function get_parameter_multiplier_array(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    key::ParameterKey{T,U},
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_multiplier_array(get_parameter(container, key))
 end
 
 function get_parameter_attributes(
     container::SingleOptimizationContainer,
-    key::ParameterKey{T, U},
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+    key::ParameterKey{T,U},
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_attributes(get_parameter(container, key))
 end
 
@@ -696,7 +696,7 @@ function get_parameter_array(
     ::T,
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_parameter_array(container, ParameterKey(T, U, meta))
 end
 
@@ -705,7 +705,7 @@ function get_parameter_multiplier_array(
     ::T,
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_multiplier_array(get_parameter(container, ParameterKey(T, U, meta)))
 end
 
@@ -714,7 +714,7 @@ function get_parameter_attributes(
     ::T,
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ParameterType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ParameterType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_attributes(get_parameter(container, ParameterKey(T, U, meta)))
 end
 
@@ -723,7 +723,7 @@ end
 function _add_to_jump_expression!(
     expression::T,
     value::Float64,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     JuMP.add_to_expression!(expression, value)
     return
 end
@@ -732,7 +732,7 @@ function _add_to_jump_expression!(
     expression::T,
     parameter::Float64,
     multiplier::Float64,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     _add_to_jump_expression!(expression, parameter * multiplier)
     return
 end
@@ -741,7 +741,7 @@ function _add_to_jump_expression!(
     expression::T,
     var::JuMP.VariableRef,
     multiplier::Float64,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     JuMP.add_to_expression!(expression, multiplier, var)
     return
 end
@@ -752,7 +752,7 @@ function _add_expression_container!(
     ::Type{T},
     axs...;
     sparse=false,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     if sparse
         expr_container = sparse_container_spec(T, axs...)
     else
@@ -770,7 +770,7 @@ function add_expression_container!(
     axs...;
     sparse=false,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ExpressionType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     expr_key = ExpressionKey(T, U, meta)
     return _add_expression_container!(container, expr_key, GAE, axs...; sparse=sparse)
 end
@@ -797,7 +797,7 @@ function get_expression(
     ::T,
     ::Type{U},
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio}}
+) where {T<:ExpressionType,U<:Union{PSIP.Technology,PSIP.Portfolio}}
     return get_expression(container, ExpressionKey(T, U, meta))
 end
 
@@ -805,7 +805,7 @@ function get_expression(
     container::SingleOptimizationContainer,
     ::T,
     meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
-) where {T <: ExpressionType}
+) where {T<:ExpressionType}
     return get_expression(container, ExpressionKey(T, meta))
 end
 
@@ -822,7 +822,7 @@ end
 function add_to_objective_operations_expression!(
     container::SingleOptimizationContainer,
     cost_expr::T,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     T_cf = typeof(container.objective_function.operation_terms)
     if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
         container.objective_function.operation_terms += cost_expr
@@ -835,7 +835,7 @@ end
 function add_to_objective_investment_expression!(
     container::SingleOptimizationContainer,
     cost_expr::T,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T<:JuMP.AbstractJuMPScalar}
     T_cf = typeof(container.objective_function.capital_terms)
     if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
         container.objective_function.capital_terms += cost_expr
@@ -858,7 +858,7 @@ function _make_system_expressions!(
     @error "Hard Code TimeSteps"
     time_steps = 1:48
     container.time_steps = 1:48
-    container.time_steps_investments = 1:2
+    container.time_steps_investments = 1:1
     container.expressions = Dict(
         ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
             _make_container_array(["SingleRegion"], time_steps),
@@ -870,7 +870,7 @@ function initialize_system_expressions!(
     container::SingleOptimizationContainer,
     transport_model::TransportModel{T},
     port::PSIP.Portfolio,
-) where {T <: SingleRegionBalanceModel}
+) where {T<:SingleRegionBalanceModel}
     _make_system_expressions!(container, T)
     return
 end
@@ -924,10 +924,10 @@ function build_model!(
     for (i, name_list) in enumerate(tech_names)
         tech_model = tech_templates[i]
         @debug "Building Model for $(get_technology_type(tech_model)) with $(get_investment_formulation(tech_model)) investment formulation" _group =
-        LOG_GROUP_OPTIMIZATION_CONTAINER
+            LOG_GROUP_OPTIMIZATION_CONTAINER
         TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
             if validate_available_technologies(tech_model, port)
-                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                for mod in [template.capital_model, template.operation_model, template.feasibility_model] # template.feasibility_model
                     construct_technologies!(
                         container,
                         port,
@@ -989,7 +989,7 @@ function build_model!(
             LOG_GROUP_OPTIMIZATION_CONTAINER
         TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(tech_model))" begin
             if validate_available_technologies(tech_model, port)
-                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                for mod in [template.capital_model, template.operation_model, template.feasibility_model] # template.feasibility_model
                     construct_technologies!(
                         container,
                         port,
@@ -1032,7 +1032,7 @@ function build_model!(
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-    
+
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(
             container,

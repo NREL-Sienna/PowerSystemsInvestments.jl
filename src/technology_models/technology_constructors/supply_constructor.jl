@@ -4,13 +4,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     ::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -33,13 +33,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     ::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -61,21 +61,21 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     ::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
     #add_expression!(container, SupplyTotal(), devices, C())
-
-    add_to_expression!(container, SupplyTotal(), devices, C())
+    add_variable!(container, ActivePowerVariable(), devices, C(), meta="F_var")
+    # add_to_expression!(container, SupplyTotal(), devices, C())
     return
 end
 
@@ -85,13 +85,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
@@ -113,13 +113,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
@@ -147,13 +147,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: ContinuousInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:ContinuousInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]

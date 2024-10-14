@@ -15,7 +15,7 @@ const BUILD_PROBLEMS_TIMER = TimerOutputs.TimerOutput()
 const RUN_OPERATION_MODEL_TIMER = TimerOutputs.TimerOutput()
 
 # Type Alias for JuMP containers
-const GAE = JuMP.GenericAffExpr{Float64, JuMP.VariableRef}
+const GAE = JuMP.GenericAffExpr{Float64,JuMP.VariableRef}
 const JuMPAffineExpressionArray = Matrix{GAE}
 const JuMPAffineExpressionVector = Vector{GAE}
 
@@ -28,3 +28,9 @@ ModelBuildStatus = IS.Optimization.ModelBuildStatus
 RunStatus = IS.Simulation.RunStatus
 
 IS.@scoped_enum(SOSStatusVariable, NO_VARIABLE = 1, PARAMETER = 2, VARIABLE = 3,)
+
+# Mapping
+const OPMAPPING = Dict(("2024", 1) => 1:48)
+#, ("2028", 1) => 49:96)
+const INVMAPPING = Dict("2024" => 1)
+#, "2028" => 2)
