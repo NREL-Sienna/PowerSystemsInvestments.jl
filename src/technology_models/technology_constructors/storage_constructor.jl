@@ -14,8 +14,8 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     # BuildCapacity variables
-    add_variable!(container, BuildEnergyCapacity(), devices, B())
-    add_variable!(container, BuildPowerCapacity(), devices, B())
+    add_variable!(container, BuildEnergyCapacity(), devices, B(), technology_model.group_name)
+    add_variable!(container, BuildPowerCapacity(), devices, B(), technology_model.group_name)
 
     # CumulativeCapacity expressions
     add_expression!(container, CumulativePowerCapacity(), devices, B())
@@ -38,11 +38,11 @@ function construct_technologies!(
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
     #ActivePowerVariables
-    add_variable!(container, ActiveInPowerVariable(), devices, C())
-    add_variable!(container, ActiveOutPowerVariable(), devices, C())
+    add_variable!(container, ActiveInPowerVariable(), devices, C(), technology_model.group_name)
+    add_variable!(container, ActiveOutPowerVariable(), devices, C(), technology_model.group_name)
 
     #EnergyVariable
-    add_variable!(container, EnergyVariable(), devices, C())
+    add_variable!(container, EnergyVariable(), devices, C(), technology_model.group_name)
 
     # EnergyBalance
     add_to_expression!(container, EnergyBalance(), ActiveInPowerVariable(), devices, C())

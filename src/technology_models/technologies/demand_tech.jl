@@ -69,7 +69,6 @@ function add_to_expression!(
         ts_name = "ops_peak_load"
         # ts_keys = filter(x -> x.name == ts_name, IS.get_time_series_keys(d))
         ts_keys = filter(x -> x.name == ts_name && Dates.Year(x.initial_timestamp) == Dates.Year(2024), IS.get_time_series_keys(d))
-        println(ts_keys)
         for ts_key in ts_keys
             ts_type = ts_key.time_series_type
             features = ts_key.features
@@ -83,8 +82,6 @@ function add_to_expression!(
 
             multiplier = -1.0
             for (ix, t) in enumerate(time_steps_ix)
-                println("SingleRegion", t)
-                println("ix", ix)
                 _add_to_jump_expression!(expression["SingleRegion", t], ts_data[ix] * multiplier)
             end
         end

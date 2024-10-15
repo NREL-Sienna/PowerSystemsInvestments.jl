@@ -1140,21 +1140,22 @@ function get_all_variable_keys(container::SingleOptimizationContainer)
 end
 
 function check_duplicate_names(
-    names::Vector{String}, 
+    names::Vector{String},
     container::SingleOptimizationContainer,
     variable_type::T,
-    tech_type::Type{D}
+    tech_type::Type{D},
+    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
 ) where {
-    T <: ISOPT.VariableType,
-    D <: PSIP.Technology
+    T<:ISOPT.VariableType,
+    D<:PSIP.Technology
 }
     duplicate = false
     n = ""
-    try 
+    try
         variable = get_variable(container, variable_type, tech_type)
         ax = axes(variable)
         for name in names
-            if (name in ax[1])
+            if (name * meta in ax[1])
                 duplicate = true
                 n = name
             end

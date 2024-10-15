@@ -55,7 +55,7 @@ function add_variable!(
     binary = false
 
     names = [PSIP.get_name(d) for d in devices]
-    check_duplicate_names(names, container, variable_type, D)
+    check_duplicate_names(names, container, variable_type, D, meta)
 
     variable = add_variable_container!(
         container,

@@ -213,7 +213,7 @@ function add_constraints!(
             #time_steps_ix = mapping_ops[(year, rep_day)]
             time_steps_ix = mapping_ops[(year, 1)]
             time_step_inv = mapping_inv[year]
-            println("supply $(time_steps_ix)")
+
             for (ix, t) in enumerate(time_steps_ix)
                 con_ub[name, t] = JuMP.@constraint(
                     get_jump_model(container),

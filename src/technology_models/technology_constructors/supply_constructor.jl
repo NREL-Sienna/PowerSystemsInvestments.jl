@@ -75,7 +75,7 @@ function construct_technologies!(
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
     #add_expression!(container, SupplyTotal(), devices, C())
-    add_variable!(container, ActivePowerVariable(), devices, C(), meta="F_var")
+    add_variable!(container, ActivePowerVariable(), devices, C(), technology_model.group_name, meta="F_var")
     # add_to_expression!(container, SupplyTotal(), devices, C())
     return
 end
@@ -169,13 +169,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     ::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.SupplyTechnology,
-    B <: IntegerInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.SupplyTechnology,
+    B<:IntegerInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -186,7 +186,7 @@ function construct_technologies!(
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
-    
+
     add_variable!(container, BuildCapacity(), devices, B(), technology_model.group_name)
 
     # CumulativeCapacity
