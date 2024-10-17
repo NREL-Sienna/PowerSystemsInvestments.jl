@@ -875,6 +875,7 @@ function initialize_system_expressions!(
     return
 end
 
+
 ###################################Initial Conditions Containers############################
 
 function calculate_aux_variables!(container::SingleOptimizationContainer, port::PSIP.Portfolio)
@@ -979,6 +980,10 @@ function build_model!(
     end
     =#
     #@show container.variables
+
+    # Constructor for transport model, adds EnergyBalanceConstraint
+    construct_transport!(container, port, template.transport_model)
+
     # TODO: Add Constraints for this
 
     for (i, name_list) in enumerate(tech_names)
