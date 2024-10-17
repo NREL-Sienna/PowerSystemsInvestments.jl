@@ -38,6 +38,7 @@ export AggregateOperatingCost
 export RepresentativePeriods
 
 export SingleRegionBalanceModel
+export MultiRegionBalanceModel
 
 ## Variables ##
 export BuildCapacity

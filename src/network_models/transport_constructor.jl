@@ -18,6 +18,6 @@ function construct_transport!(
     #::ArgumentConstructStage,
 )
 
-    add_constraints!(container, MultiRegionBalanceConstraint(), p)
+    add_constraints!(container, MultiRegionBalanceConstraint, p)
 
 end
