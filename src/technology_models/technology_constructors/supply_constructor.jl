@@ -19,7 +19,7 @@ function construct_technologies!(
     #PSIP.get_technologies(T, p)
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
@@ -50,7 +50,7 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     #ActivePowerVariable
     add_variable!(container, ActivePowerVariable(), devices, C(), tech_model)
@@ -82,7 +82,7 @@ function construct_technologies!(
     #add_expression!(container, SupplyTotal(), devices, C())
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     add_to_expression!(container, SupplyTotal(), devices, C(), tech_model)
     return
@@ -106,7 +106,7 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     # Capital Component of objective function
     objective_function!(container, devices, B(), tech_model)
@@ -137,7 +137,7 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     # Operations Component of objective function
     objective_function!(container, devices, C(), tech_model)
@@ -176,7 +176,8 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    #tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     return
 end
@@ -204,7 +205,7 @@ function construct_technologies!(
     #PSIP.get_technologies(T, p)
 
     #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(B)
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
