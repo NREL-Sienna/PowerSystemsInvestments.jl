@@ -47,7 +47,7 @@ function add_expression!(
     expression_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    model_name::String
+    tech_model::String
 ) where {
     T<:CumulativeCapacity,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -56,7 +56,7 @@ function add_expression!(
     time_steps = get_time_steps_investments(container)
     binary = false
 
-    var = get_variable(container, BuildCapacity(), D, model_name)
+    var = get_variable(container, BuildCapacity(), D, tech_model)
 
     expression = add_expression_container!(
         container,
@@ -64,7 +64,7 @@ function add_expression!(
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
-        meta=model_name
+        meta=tech_model
     )
 
     # TODO: Move to add_to_expression?
@@ -91,7 +91,7 @@ function add_expression!(
     expression_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    model_name::String
+    tech_model::String
 ) where {
     T<:VariableOMCost,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -100,7 +100,7 @@ function add_expression!(
     time_steps = get_time_steps(container)
     binary = false
     
-    var = get_variable(container, BuildCapacity(), D, model_name)
+    var = get_variable(container, BuildCapacity(), D, tech_model)
 
     expression = add_expression_container!(
         container,
@@ -108,7 +108,7 @@ function add_expression!(
         D,
         [PSIP.get_name(d) for d in devices],
         time_steps,
-        meta=model_name
+        meta=tech_model
     )
 
     return
@@ -119,7 +119,7 @@ function add_to_expression!(
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
-    model_name::String
+    tech_model::String
 ) where {
     T<:EnergyBalance,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -129,7 +129,7 @@ function add_to_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    variable = get_variable(container, ActivePowerVariable(), D, model_name)
+    variable = get_variable(container, ActivePowerVariable(), D, tech_model)
     expression = get_expression(container, T(), PSIP.Portfolio)
     # expression = add_expression_container!(container, expression_type, D, time_steps)
     for d in devices, t in time_steps
@@ -150,7 +150,7 @@ function add_expression!(
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
-    model_name::String
+    tech_model::String
 ) where {
     T<:EnergyBalance,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -160,10 +160,10 @@ function add_expression!(
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
 
-    expression = get_expression(container, T, model_name)
+    expression = get_expression(container, T, tech_model)
 
     #TODO: move to separate add_to_expression! function, could not figure out ExpressionKey
-    variable = get_variable(container, ActivePowerVariable(), D, model_name)
+    variable = get_variable(container, ActivePowerVariable(), D, tech_model)
 
     for d in devices, t in time_steps
         name = PSIP.get_name(d)
@@ -185,7 +185,7 @@ function add_constraints!(
     ::T,
     ::V,
     devices::U,
-    model_name::String
+    tech_model::String
 ) where {
     T<:ActivePowerLimitsConstraint,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -198,10 +198,10 @@ function add_constraints!(
     mapping_ops = Dict(("2030", 1) => 1:24, ("2035", 1) => 25:48)
     mapping_inv = Dict("2030" => 1, "2035" => 2)
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=model_name)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativeCapacity(), D, model_name)
-    active_power = get_variable(container, V(), D, model_name)
+    installed_cap = get_expression(container, CumulativeCapacity(), D, tech_model)
+    active_power = get_variable(container, V(), D, tech_model)
 
     for d in devices
         name = PSIP.get_name(d)
@@ -238,7 +238,7 @@ function add_constraints!(
     ::T,
     ::V,
     devices::U,
-    model_name::String
+    tech_model::String
 ) where {
     T<:ActivePowerLimitsConstraint,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -251,10 +251,10 @@ function add_constraints!(
     mapping_ops = Dict(("2030", 1) => 1:24, ("2035", 1) => 25:48)
     mapping_inv = Dict("2030" => 1, "2035" => 2)
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=model_name)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativeCapacity(), D, model_name)
-    active_power = get_variable(container, V(), D, model_name)
+    installed_cap = get_expression(container, CumulativeCapacity(), D, tech_model)
+    active_power = get_variable(container, V(), D, tech_model)
 
     for d in devices
         name = PSIP.get_name(d)
@@ -288,7 +288,7 @@ function add_constraints!(
     ::T,
     ::V,
     devices::U,
-    model_name::String
+    tech_model::String
     #::NetworkModel{X},
 ) where {
     T<:MaximumCumulativeCapacity,
@@ -299,9 +299,9 @@ function add_constraints!(
     time_steps = get_time_steps_investments(container)
 
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=model_name)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativeCapacity(), D, model_name)
+    installed_cap = get_expression(container, CumulativeCapacity(), D, tech_model)
 
     for d in devices
         name = PSIP.get_name(d)
@@ -323,9 +323,9 @@ function objective_function!(
     devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
-    model_name::String,
+    tech_model::String,
 ) where {T<:PSIP.SupplyTechnology}#, U <: ActivePowerVariable}
-    add_variable_cost!(container, ActivePowerVariable(), devices, formulation, model_name) #U()
+    add_variable_cost!(container, ActivePowerVariable(), devices, formulation, tech_model) #U()
     #add_start_up_cost!(container, StartVariable(), devices, U())
     #add_shut_down_cost!(container, StopVariable(), devices, U())
     #add_proportional_cost!(container, OnVariable(), devices, U())
@@ -337,9 +337,9 @@ function objective_function!(
     devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
-    model_name::String,
+    tech_model::String,
 ) where {T<:PSIP.SupplyTechnology}#, U <: BuildCapacity}
-    add_capital_cost!(container, BuildCapacity(), devices, formulation, model_name) #U()
-    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation, model_name)
+    add_capital_cost!(container, BuildCapacity(), devices, formulation, tech_model) #U()
+    add_fixed_om_cost!(container, CumulativeCapacity(), devices, formulation, tech_model)
     return
 end

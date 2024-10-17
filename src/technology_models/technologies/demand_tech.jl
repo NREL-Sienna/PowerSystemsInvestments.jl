@@ -32,13 +32,12 @@ get_variable_multiplier(::ActivePowerVariable, ::Type{PSIP.DemandRequirement}) =
 
 ################## Expressions ###################
 
-# TODO: SupplyTotal and DemandTotal should probably be defined for each zone/region/etc. later on
-
 function add_to_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
+    #tech_model::String,
 ) where {
     T<:EnergyBalance,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -111,7 +110,7 @@ end
 =#
 
 ################### Constraints ##################
-
+# TODO: Get rid of this!!!
 function add_constraints!(
     container::SingleOptimizationContainer,
     ::Type{T},

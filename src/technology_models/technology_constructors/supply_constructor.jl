@@ -19,14 +19,14 @@ function construct_technologies!(
     #PSIP.get_technologies(T, p)
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
-    add_variable!(container, BuildCapacity(), devices, B(), model_name)
+    add_variable!(container, BuildCapacity(), devices, B(), tech_model)
 
     # CumulativeCapacity
-    add_expression!(container, CumulativeCapacity(), devices, B(), model_name)
+    add_expression!(container, CumulativeCapacity(), devices, B(), tech_model)
     return
 end
 
@@ -50,13 +50,13 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     #ActivePowerVariable
-    add_variable!(container, ActivePowerVariable(), devices, C(), model_name)
+    add_variable!(container, ActivePowerVariable(), devices, C(), tech_model)
 
     # SupplyTotal
-    add_to_expression!(container, EnergyBalance(), devices, C(), model_name)
+    add_to_expression!(container, EnergyBalance(), devices, C(), tech_model)
 
     return
 end
@@ -82,9 +82,9 @@ function construct_technologies!(
     #add_expression!(container, SupplyTotal(), devices, C())
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
-    add_to_expression!(container, SupplyTotal(), devices, C(), model_name)
+    add_to_expression!(container, SupplyTotal(), devices, C(), tech_model)
     return
 end
 
@@ -106,15 +106,15 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     # Capital Component of objective function
-    objective_function!(container, devices, B(), model_name)
+    objective_function!(container, devices, B(), tech_model)
     # Add objective function from container to JuMP model
     update_objective_function!(container)
 
     # Capacity constraint
-    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices, model_name)
+    add_constraints!(container, MaximumCumulativeCapacity(), CumulativeCapacity(), devices, tech_model)
 
     return
 end
@@ -137,10 +137,10 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     # Operations Component of objective function
-    objective_function!(container, devices, C(), model_name)
+    objective_function!(container, devices, C(), tech_model)
 
     # Add objective function from container to JuMP model
     update_objective_function!(container)
@@ -152,7 +152,7 @@ function construct_technologies!(
         ActivePowerLimitsConstraint(),
         ActivePowerVariable(),
         devices,
-        model_name
+        tech_model
     )
 
     return
@@ -176,7 +176,7 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     return
 end
@@ -204,12 +204,12 @@ function construct_technologies!(
     #PSIP.get_technologies(T, p)
 
     #convert technology model to string for container metadata
-    model_name = IS.strip_module_name(typeof(technology_model))
+    tech_model = IS.strip_module_name(typeof(technology_model))
 
     # BuildCapacity variable
     # This should break if a name is passed here a second time
     
-    add_variable!(container, BuildCapacity(), devices, B(), model_name)
+    add_variable!(container, BuildCapacity(), devices, B(), tech_model)
 
     # CumulativeCapacity
     #add_expression!(container, CumulativeCapacity(), devices, B(), technology_model.group_name)
