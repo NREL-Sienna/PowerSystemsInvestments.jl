@@ -866,6 +866,23 @@ function _make_system_expressions!(
     return
 end
 
+function _make_system_expressions!(
+    container::SingleOptimizationContainer,
+    ::Type{MultiRegionBalanceModel},
+    port::PSIP.Portfolio
+)
+    regions = get_technologies(PSIP.Zone, port)
+    @error "Hard Code TimeSteps"
+    time_steps = 1:48
+    container.time_steps = 1:48
+    container.time_steps_investments = 1:2
+    container.expressions = Dict(
+        ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
+            _make_container_array(regions, time_steps),
+    )
+    return
+end
+
 function initialize_system_expressions!(
     container::SingleOptimizationContainer,
     transport_model::TransportModel{T},
@@ -875,6 +892,14 @@ function initialize_system_expressions!(
     return
 end
 
+function initialize_system_expressions!(
+    container::SingleOptimizationContainer,
+    transport_model::TransportModel{T},
+    port::PSIP.Portfolio,
+) where {T <: MultiRegionBalanceModel}
+    _make_system_expressions!(container, T, port)
+    return
+end
 
 ###################################Initial Conditions Containers############################
 
