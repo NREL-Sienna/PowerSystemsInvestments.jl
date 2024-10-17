@@ -866,12 +866,38 @@ function _make_system_expressions!(
     return
 end
 
+function _make_system_expressions!(
+    container::SingleOptimizationContainer,
+    ::Type{MultiRegionBalanceModel},
+    port::PSIP.Portfolio
+)
+    regions = PSIP.get_regions(PSIP.Zone, port)
+    @error "Hard Code TimeSteps"
+    time_steps = 1:48
+    container.time_steps = 1:48
+    container.time_steps_investments = 1:2
+    container.expressions = Dict(
+        ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
+            _make_container_array(regions, time_steps),
+    )
+    return
+end
+
 function initialize_system_expressions!(
     container::SingleOptimizationContainer,
     transport_model::TransportModel{T},
     port::PSIP.Portfolio,
 ) where {T<:SingleRegionBalanceModel}
     _make_system_expressions!(container, T)
+    return
+end
+
+function initialize_system_expressions!(
+    container::SingleOptimizationContainer,
+    transport_model::TransportModel{T},
+    port::PSIP.Portfolio,
+) where {T <: MultiRegionBalanceModel}
+    _make_system_expressions!(container, T, port)
     return
 end
 
@@ -935,7 +961,7 @@ function build_model!(
                         ArgumentConstructStage(),
                         mod,
                         tech_model,
-                        #transmission_model,
+                        transport_model,
                     )
                 end
             end
@@ -944,6 +970,7 @@ function build_model!(
         end
     end
 
+    #TODO: 
     # Requirements Arguments Eventually
     #=
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
@@ -979,6 +1006,10 @@ function build_model!(
     end
     =#
     #@show container.variables
+
+    # Constructor for transport model, adds EnergyBalanceConstraint
+    construct_transport!(container, port, template.transport_model)
+
     # TODO: Add Constraints for this
 
     for (i, name_list) in enumerate(tech_names)
@@ -995,7 +1026,7 @@ function build_model!(
                         ModelConstructStage(),
                         mod,
                         tech_model,
-                        #transmission_model,
+                        transport_model,
                     )
                 end
             end

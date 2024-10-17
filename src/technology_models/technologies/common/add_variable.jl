@@ -3,8 +3,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    group_name::String;
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    tech_model::String
 ) where {
     T<:InvestmentVariableType,
     U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
@@ -20,6 +19,7 @@ function add_variable!(
         D,
         names,
         time_steps,
+        meta=tech_model
     )
 
     for t in time_steps, d in devices
@@ -44,8 +44,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    group_name::String;
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    tech_model::String
 ) where {
     T<:OperationsVariableType,
     U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
@@ -63,7 +62,7 @@ function add_variable!(
         D,
         names,
         time_steps,
-        meta=meta,
+        meta=tech_model
     )
 
 
