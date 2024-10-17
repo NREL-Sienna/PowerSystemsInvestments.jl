@@ -3,7 +3,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    group_name::String
+    model_name::String
 ) where {
     T <: InvestmentVariableType,
     U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -21,7 +21,7 @@ function add_variable!(
         D,
         names,
         time_steps,
-        meta=group_name
+        meta=model_name
     )
 
     for t in time_steps, d in devices
@@ -46,7 +46,7 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
-    group_name::String
+    model_name::String
 ) where {
     T <: OperationsVariableType,
     U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -64,7 +64,7 @@ function add_variable!(
         D,
         names,
         time_steps,
-        meta = group_name
+        meta = model_name
     )
 
 

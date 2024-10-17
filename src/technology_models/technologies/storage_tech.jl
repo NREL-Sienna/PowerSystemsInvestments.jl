@@ -146,6 +146,7 @@ function add_to_expression!(
     var::V,
     devices::U,
     formulation::BasicDispatch,
+    model_name::String,
 ) where {
     T<:EnergyBalance,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
@@ -512,9 +513,10 @@ function objective_function!(
     devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::BasicDispatch, #Type{<:PM.AbstractPowerModel},
+    model_name::String,
 ) where {T<:PSIP.StorageTechnology}#, U <: ActivePowerVariable}
-    add_variable_cost!(container, ActiveOutPowerVariable(), devices, formulation)
-    add_variable_cost!(container, ActiveInPowerVariable(), devices, formulation)
+    add_variable_cost!(container, ActiveOutPowerVariable(), devices, formulation, model_name)
+    add_variable_cost!(container, ActiveInPowerVariable(), devices, formulation, model_name)
     return
 end
 
@@ -523,10 +525,11 @@ function objective_function!(
     devices::Union{Vector{T}, IS.FlattenIteratorWrapper{T}},
     #DeviceModel{T, U},
     formulation::ContinuousInvestment, #Type{<:PM.AbstractPowerModel},
+    model_name::String,
 ) where {T<:PSIP.StorageTechnology}#, U <: BuildCapacity}
-    add_capital_cost!(container, BuildEnergyCapacity(), devices, formulation)
-    add_capital_cost!(container, BuildPowerCapacity(), devices, formulation)
-    add_fixed_om_cost!(container, CumulativeEnergyCapacity(), devices, formulation)
-    add_fixed_om_cost!(container, CumulativePowerCapacity(), devices, formulation)
+    add_capital_cost!(container, BuildEnergyCapacity(), devices, formulation, model_name)
+    add_capital_cost!(container, BuildPowerCapacity(), devices, formulation, model_name)
+    add_fixed_om_cost!(container, CumulativeEnergyCapacity(), devices, formulation, model_name)
+    add_fixed_om_cost!(container, CumulativePowerCapacity(), devices, formulation, model_name)
     return
 end

@@ -179,7 +179,6 @@ end
         PSINV.IntegerInvestment,
         PSINV.BasicDispatch,
         PSINV.BasicDispatchFeasibility;
-        group_name = "test"
     )
 
     @test_throws ArgumentError PSINV.construct_technologies!(container, p_5bus, ["cheap_thermal"], PSINV.ArgumentConstructStage(), DiscountedCashFlow(0.07), unit_thermal_model)
