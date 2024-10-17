@@ -5,7 +5,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.DemandRequirement,
     B <: StaticLoadInvestment,
@@ -27,6 +27,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
     T <: PSIP.DemandRequirement,
@@ -40,7 +41,7 @@ function construct_technologies!(
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
     # SupplyTotal, initialize expression, then add ActivePowerVariable in supply_constructor
-    add_to_expression!(container, EnergyBalance(), devices, C())
+    add_to_expression!(container, EnergyBalance(), devices, C(), transport_model)
 
     # DemandTotal
     # add_to_expression!(container, DemandTotal(), devices, C())
@@ -55,6 +56,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
     T <: PSIP.DemandRequirement,
@@ -67,7 +69,6 @@ function construct_technologies!(
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
 
-
     return
 end
 
@@ -78,7 +79,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.DemandRequirement,
     B <: StaticLoadInvestment,
@@ -95,7 +96,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.DemandRequirement,
     B <: StaticLoadInvestment,
@@ -116,7 +117,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.DemandRequirement,
     B <: StaticLoadInvestment,

@@ -5,7 +5,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     ::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -37,7 +37,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     ::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -56,7 +56,7 @@ function construct_technologies!(
     add_variable!(container, ActivePowerVariable(), devices, C(), tech_model)
 
     # SupplyTotal
-    add_to_expression!(container, EnergyBalance(), devices, C(), tech_model)
+    add_to_expression!(container, EnergyBalance(), devices, C(), tech_model, transport_model)
 
     return
 end
@@ -68,7 +68,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     ::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -95,7 +95,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -126,7 +126,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -164,7 +164,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: ContinuousInvestment,
@@ -189,7 +189,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     ::CapitalCostModel,
     technology_model::TechnologyModel{T, B, C, D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
     T <: PSIP.SupplyTechnology,
     B <: IntegerInvestment,

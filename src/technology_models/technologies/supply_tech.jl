@@ -119,10 +119,12 @@ function add_to_expression!(
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
-    tech_model::String
+    tech_model::String,
+    transport_model::TransportModel{V}
 ) where {
     T<:EnergyBalance,
     U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
+    V<:SingleRegionBalanceModel
 } where {D<:PSIP.SupplyTechnology}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
@@ -137,6 +139,40 @@ function add_to_expression!(
         #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
         _add_to_jump_expression!(
             expression["SingleRegion", t],
+            variable[name, t],
+            1.0, #get_variable_multiplier(U(), V, W()),
+        )
+    end
+
+    return
+end
+
+function add_to_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::BasicDispatch,
+    tech_model::String,
+    transport_model::TransportModel{V}
+) where {
+    T<:EnergyBalance,
+    U<:Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
+    V<:MultiRegionBalanceModel
+} where {D<:PSIP.SupplyTechnology}
+    #@assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+    variable = get_variable(container, ActivePowerVariable(), D, tech_model)
+    expression = get_expression(container, T(), PSIP.Portfolio)
+    # expression = add_expression_container!(container, expression_type, D, time_steps)
+    for d in devices, t in time_steps
+        name = PSIP.get_name(d)
+        region = PSIP.get_region(d)
+        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+        _add_to_jump_expression!(
+            expression[region, t],
             variable[name, t],
             1.0, #get_variable_multiplier(U(), V, W()),
         )

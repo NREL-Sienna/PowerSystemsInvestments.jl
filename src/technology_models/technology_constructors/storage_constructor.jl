@@ -5,7 +5,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     ::CapitalCostModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
 
@@ -33,7 +33,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
 
@@ -66,7 +66,7 @@ function construct_technologies!(
     ::ArgumentConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
 
@@ -84,7 +84,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::CapitalCostModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
     #devices = PSIP.get_technologies(T, p)
@@ -124,7 +124,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::OperationCostModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
     #devices = PSIP.get_technologies(T, p)
@@ -173,7 +173,7 @@ function construct_technologies!(
     ::ModelConstructStage,
     model::FeasibilityModel,
     technology_model::TechnologyModel{T,B,C,D},
-    # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
+    transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {T<:PSIP.StorageTechnology,B<:ContinuousInvestment,C<:BasicDispatch,
     D<:FeasibilityTechnologyFormulation,}
     #devices = PSIP.get_technologies(T, p)

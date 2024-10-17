@@ -871,7 +871,7 @@ function _make_system_expressions!(
     ::Type{MultiRegionBalanceModel},
     port::PSIP.Portfolio
 )
-    regions = get_technologies(PSIP.Zone, port)
+    regions = PSIP.get_regions(PSIP.Zone, port)
     @error "Hard Code TimeSteps"
     time_steps = 1:48
     container.time_steps = 1:48
@@ -961,7 +961,7 @@ function build_model!(
                         ArgumentConstructStage(),
                         mod,
                         tech_model,
-                        #transmission_model,
+                        transport_model,
                     )
                 end
             end
@@ -970,6 +970,7 @@ function build_model!(
         end
     end
 
+    #TODO: 
     # Requirements Arguments Eventually
     #=
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
@@ -1025,7 +1026,7 @@ function build_model!(
                         ModelConstructStage(),
                         mod,
                         tech_model,
-                        #transmission_model,
+                        transport_model,
                     )
                 end
             end
