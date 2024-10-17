@@ -189,6 +189,7 @@ include("technology_models/technologies/supply_tech.jl")
 include("technology_models/technologies/demand_tech.jl")
 include("technology_models/technologies/storage_tech.jl")
 include("network_models/singleregion_model.jl")
+include("network_models/transport_constructor.jl")
 
 include("technology_models/technology_constructors/supply_constructor.jl")
 include("technology_models/technology_constructors/demand_constructor.jl")
