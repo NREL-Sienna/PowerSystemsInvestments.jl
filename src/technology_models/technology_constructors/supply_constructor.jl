@@ -83,8 +83,7 @@ function construct_technologies!(
 
     #convert technology model to string for container metadata
     tech_model = IS.strip_module_name(B)
-
-    add_to_expression!(container, SupplyTotal(), devices, C(), tech_model)
+    # add_to_expression!(container, SupplyTotal(), devices, C(), tech_model, transport_model)
     return
 end
 
@@ -173,12 +172,12 @@ function construct_technologies!(
 }
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
-    add_constraints!(
-        container,
-        FsblyActivePowerLimitsConstraint(),
-        ActivePowerVariable(),
-        devices,
-    )
+    # add_constraints!(
+    #     container,
+    #     FsblyActivePowerLimitsConstraint(),
+    #     ActivePowerVariable(),
+    #     devices,
+    # )
 
     #convert technology model to string for container metadata
     #tech_model = IS.strip_module_name(typeof(technology_model))

@@ -21,8 +21,8 @@ function construct_technologies!(
     add_variable!(container, BuildPowerCapacity(), devices, B(), tech_model)
 
     # CumulativeCapacity expressions
-    add_expression!(container, CumulativePowerCapacity(), devices, B())
-    add_expression!(container, CumulativeEnergyCapacity(), devices, B())
+    add_expression!(container, CumulativePowerCapacity(), devices, B(), tech_model, transport_model)
+    add_expression!(container, CumulativeEnergyCapacity(), devices, B(), tech_model, transport_model)
     return
 end
 
@@ -105,6 +105,7 @@ function construct_technologies!(
         MaximumCumulativePowerCapacity(),
         CumulativePowerCapacity(),
         devices,
+        tech_model
     )
 
     add_constraints!(
