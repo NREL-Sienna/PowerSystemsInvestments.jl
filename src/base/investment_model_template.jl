@@ -30,9 +30,13 @@ InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportAggregation} =
 InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionPowerModel)
 
 get_technology_models(template::InvestmentModelTemplate) = template.technologies
-get_network_model(template::InvestmentModelTemplate) = template.network_model
-get_network_formulation(template::InvestmentModelTemplate) =
-    get_network_formulation(get_network_model(template))
+get_transport_model(template::InvestmentModelTemplate) = template.transport_model
+get_transport_formulation(template::InvestmentModelTemplate) =
+    get_transport_formulation(get_transport_model(template))
+
+get_capital_model(template::InvestmentModelTemplate) = template.capital_model
+get_operation_model(template::InvestmentModelTemplate) = template.operation_model
+get_feasibility_model(template::InvestmentModelTemplate) = template.feasibility_model
 
 """
 Sets the network model in a template.
@@ -45,25 +49,27 @@ function set_transport_model!(
     return
 end
 
-function set_device_model!(
+function set_technology_model!(
     template::InvestmentModelTemplate,
     component_type::Type{<:PSIP.Technology},
     investment_formulation::Type{<:InvestmentTechnologyFormulation},
     operations_formulation::Type{<:OperationsTechnologyFormulation},
+    feasibility_formulation::Type{<:FeasibilityTechnologyFormulation}
 )
-    set_device_model!(
+    set_technology_model!(
         template,
-        TechnologyModel(component_type, investment_formulation, operations_formulation),
+        TechnologyModel(component_type, investment_formulation, operations_formulation, feasibility_formulation),
     )
     return
 end
 
-function set_device_model!(
+function set_technology_model!(
     template::InvestmentModelTemplate,
     model::TechnologyModel{
         <:PSIP.Technology,
         <:InvestmentTechnologyFormulation,
         <:OperationsTechnologyFormulation,
+        <:FeasibilityTechnologyFormulation
     },
 )
     _set_model!(template.technologies, model)

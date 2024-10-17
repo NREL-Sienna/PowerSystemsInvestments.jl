@@ -10,7 +10,7 @@ function OptimizationProblemResults(model::InvestmentModel)
     end
 
     # TODO: Look at how timesteps are extracted from the model
-    # timestamps = get_timestamps(model)
+    timestamps = get_timestamps(model)
     optimizer_stats = IS.Optimization.to_dataframe(get_optimizer_stats(model))
 
     aux_variable_values =
@@ -22,13 +22,13 @@ function OptimizationProblemResults(model::InvestmentModel)
     expression_values =
         Dict(x => read_expression(model, x) for x in list_expression_keys(model))
 
-    sys = get_system(model)
+    portfolio = get_portfolio(model)
 
     return OptimizationProblemResults(
         get_problem_base_power(model),
         timestamps,
-        sys,
-        IS.get_uuid(sys),
+        portfolio,
+        IS.get_uuid(portfolio),
         aux_variable_values,
         variable_values,
         dual_values,
