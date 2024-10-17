@@ -75,8 +75,9 @@ function construct_technologies!(
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
     #add_expression!(container, SupplyTotal(), devices, C())
-    add_variable!(container, ActivePowerVariable(), devices, C(), technology_model.group_name, meta="F_var")
+    add_variable!(container, ActivePowerVariable(), devices, C(), technology_model.group_name, meta="Feas_var")
     # add_to_expression!(container, SupplyTotal(), devices, C())
+    add_to_expression!(container, FeasibilitySurplus(), devices, C())
     return
 end
 
@@ -158,7 +159,12 @@ function construct_technologies!(
 }
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
-
+    add_constraints!(
+        container,
+        FsblyActivePowerLimitsConstraint(),
+        ActivePowerVariable(),
+        devices,
+    )
     return
 end
 

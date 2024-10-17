@@ -59,6 +59,7 @@ export DemandTotal
 export EnergyBalance
 export CumulativePowerCapacity
 export CumulativeEnergyCapacity
+export FeasibilitySurplus
 
 
 #remove later, just for testing
@@ -136,12 +137,12 @@ import InfrastructureSystems.Optimization:
     OptimizationProblemResults,
     OptimizationProblemResultsExport,
     OptimizerStats
-import InfrastructureSystems.Optimization: 
-    read_optimizer_stats, 
+import InfrastructureSystems.Optimization:
+    read_optimizer_stats,
     get_optimizer_stats,
-    export_results, 
-    serialize_results, 
-    get_timestamps, 
+    export_results,
+    serialize_results,
+    get_timestamps,
     get_model_base_power,
     get_objective_value
 import TimerOutputs
