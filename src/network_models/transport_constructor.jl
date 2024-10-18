@@ -7,7 +7,7 @@ function construct_transport!(
 )
 
     add_constraints!(container, SingleRegionBalanceConstraint, p)
-
+    add_constraints!(container, SingleRegionBalanceFeasibilityConstraint, p)
 end
 
 function construct_transport!(

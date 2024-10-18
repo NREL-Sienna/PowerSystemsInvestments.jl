@@ -16,6 +16,15 @@ get_variable_upper_bound(::ActiveOutPowerVariable, d::PSIP.StorageTechnology, ::
 get_variable_lower_bound(::EnergyVariable, d::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = 0.0
 get_variable_upper_bound(::EnergyVariable, d::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = nothing
 
+get_variable_lower_bound(::ActiveInPowerVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = 0.0
+get_variable_upper_bound(::ActiveInPowerVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = nothing
+
+get_variable_lower_bound(::ActiveOutPowerVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = 0.0
+get_variable_upper_bound(::ActiveOutPowerVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = nothing
+
+get_variable_lower_bound(::EnergyVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = 0.0
+get_variable_upper_bound(::EnergyVariable, d::PSIP.StorageTechnology, ::BasicDispatchFeasibility) = nothing
+
 get_variable_multiplier(::ActiveInPowerVariable, ::Type{PSIP.StorageTechnology}) = 1.0
 get_variable_multiplier(::ActiveOutPowerVariable, ::Type{PSIP.StorageTechnology}) = 1.0
 
@@ -214,6 +223,72 @@ function add_to_expression!(
     return
 end
 
+function add_to_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    var::V,
+    devices::U,
+    formulation::BasicDispatchFeasibility,
+    tech_model::String,
+) where {
+    T<:FeasibilitySurplus,
+    U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActiveOutPowerVariable,
+} where {D<:PSIP.StorageTechnology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+    variable = get_variable(container, V(), D, tech_model)
+    expression = get_expression(container, T(), PSIP.Portfolio)
+
+    for d in devices, t in time_steps
+        name = PSIP.get_name(d)
+        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+        _add_to_jump_expression!(
+            expression["SingleRegion", t],
+            variable[name, t],
+            1.0, #get_variable_multiplier(U(), V, W()),
+        )
+    end
+
+    return
+end
+
+function add_to_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    var::V,
+    devices::U,
+    formulation::BasicDispatchFeasibility,
+    tech_model::String,
+) where {
+    T<:FeasibilitySurplus,
+    U<:Union{D,Vector{D},IS.FlattenIteratorWrapper{D}},
+    V<:ActiveInPowerVariable,
+} where {D<:PSIP.StorageTechnology}
+    @assert !isempty(devices)
+    time_steps = get_time_steps(container)
+    #binary = false
+    #var = get_variable(container, ActivePowerVariable(), D)
+
+    variable = get_variable(container, V(), D, tech_model)
+    expression = get_expression(container, T(), PSIP.Portfolio)
+
+    for d in devices, t in time_steps
+        name = PSIP.get_name(d)
+        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+        _add_to_jump_expression!(
+            expression["SingleRegion", t],
+            variable[name, t],
+            -1.0, #get_variable_multiplier(U(), V, W()),
+        )
+    end
+
+    return
+end
+
 function add_expression!(
     container::SingleOptimizationContainer,
     expression_type::T,
@@ -266,9 +341,9 @@ function add_constraints!(
     mapping_ops = OPMAPPING
     mapping_inv = INVMAPPING
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativePowerCapacity(), D, tech_model)
+    installed_cap = get_expression(container, CumulativePowerCapacity(), D, "ContinuousInvestment")
     active_power = get_variable(container, V(), D, tech_model)
 
     for d in devices
@@ -316,9 +391,9 @@ function add_constraints!(
     mapping_ops = OPMAPPING
     mapping_inv = INVMAPPING
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativePowerCapacity(), D, tech_model)
+    installed_cap = get_expression(container, CumulativePowerCapacity(), D, "ContinuousInvestment")
     active_power = get_variable(container, V(), D, tech_model)
 
     for d in devices
@@ -366,9 +441,9 @@ function add_constraints!(
     mapping_ops = OPMAPPING
     mapping_inv = INVMAPPING
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, CumulativeEnergyCapacity(), D, tech_model)
+    installed_cap = get_expression(container, CumulativeEnergyCapacity(), D, "ContinuousInvestment")
     energy_var = get_variable(container, V(), D, tech_model)
 
     for d in devices
@@ -416,7 +491,7 @@ function add_constraints!(
     mapping_ops = OPMAPPING
     mapping_inv = INVMAPPING
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
     charge = get_variable(container, ActiveInPowerVariable(), D, tech_model)
     discharge = get_variable(container, ActiveOutPowerVariable(), D, tech_model)
@@ -474,9 +549,9 @@ function add_constraints!(
     time_steps = get_time_steps_investments(container)
 
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, V(), D, tech_model)
+    installed_cap = get_expression(container, V(), D, "ContinuousInvestment")
 
     for d in devices
         name = PSIP.get_name(d)
@@ -508,9 +583,9 @@ function add_constraints!(
     time_steps = get_time_steps_investments(container)
 
     device_names = PSIP.get_name.(devices)
-    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps)
+    con_ub = add_constraints_container!(container, T(), D, device_names, time_steps, meta=tech_model)
 
-    installed_cap = get_expression(container, V(), D, tech_model)
+    installed_cap = get_expression(container, V(), D, "ContinuousInvestment")
 
     for d in devices
         name = PSIP.get_name(d)

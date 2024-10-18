@@ -73,7 +73,19 @@ function construct_technologies!(
     #TODO: Port get_available_component functions from PSY
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
+    tech_model = IS.strip_module_name(D)
 
+    #ActivePowerVariables
+    add_variable!(container, ActiveInPowerVariable(), devices, C(), tech_model)
+    add_variable!(container, ActiveOutPowerVariable(), devices, C(), tech_model)
+
+    #EnergyVariable
+    add_variable!(container, EnergyVariable(), devices, C(), tech_model)
+
+    # EnergyBalance
+    add_to_expression!(container, FeasibilitySurplus(), ActiveInPowerVariable(), devices, D(), tech_model)
+    add_to_expression!(container, FeasibilitySurplus(), ActiveOutPowerVariable(), devices, D(), tech_model)
+    # add_to_expression!(container, DemandTotal(), devices, C())
     return
 end
 
@@ -179,6 +191,28 @@ function construct_technologies!(
     D<:FeasibilityTechnologyFormulation,}
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
+    tech_model = IS.strip_module_name(D)
+    add_constraints!(
+        container,
+        InputActivePowerVariableLimitsConstraint(),
+        ActiveInPowerVariable(),
+        devices,
+        tech_model
+    )
 
+    # Dispatch output power constraint
+    add_constraints!(
+        container,
+        OutputActivePowerVariableLimitsConstraint(),
+        ActiveOutPowerVariable(),
+        devices,
+        tech_model
+    )
+
+    # Energy storage constraint
+    add_constraints!(container, StateofChargeLimitsConstraint(), EnergyVariable(), devices, tech_model)
+
+    #State of charge constraint
+    add_constraints!(container, EnergyBalanceConstraint(), EnergyVariable(), devices, tech_model)
     return
 end

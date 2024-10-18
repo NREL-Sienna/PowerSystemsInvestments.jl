@@ -24,3 +24,5 @@ struct InputActivePowerVariableLimitsConstraint <: ISOPT.ConstraintType end
 struct EnergyBalanceConstraint <: ISOPT.ConstraintType end
 
 struct StateofChargeLimitsConstraint <: ISOPT.ConstraintType end
+
+struct SingleRegionBalanceFeasibilityConstraint <: ISOPT.ConstraintType end

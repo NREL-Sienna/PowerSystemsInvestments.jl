@@ -862,6 +862,8 @@ function _make_system_expressions!(
     container.expressions = Dict(
         ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
             _make_container_array(["SingleRegion"], time_steps),
+        ExpressionKey(FeasibilitySurplus, PSIP.Portfolio) =>
+            _make_container_array(["SingleRegion"], time_steps),
     )
     return
 end
@@ -878,6 +880,8 @@ function _make_system_expressions!(
     container.time_steps_investments = 1:2
     container.expressions = Dict(
         ExpressionKey(EnergyBalance, PSIP.Portfolio) =>
+            _make_container_array(regions, time_steps),
+        ExpressionKey(FeasibilitySurplus, PSIP.Portfolio) =>
             _make_container_array(regions, time_steps),
     )
     return
@@ -896,7 +900,7 @@ function initialize_system_expressions!(
     container::SingleOptimizationContainer,
     transport_model::TransportModel{T},
     port::PSIP.Portfolio,
-) where {T <: MultiRegionBalanceModel}
+) where {T<:MultiRegionBalanceModel}
     _make_system_expressions!(container, T, port)
     return
 end
