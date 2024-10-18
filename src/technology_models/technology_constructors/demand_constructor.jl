@@ -4,13 +4,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -26,14 +26,14 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
@@ -55,20 +55,20 @@ function construct_technologies!(
     names::Vector{String},
     ::ArgumentConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
     # network_model::NetworkModel{<:PM.AbstractActivePowerModel},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #TODO: Port get_available_component functions from PSY
     #devices = PSIP.get_technologies(T, p)
     devices = [PSIP.get_technology(T, p, n) for n in names]
-
+    add_to_expression!(container, FeasibilitySurplus(), devices, D(), transport_model)
     return
 end
 
@@ -78,13 +78,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     return
 end
@@ -95,13 +95,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::OperationCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
 
     #power balance
@@ -116,13 +116,13 @@ function construct_technologies!(
     names::Vector{String},
     ::ModelConstructStage,
     model::FeasibilityModel,
-    technology_model::TechnologyModel{T, B, C, D},
+    technology_model::TechnologyModel{T,B,C,D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.DemandRequirement,
-    B <: StaticLoadInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
+    T<:PSIP.DemandRequirement,
+    B<:StaticLoadInvestment,
+    C<:BasicDispatch,
+    D<:FeasibilityTechnologyFormulation,
 }
     return
 end
