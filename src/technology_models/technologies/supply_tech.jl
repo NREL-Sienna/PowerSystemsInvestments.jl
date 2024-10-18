@@ -198,21 +198,50 @@ function add_to_expression!(
 } where {D<:PSIP.SupplyTechnology}
     #@assert !isempty(devices)
     time_steps = get_time_steps(container)
+    mapping_ops = OPMAPPING
+    mapping_inv = INVMAPPING
     #binary = false
     #var = get_variable(container, ActivePowerVariable(), D)
-
+    installed_cap = get_expression(container, CumulativeCapacity(), D, "ContinuousInvestment")
     variable = get_variable(container, ActivePowerVariable(), D, tech_model)
     expression = get_expression(container, T(), PSIP.Portfolio)
     # expression = add_expression_container!(container, expression_type, D, time_steps)
-    for d in devices, t in time_steps
+    for d in devices
         name = PSIP.get_name(d)
-        #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
-        _add_to_jump_expression!(
-            expression["SingleRegion", t],
-            variable[name, t],
-            1.0, #get_variable_multiplier(U(), V, W()),
-        )
+        ts_name = "ops_variable_cap_factor"
+        # ts_keys = filter(x -> x.name == ts_name, IS.get_time_series_keys(d))
+        ts_keys = filter(x -> x.name == ts_name && Dates.Year(x.initial_timestamp) == Dates.Year(2024), IS.get_time_series_keys(d))
+        for ts_key in ts_keys
+            ts_type = ts_key.time_series_type
+            features = ts_key.features
+            year = features["year"]
+            #rep_day = features["rep_day"]
+            ts_data = TimeSeries.values(
+                #IS.get_time_series(ts_type, d, ts_name; year=year, rep_day=rep_day).data,
+                IS.get_time_series(ts_type, d, ts_name; year=year).data,
+            )
+            #time_steps_ix = mapping_ops[(year, rep_day)]
+            time_steps_ix = mapping_ops[(year, 1)]
+            time_step_inv = mapping_inv[year]
+
+            for (ix, t) in enumerate(time_steps_ix)
+                _add_to_jump_expression!(
+                    expression["SingleRegion", t],
+                    installed_cap[name, time_step_inv],
+                    1.0, #get_variable_multiplier(U(), V, W()),
+                )
+            end
+        end
     end
+    # for d in devices, t in time_steps
+    #     name = PSIP.get_name(d)
+    #     #bus_no = PNM.get_mapped_bus_number(radial_network_reduction, PSY.get_bus(d))
+    #     _add_to_jump_expression!(
+    #         expression["SingleRegion", t],
+    #         variable[name, t],
+    #         1.0, #get_variable_multiplier(U(), V, W()),
+    #     )
+    # end
 
     return
 end

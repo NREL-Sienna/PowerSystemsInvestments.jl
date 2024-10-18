@@ -746,6 +746,15 @@ function _add_to_jump_expression!(
     return
 end
 
+function _add_to_jump_expression!(
+    expression::T,
+    var::JuMP.AffExpr,
+    multiplier::Float64,
+) where {T<:JuMP.AbstractJuMPScalar}
+    JuMP.add_to_expression!(expression, multiplier, var)
+    return
+end
+
 function _add_expression_container!(
     container::SingleOptimizationContainer,
     expr_key::ExpressionKey,
