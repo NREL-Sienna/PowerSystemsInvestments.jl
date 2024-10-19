@@ -288,7 +288,6 @@ function _get_solver_time(jump_model::JuMP.Model)
     return solver_solve_time
 end
 
-#=
 function write_optimizer_stats!(optimizer_stats::OptimizerStats, jump_model::JuMP.Model)
     if JuMP.primal_status(jump_model) == MOI.FEASIBLE_POINT::MOI.ResultStatusCode
         optimizer_stats.objective_value = JuMP.objective_value(jump_model)
@@ -307,6 +306,7 @@ function write_optimizer_stats!(optimizer_stats::OptimizerStats, jump_model::JuM
     return
 end
 
+
 """
 Exports the JuMP object in MathOptFormat
 """
@@ -316,7 +316,7 @@ function serialize_jump_optimization_model(jump_model::JuMP.Model, save_path::St
     MOI.write_to_file(MOF_model, save_path)
     return
 end
-
+#=
 # check_conflict_status functions can't be tested on CI because free solvers don't support IIS
 function check_conflict_status(
     jump_model::JuMP.Model,

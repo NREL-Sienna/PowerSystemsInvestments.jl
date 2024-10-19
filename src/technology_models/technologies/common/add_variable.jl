@@ -3,20 +3,25 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
+    tech_model::String
 ) where {
     T <: InvestmentVariableType,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps_investments(container)
     binary = false
+
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
 
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
+        meta=tech_model
     )
 
     for t in time_steps, d in devices
@@ -41,21 +46,27 @@ function add_variable!(
     variable_type::T,
     devices::U,
     formulation::AbstractTechnologyFormulation,
+    tech_model::String
 ) where {
     T <: OperationsVariableType,
-    U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    U <: Union{D, Vector{D}, IS.FlattenIteratorWrapper{D}},
 } where {D <: PSIP.Technology}
-    @assert !isempty(devices)
+    #@assert !isempty(devices)
     time_steps = get_time_steps(container)
     binary = false
+
+    names = [PSIP.get_name(d) for d in devices]
+    check_duplicate_names(names, container, variable_type, D)
 
     variable = add_variable_container!(
         container,
         variable_type,
         D,
-        [PSIP.get_name(d) for d in devices],
+        names,
         time_steps,
+        meta=tech_model
     )
+
 
     for t in time_steps, d in devices
         name = PSY.get_name(d)

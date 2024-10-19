@@ -1,6 +1,10 @@
 """
 Stores results data for one InvestmentModel
 """
+
+const InvestmentModelIndexType = Dates.DateTime
+
+
 mutable struct InvestmentModelStore <: ISOPT.AbstractModelStore
     # All DenseAxisArrays have axes (column names, row indexes)
     duals::Dict{ConstraintKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}
@@ -117,8 +121,6 @@ function initialize_storage!(
     end
     return
 end
-
-struct InvestmentModelIndexType end
 
 function write_result!(
     store::InvestmentModelStore,

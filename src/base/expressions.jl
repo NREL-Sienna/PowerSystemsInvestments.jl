@@ -3,7 +3,7 @@ abstract type OperationsExpressionType <: ISOPT.ExpressionType end
 
 struct SupplyTotal <: OperationsExpressionType end
 struct DemandTotal <: OperationsExpressionType end
-struct ActivePowerBalance <: OperationsExpressionType end
+struct EnergyBalance <: OperationsExpressionType end
 
 struct CumulativeCapacity <: InvestmentExpressionType end
 

@@ -1,10 +1,12 @@
 using Test
 import InfrastructureSystems
+import InfrastructureSystems.Optimization
 using JuMP
 using Logging
 using PowerSystemsInvestments
 using PowerSystemsInvestmentsPortfolios
 using PowerSystems
+using DataFrames
 using HiGHS
 
 const IS = InfrastructureSystems

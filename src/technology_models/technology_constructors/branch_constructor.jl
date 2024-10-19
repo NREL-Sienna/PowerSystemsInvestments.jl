@@ -7,7 +7,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -22,11 +22,11 @@ function construct_technologies!(
     tech_model = IS.strip_module_name(B)
 
     # BuildCapacity variable
-    # This should break if a name is passed here a second time
     add_variable!(container, BuildCapacity(), devices, B(), tech_model)
 
     # CumulativeCapacity
     add_expression!(container, CumulativeCapacity(), devices, B(), tech_model)
+
     return
 end
 
@@ -39,7 +39,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -55,7 +55,7 @@ function construct_technologies!(
     #ActivePowerVariable
     add_variable!(container, ActivePowerVariable(), devices, C(), tech_model)
 
-    # SupplyTotal
+    # EnergyBalance
     add_to_expression!(container, EnergyBalance(), devices, C(), tech_model, transport_model)
 
     return
@@ -70,7 +70,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -84,7 +84,6 @@ function construct_technologies!(
     #convert technology model to string for container metadata
     tech_model = IS.strip_module_name(B)
 
-    add_to_expression!(container, SupplyTotal(), devices, C(), tech_model)
     return
 end
 
@@ -97,7 +96,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -128,7 +127,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -138,12 +137,6 @@ function construct_technologies!(
 
     #convert technology model to string for container metadata
     tech_model = IS.strip_module_name(B)
-
-    # Operations Component of objective function
-    objective_function!(container, devices, C(), tech_model)
-
-    # Add objective function from container to JuMP model
-    update_objective_function!(container)
     
     # Dispatch constraint
     add_constraints!(
@@ -166,7 +159,7 @@ function construct_technologies!(
     technology_model::TechnologyModel{T, B, C, D},
     transport_model::TransportModel{<:AbstractTransportAggregation},
 ) where {
-    T <: PSIP.SupplyTechnology,
+    T <: PSIP.ACTransportTechnology,
     B <: ContinuousInvestment,
     C <: BasicDispatch,
     D <: FeasibilityTechnologyFormulation,
@@ -178,40 +171,5 @@ function construct_technologies!(
     #tech_model = IS.strip_module_name(typeof(technology_model))
     tech_model = IS.strip_module_name(B)
 
-    return
-end
-
-#Added constructor for unit investment problems. Does not do anything yet, purely for testing purposes
-function construct_technologies!(
-    container::SingleOptimizationContainer,
-    p::PSIP.Portfolio,
-    names::Vector{String},
-    ::ArgumentConstructStage,
-    ::CapitalCostModel,
-    technology_model::TechnologyModel{T, B, C, D},
-    transport_model::TransportModel{<:AbstractTransportAggregation},
-) where {
-    T <: PSIP.SupplyTechnology,
-    B <: IntegerInvestment,
-    C <: BasicDispatch,
-    D <: FeasibilityTechnologyFormulation,
-}
-
-    #TODO: Port get_available_component functions from PSY
-    # filter based on technology names passed
-    #TODO: Review when we start working with larger models
-    devices = [PSIP.get_technology(T, p, n) for n in names]
-    #PSIP.get_technologies(T, p)
-
-    #convert technology model to string for container metadata
-    tech_model = IS.strip_module_name(B)
-
-    # BuildCapacity variable
-    # This should break if a name is passed here a second time
-    
-    add_variable!(container, BuildCapacity(), devices, B(), tech_model)
-
-    # CumulativeCapacity
-    #add_expression!(container, CumulativeCapacity(), devices, B(), technology_model.group_name)
     return
 end
