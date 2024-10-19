@@ -200,8 +200,8 @@ function add_constraints!(
 
     for d in devices
         name = PSIP.get_name(d)
-        max_capacity = PSIP.maximum_new_capacity(d)
-        init_cap = PSIP.existing_line_capacity(d)
+        max_capacity = PSIP.get_maximum_new_capacity(d)
+        init_cap = PSIP.get_existing_line_capacity(d)
         for t in time_steps
             con_ub[name, t] = JuMP.@constraint(
                 get_jump_model(container),

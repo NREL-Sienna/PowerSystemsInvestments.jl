@@ -986,31 +986,41 @@ function build_model!(
     =#
 
     # Transportation Model Arguments
-    #= Transportation Model Arguments
-    for branch_model in values(template.branches)
-        @debug "Building Arguments for $(get_component_type(branch_model)) with $(get_formulation(branch_model)) formulation" _group =
+    
+    branch_names = collect(values(template.branch_models))
+    branch_templates = collect(keys(template.branch_models))
+    for (i, name_list) in enumerate(branch_names)
+        branch_model = branch_templates[i]
+        @debug "Building Arguments for $(get_technology_type(branch_model)) with $(get_investment_formulation(branch_model)) formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
-        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(branch_model))" begin
-            if validate_available_devices(branch_model, sys)
-                construct_device!(
-                    container,
-                    sys,
-                    ArgumentConstructStage(),
-                    branch_model,
-                    transmission_model,
-                )
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(branch_model))" begin
+            if validate_available_technologies(branch_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        name_list,
+                        ArgumentConstructStage(),
+                        mod,
+                        branch_model,
+                        transport_model,
+                    )
+                end
             end
             @debug "Problem size:" get_problem_size(container) _group =
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-    =#
-    #@show container.variables
-
+    
     # Constructor for transport model, adds EnergyBalanceConstraint
-    construct_transport!(container, port, template.transport_model)
-
-    # TODO: Add Constraints for this
+    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transport_model)" begin
+        @debug "Building $(transport_model) transport formulation" _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+        #construct_network!(container, sys, transport_model, template)
+        construct_transport!(container, port, transport_model)
+        @debug "Problem size:" get_problem_size(container) _group =
+            LOG_GROUP_OPTIMIZATION_CONTAINER
+    end
 
     for (i, name_list) in enumerate(tech_names)
         tech_model = tech_templates[i]
@@ -1035,34 +1045,30 @@ function build_model!(
         end
     end
 
-    #=
-    # This function should be called after construct_device ModelConstructStage
-    TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(transport_model)" begin
-        @debug "Building $(transport_model) transport formulation" _group =
-            LOG_GROUP_OPTIMIZATION_CONTAINER
-        construct_network!(container, sys, transport_model, template)
-        @debug "Problem size:" get_problem_size(container) _group =
-            LOG_GROUP_OPTIMIZATION_CONTAINER
-    end
 
-    for branch_model in values(template.branches)
-        @debug "Building Model for $(get_component_type(branch_model)) with $(get_formulation(branch_model)) formulation" _group =
+    for (i, name_list) in enumerate(branch_names)
+        branch_model = branch_templates[i]
+        @debug "Building Arguments for $(get_technology_type(branch_model)) with $(get_investment_formulation(branch_model)) formulation" _group =
             LOG_GROUP_OPTIMIZATION_CONTAINER
-        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_component_type(branch_model))" begin
-            if validate_available_devices(branch_model, sys)
-                construct_device!(
-                    container,
-                    sys,
-                    ModelConstructStage(),
-                    branch_model,
-                    transmission_model,
-                )
+        TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "$(get_technology_type(branch_model))" begin
+            if validate_available_technologies(branch_model, port)
+                for mod in [template.capital_model, template.operation_model] # template.feasibility_model
+                    construct_technologies!(
+                        container,
+                        port,
+                        name_list,
+                        ModelConstructStage(),
+                        mod,
+                        branch_model,
+                        transport_model,
+                    )
+                end
             end
             @debug "Problem size:" get_problem_size(container) _group =
                 LOG_GROUP_OPTIMIZATION_CONTAINER
         end
     end
-    
+    #=
     TimerOutputs.@timeit BUILD_PROBLEMS_TIMER "Services" begin
         construct_services!(
             container,

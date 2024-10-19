@@ -137,12 +137,6 @@ function construct_technologies!(
 
     #convert technology model to string for container metadata
     tech_model = IS.strip_module_name(B)
-
-    # Operations Component of objective function
-    objective_function!(container, devices, C(), tech_model)
-
-    # Add objective function from container to JuMP model
-    update_objective_function!(container)
     
     # Dispatch constraint
     add_constraints!(

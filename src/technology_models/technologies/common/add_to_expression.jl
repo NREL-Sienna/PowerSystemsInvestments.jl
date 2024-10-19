@@ -85,6 +85,25 @@ function add_to_expression!(
     end
     return
 end
+
+function add_to_expression!(
+    container::SingleOptimizationContainer,
+    ::Type{S},
+    cost_expression::JuMP.AbstractJuMPScalar,
+    technology::T,
+    time_period::Int,
+    tech_model::String,
+) where {S<:InvestmentExpressionType,T<:PSIP.ACTransportTechnology}
+    if has_container_key(container, S, T)
+        device_cost_expression = get_expression(container, S(), T, tech_model)
+        component_name = PSY.get_name(technology)
+        JuMP.add_to_expression!(
+            device_cost_expression[component_name, time_period],
+            cost_expression,
+        )
+    end
+    return
+end
 """
 Default implementation to add device variables to SystemBalanceExpressions
 """

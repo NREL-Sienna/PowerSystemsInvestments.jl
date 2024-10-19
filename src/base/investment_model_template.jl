@@ -6,6 +6,7 @@ mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
     feasibility_model::FeasibilityModel
     transport_model::TransportModel{<:AbstractTransportAggregation}
     technology_models::Dict # Type to be refined later
+    branch_models::Dict # rename?
 
     function InvestmentModelTemplate(
         capital_model::CapitalCostModel,
@@ -13,7 +14,7 @@ mutable struct InvestmentModelTemplate <: AbstractInvestmentModelTemplate
         feasibility_model::FeasibilityModel,
         transport_model::TransportModel{T},
     ) where {T <: AbstractTransportAggregation}
-        new(capital_model, operation_model, feasibility_model, transport_model, Dict())
+        new(capital_model, operation_model, feasibility_model, transport_model, Dict(), Dict())
     end
 end
 
@@ -29,7 +30,8 @@ InvestmentModelTemplate(::Type{T}) where {T <: AbstractTransportAggregation} =
     InvestmentModelTemplate(TransportModel(T))
 InvestmentModelTemplate() = InvestmentModelTemplate(SingleRegionPowerModel)
 
-get_technology_models(template::InvestmentModelTemplate) = template.technologies
+get_technology_models(template::InvestmentModelTemplate) = template.technology_models
+get_branch_models(template::InvestmentModelTemplate) = template.branch_models
 get_transport_model(template::InvestmentModelTemplate) = template.transport_model
 get_transport_formulation(template::InvestmentModelTemplate) =
     get_transport_formulation(get_transport_model(template))

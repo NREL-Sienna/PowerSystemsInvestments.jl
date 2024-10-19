@@ -17,6 +17,7 @@ function _add_cost_to_objective!(
     tech_model::String,
 ) where {T<:VariableType,U<:AbstractTechnologyFormulation}
     #base_power = get_base_power(component)
+    #TODO: Maybe remove base_power?
     device_base_power = PSIP.get_base_power(technology)
     #value_curve = PSY.get_value_curve(cost_function)
     #power_units = PSY.get_power_units(cost_function)
