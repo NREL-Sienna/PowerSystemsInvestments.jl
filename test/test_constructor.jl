@@ -20,6 +20,15 @@
     @test PSIN.get_objective_expression(test_obj) == 10.0 * x^2 + 5.0 * x + 60.0
 end
 
+@testset "Investment Formulation Validation" begin
+    @test_throws ArgumentError PSIN.TechnologyModel(
+        PSIP.StorageTechnology{PSY.EnergyReservoirStorage},
+        PSIN.BinaryInvestment,
+        PSIN.CyclicalStorageDispatch,
+        PSIN.BasicDispatchFeasibility,
+    )
+end
+
 @testset "Constructor" begin
     p_5bus, op_days = test_2_zone_portfolio()
 
