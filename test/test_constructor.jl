@@ -71,6 +71,16 @@ end
         PSIN.BasicDispatch,
         PSIN.BasicDispatchFeasibility,
     )
+    storage_type = PSIP.StorageTechnology{PSY.EnergyReservoirStorage}
+    storage_model = PSIN.TechnologyModel(
+        storage_type,
+        PSIN.IntegerInvestment,
+        PSIN.CyclicalStorageDispatch,
+        PSIN.BasicDispatchFeasibility,
+    )
+    storage = PSIP.get_technology(storage_type, p_5bus, "test_storage")
+    PSIP.set_unit_size_discharge!(storage, 10.0)
+    PSIP.set_unit_size_energy!(storage, 40.0)
 
     # Argument Stage
 
@@ -214,6 +224,55 @@ end
     @test length(e["cheap_thermal", :]) ==
           length(PSIN.get_investment_time_steps(container.time_mapping))
 
+    # StorageTechnology{EnergyReservoirStorage}
+    PSIN.construct_technologies!(
+        container,
+        p_5bus,
+        ["test_storage"],
+        PSIN.ArgumentConstructStage(),
+        capital,
+        storage_type,
+        PSIN.IntegerInvestment,
+        transport_model,
+        [storage_model],
+    )
+
+    build_power = PSIN.get_variable(
+        container,
+        PSIN.BuildPowerCapacity(),
+        storage_type,
+        "IntegerInvestment",
+    )
+    build_energy = PSIN.get_variable(
+        container,
+        PSIN.BuildEnergyCapacity(),
+        storage_type,
+        "IntegerInvestment",
+    )
+    cumulative_power = PSIN.get_expression(
+        container,
+        PSIN.CumulativePowerCapacity(),
+        storage_type,
+        "IntegerInvestment",
+    )
+    cumulative_energy = PSIN.get_expression(
+        container,
+        PSIN.CumulativeEnergyCapacity(),
+        storage_type,
+        "IntegerInvestment",
+    )
+    first_investment_time_step =
+        first(PSIN.get_investment_time_steps(container.time_mapping))
+
+    @test JuMP.coefficient(
+        cumulative_power["test_storage", first_investment_time_step],
+        build_power["test_storage", first_investment_time_step],
+    ) == PSIP.get_unit_size_discharge(storage)
+    @test JuMP.coefficient(
+        cumulative_energy["test_storage", first_investment_time_step],
+        build_energy["test_storage", first_investment_time_step],
+    ) == PSIP.get_unit_size_energy(storage)
+
     # Model Stage
 
     #DemandRequirement{PowerLoad}
@@ -320,4 +379,36 @@ end
           length(PSIN.get_investment_time_steps(container.time_mapping))
     @test length(c["cheap_thermal", :]) ==
           length(PSIN.get_investment_time_steps(container.time_mapping))
+
+    # StorageTechnology{EnergyReservoirStorage}
+    PSIN.construct_technologies!(
+        container,
+        p_5bus,
+        ["test_storage"],
+        PSIN.ModelConstructStage(),
+        capital,
+        storage_type,
+        PSIN.IntegerInvestment,
+        transport_model,
+        [storage_model],
+    )
+
+    objective = JuMP.objective_function(PSIN.get_jump_model(container))
+    power_objective_coefficient =
+        JuMP.coefficient(objective, build_power["test_storage", first_investment_time_step])
+    energy_objective_coefficient = JuMP.coefficient(
+        objective,
+        build_energy["test_storage", first_investment_time_step],
+    )
+    power_capital_cost = PSY.get_proportional_term(
+        PSY.get_function_data(PSIP.get_capital_costs_discharge(storage)),
+    )
+    energy_capital_cost = PSY.get_proportional_term(
+        PSY.get_function_data(PSIP.get_capital_costs_energy(storage)),
+    )
+    @test isapprox(
+        power_objective_coefficient / energy_objective_coefficient,
+        power_capital_cost * PSIP.get_unit_size_discharge(storage) /
+        (energy_capital_cost * PSIP.get_unit_size_energy(storage)),
+    )
 end
