@@ -76,11 +76,9 @@ _supported_investment_formulations(::Type{<:PSIP.NodalACTransportTechnology}) =
 _supported_investment_formulations(::Type{<:PSIP.DemandRequirement}) =
     (StaticLoadInvestment,)
 
-function _check_technology_formulation(
+function _check_investment_formulation(
     ::Type{D},
     ::Type{A},
-    ::Type{<:OperationsTechnologyFormulation},
-    ::Type{<:FeasibilityTechnologyFormulation},
 ) where {D <: PSIP.Technology, A <: InvestmentTechnologyFormulation}
     supported_formulations = _supported_investment_formulations(D)
     isnothing(supported_formulations) && return
@@ -114,7 +112,7 @@ function TechnologyModel(
     B <: OperationsTechnologyFormulation,
     C <: FeasibilityTechnologyFormulation,
 }
-    _check_technology_formulation(D, A, B, C)
+    _check_investment_formulation(D, A)
 
     attributes_ = get_default_attributes(D, A, B, C)
     for (k, v) in attributes

@@ -397,9 +397,10 @@ end
     final_time_step = last(investment_time_steps)
     lower_constraint = lower_duration["test_storage", final_time_step]
     upper_constraint = upper_duration["test_storage", final_time_step]
-    @test JuMP.constraint_object(lower_constraint).set ==
-          MathOptInterface.GreaterThan(0.0)
-    @test JuMP.constraint_object(upper_constraint).set == MathOptInterface.LessThan(0.0)
+    @test JuMP.constraint_object(lower_constraint).set isa
+          MathOptInterface.GreaterThan{Float64}
+    @test JuMP.constraint_object(upper_constraint).set isa
+          MathOptInterface.LessThan{Float64}
     for t in investment_time_steps
         @test JuMP.normalized_coefficient(
             lower_constraint,

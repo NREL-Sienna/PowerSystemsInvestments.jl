@@ -753,11 +753,14 @@ end
 function add_constraints!(
     container::SingleOptimizationContainer,
     ::StorageDurationLowerBoundConstraint,
-    devices::Vector{D},
-    formulation::ContinuousInvestment,
-) where {D <: PSIP.StorageTechnology}
+    devices::U,
+    formulation::S,
+) where {
+    U <: Vector{D},
+    S <: ContinuousInvestment,
+} where {D <: PSIP.StorageTechnology}
     time_steps = get_investment_time_steps(get_time_mapping(container))
-    tech_model = string(typeof(formulation))
+    tech_model = string(S)
     device_names = PSIP.get_name.(devices)
     constraints = add_constraints_container!(
         container,
@@ -789,11 +792,14 @@ end
 function add_constraints!(
     container::SingleOptimizationContainer,
     ::StorageDurationUpperBoundConstraint,
-    devices::Vector{D},
-    formulation::ContinuousInvestment,
-) where {D <: PSIP.StorageTechnology}
+    devices::U,
+    formulation::S,
+) where {
+    U <: Vector{D},
+    S <: ContinuousInvestment,
+} where {D <: PSIP.StorageTechnology}
     time_steps = get_investment_time_steps(get_time_mapping(container))
-    tech_model = string(typeof(formulation))
+    tech_model = string(S)
     device_names = PSIP.get_name.(devices)
     constraints = add_constraints_container!(
         container,
