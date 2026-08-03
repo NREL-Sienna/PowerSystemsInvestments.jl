@@ -174,9 +174,9 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size_energy(d)
+        unit_size = PSIP.get_unit_size_discharge(d)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),
@@ -217,7 +217,7 @@ function add_expression!(
     for t in time_steps, d in devices
         unit_size = PSIP.get_unit_size_energy(d)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),
