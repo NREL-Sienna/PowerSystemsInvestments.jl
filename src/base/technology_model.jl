@@ -65,16 +65,6 @@ get_feasibility_formulation(
 } = C
 
 _supported_investment_formulations(::Type{<:PSIP.Technology}) = nothing
-_supported_investment_formulations(::Type{<:PSIP.SupplyTechnology}) =
-    (ContinuousInvestment,)
-_supported_investment_formulations(::Type{<:PSIP.StorageTechnology}) =
-    (ContinuousInvestment,)
-_supported_investment_formulations(::Type{<:PSIP.AggregateTransportTechnology}) =
-    (ContinuousInvestment,)
-_supported_investment_formulations(::Type{<:PSIP.NodalACTransportTechnology}) =
-    (ContinuousInvestment,)
-_supported_investment_formulations(::Type{<:PSIP.DemandRequirement}) =
-    (StaticLoadInvestment,)
 
 function _check_investment_formulation(
     ::Type{D},
