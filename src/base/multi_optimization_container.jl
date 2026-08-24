@@ -7,14 +7,14 @@ Base.@kwdef mutable struct MultiOptimizationContainer{T <: SolutionAlgorithm} <:
     resolution::Dates.TimePeriod
     settings::Settings
     settings_copy::Settings
-    variables::Dict{ISOPT.VariableKey, AbstractArray}
-    aux_variables::Dict{ISOPT.AuxVarKey, AbstractArray}
-    duals::Dict{ISOPT.ConstraintKey, AbstractArray}
-    constraints::Dict{ISOPT.ConstraintKey, AbstractArray}
+    variables::Dict{IOM.VariableKey, AbstractArray}
+    aux_variables::Dict{IOM.AuxVarKey, AbstractArray}
+    duals::Dict{IOM.ConstraintKey, AbstractArray}
+    constraints::Dict{IOM.ConstraintKey, AbstractArray}
     objective_function::ObjectiveFunction
-    expressions::Dict{ISOPT.ExpressionKey, AbstractArray}
-    optimizer_stats::ISOPT.OptimizerStats  # TODO: needs custom struct for decomposition
-    metadata::ISOPT.OptimizationContainerMetadata
+    expressions::Dict{IOM.ExpressionKey, AbstractArray}
+    optimizer_stats::IOM.OptimizerStats  # TODO: needs custom struct for decomposition
+    metadata::IOM.OptimizationContainerMetadata
     default_time_series_type::Type{<:PSY.TimeSeriesData}  # Maybe isn't needed here
     mpi_info::Union{Nothing, MpiInfo}
 end
@@ -50,7 +50,7 @@ function MultiOptimizationContainer(
         objective_function=ObjectiveFunction(),
         expressions=Dict{ExpressionKey, AbstractArray}(),
         base_power=PSY.get_base_power(sys),
-        optimizer_stats=ISOPT.OptimizerStats(),
+        optimizer_stats=IOM.OptimizerStats(),
         built_for_recurrent_solves=false,
         metadata=OptimizationContainerMetadata(),
         default_time_series_type=U,
@@ -126,7 +126,6 @@ function init_optimization_container!(
     transport_model::TransportModel{<:AbstractTransportAggregation},
     portfolio::PSIP.Portfolio,
 )
-    PSY.set_units_base_system!(portfolio, "NATURAL_UNITS")
     # The order of operations matter
     settings = get_settings(container)
 

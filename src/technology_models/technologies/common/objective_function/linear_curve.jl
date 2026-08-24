@@ -47,6 +47,18 @@ function _add_cost_to_objective!(
     return
 end
 
+function _add_cost_to_objective!(
+    container::SingleOptimizationContainer,
+    ::T,
+    technology::PSIP.Technology,
+    cost_curve::PSY.CostCurve,
+    ::U,
+    tech_model::String,
+) where {T <: VariableType, U <: AbstractTechnologyFormulation}
+    value_curve = PSY.get_value_curve(cost_curve)
+    return _add_cost_to_objective!(container, T(), technology, value_curve, U(), tech_model)
+end
+
 #Fixed OM calculated from build capacity
 function _add_cost_to_objective!(
     container::SingleOptimizationContainer,

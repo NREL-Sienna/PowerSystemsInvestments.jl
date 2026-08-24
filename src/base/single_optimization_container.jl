@@ -20,12 +20,12 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
     time_mapping::TimeMapping
     settings::Settings
     settings_copy::Settings
-    variables::Dict{ISOPT.VariableKey, AbstractArray}
-    aux_variables::Dict{ISOPT.AuxVarKey, AbstractArray}
-    duals::Dict{ISOPT.ConstraintKey, AbstractArray}
-    constraints::Dict{ISOPT.ConstraintKey, AbstractArray}
+    variables::Dict{IOM.VariableKey, AbstractArray}
+    aux_variables::Dict{IOM.AuxVarKey, AbstractArray}
+    duals::Dict{IOM.ConstraintKey, AbstractArray}
+    constraints::Dict{IOM.ConstraintKey, AbstractArray}
     objective_function::ObjectiveFunction
-    expressions::Dict{ISOPT.ExpressionKey, AbstractArray}
+    expressions::Dict{IOM.ExpressionKey, AbstractArray}
     primal_values_cache::PrimalValuesCache
     operational_weights::Union{Nothing, Vector{Float64}}
     base_year::Int
@@ -33,8 +33,8 @@ Base.@kwdef mutable struct SingleOptimizationContainer <:
     inflation_rate::Float64
     interest_rate::Float64
     infeasibility_conflict::Dict{Symbol, Array}
-    optimizer_stats::ISOPT.OptimizerStats
-    metadata::ISOPT.OptimizationContainerMetadata
+    optimizer_stats::IOM.OptimizerStats
+    metadata::IOM.OptimizationContainerMetadata
 end
 
 function SingleOptimizationContainer(
@@ -67,8 +67,8 @@ function SingleOptimizationContainer(
         0.0,
         0.0,
         Dict{Symbol, Array}(),
-        ISOPT.OptimizerStats(),
-        ISOPT.OptimizationContainerMetadata(),
+        IOM.OptimizerStats(),
+        IOM.OptimizationContainerMetadata(),
     )
 end
 
@@ -213,8 +213,8 @@ end
 
 function _assign_container!(container::Dict, key::OptimizationContainerKey, value)
     if haskey(container, key)
-        @error "$(IS.Optimization.encode_key(key)) is already stored" sort!(
-            IS.Optimization.encode_key.(keys(container)),
+        @error "$(IOM.encode_key(key)) is already stored" sort!(
+            IOM.encode_key.(keys(container)),
         )
         throw(IS.InvalidValue("$key is already stored"))
     end
@@ -226,7 +226,7 @@ function has_container_key(
     container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     key = ExpressionKey(T, U, meta)
     return haskey(container.expressions, key)
@@ -236,7 +236,7 @@ function has_container_key(
     container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     key = VariableKey(T, U, meta)
     return haskey(container.variables, key)
@@ -246,7 +246,7 @@ function has_container_key(
     container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {
     T <: AuxVariableType,
     U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement},
@@ -259,7 +259,7 @@ function has_container_key(
     container::SingleOptimizationContainer,
     ::Type{T},
     ::Type{U},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     key = ConstraintKey(T, U, meta)
     return haskey(container.constraints, key)
@@ -287,7 +287,7 @@ function add_variable_container!(
     ::Type{U},
     axs...;
     sparse=false,
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     var_key = VariableKey(T, U, meta)
     return _add_variable_container!(container, var_key, sparse, axs...)
@@ -314,7 +314,7 @@ function add_variable_container!(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U};
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {
     T <: SparseVariableType,
     U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement},
@@ -331,8 +331,8 @@ end
 function get_variable(container::SingleOptimizationContainer, key::VariableKey)
     var = get(container.variables, key, nothing)
     if var === nothing
-        name = IS.Optimization.encode_key(key)
-        keys = IS.Optimization.encode_key.(get_variable_keys(container))
+        name = IOM.encode_key(key)
+        keys = IOM.encode_key.(get_variable_keys(container))
         throw(IS.InvalidValue("variable $name is not stored. $keys"))
     end
     return var
@@ -342,7 +342,7 @@ function get_variable(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta::String=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: VariableType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     return get_variable(container, VariableKey(T, U, meta))
 end
@@ -369,7 +369,7 @@ function add_constraints_container!(
     ::Type{U},
     axs...;
     sparse=false,
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     cons_key = ConstraintKey(T, U, meta)
     return _add_constraints_container!(container, cons_key, axs...; sparse=sparse)
@@ -382,8 +382,8 @@ end
 function get_constraint(container::SingleOptimizationContainer, key::ConstraintKey)
     var = get(container.constraints, key, nothing)
     if var === nothing
-        name = IS.Optimization.encode_key(key)
-        keys = IS.Optimization.encode_key.(get_constraint_keys(container))
+        name = IOM.encode_key(key)
+        keys = IOM.encode_key.(get_constraint_keys(container))
         throw(IS.InvalidValue("constraint $name is not stored. $keys"))
     end
 
@@ -394,7 +394,7 @@ function get_constraint(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta::String=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta::String=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ConstraintType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     return get_constraint(container, ConstraintKey(T, U, meta))
 end
@@ -466,7 +466,7 @@ function add_expression_container!(
     ::Type{U},
     axs...;
     sparse=false,
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     expr_key = ExpressionKey(T, U, meta)
     return _add_expression_container!(container, expr_key, GAE, axs...; sparse=sparse)
@@ -493,7 +493,7 @@ function get_expression(
     container::SingleOptimizationContainer,
     ::T,
     ::Type{U},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType, U <: Union{PSIP.Technology, PSIP.Portfolio, PSIP.Requirement}}
     return get_expression(container, ExpressionKey(T, U, meta))
 end
@@ -501,7 +501,7 @@ end
 function get_expression(
     container::SingleOptimizationContainer,
     ::T,
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ExpressionType}
     return get_expression(container, ExpressionKey(T, meta))
 end
@@ -909,7 +909,7 @@ function compute_conflict!(container::SingleOptimizationContainer)
                 @info "Conflict Index returned empty for $key"
                 continue
             else
-                conflict[ISOPT.encode_key(key)] = conflict_indices
+                conflict[IOM.encode_key(key)] = conflict_indices
             end
         end
 
@@ -948,7 +948,7 @@ Each Tuple corresponds to (con_name, internal_index, moi_index)
 """
 function get_all_variable_index(container::SingleOptimizationContainer)
     var_keys = get_all_variable_keys(container)
-    return [IS.Optimization.encode_key(v) for v in var_keys]
+    return [IOM.encode_key(v) for v in var_keys]
 end
 
 # Probably a more efficiency way of doing this
@@ -965,7 +965,7 @@ function check_duplicate_names(
     container::SingleOptimizationContainer,
     variable_type::T,
     tech_type::Type{D},
-    meta=IS.Optimization.CONTAINER_KEY_EMPTY_META,
+    meta=IOM.CONTAINER_KEY_EMPTY_META,
 ) where {T <: ISOPT.VariableType, D <: PSIP.Technology}
     duplicate = false
     n = ""
@@ -996,15 +996,14 @@ function serialize_metadata!(container::SingleOptimizationContainer, output_dir:
         keys(container.expressions),
     ))
         encoded_key = encode_key_as_string(key)
-        if IS.Optimization.has_container_key(container.metadata, encoded_key)
+        if IOM.has_container_key(container.metadata, encoded_key)
             # Constraints and Duals can store the same key.
-            IS.@assert_op key ==
-                          IS.Optimization.get_container_key(container.metadata, encoded_key)
+            IS.@assert_op key == IOM.get_container_key(container.metadata, encoded_key)
         end
-        IS.Optimization.add_container_key!(container.metadata, encoded_key, key)
+        IOM.add_container_key!(container.metadata, encoded_key, key)
     end
 
-    filename = IS.Optimization._make_metadata_filename(output_dir)
+    filename = IOM._make_metadata_filename(output_dir)
     # TODO: Fix Serialization Metadata
     #Serialization.serialize(filename, container.metadata)
 end

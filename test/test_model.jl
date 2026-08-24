@@ -90,9 +90,9 @@
           IS.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
     @test solve!(m) == PSIN.RunStatus.SUCCESSFULLY_FINALIZED
 
-    res = OptimizationProblemResults(m)
-    @test length(IS.Optimization.list_variable_names(res)) == 23
-    @test length(IS.Optimization.list_dual_names(res)) == 0
+    res = OptimizationProblemOutputs(m)
+    @test length(IOM.list_variable_names(res)) == 23
+    @test length(IOM.list_dual_names(res)) == 0
     @test length(PSIN.get_timestamps(res)) == 48
 
     template = InvestmentModelTemplate(
@@ -169,9 +169,9 @@
           IS.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
     @test solve!(m) == PSIN.RunStatus.SUCCESSFULLY_FINALIZED
 
-    res = OptimizationProblemResults(m)
-    @test length(IS.Optimization.list_variable_names(res)) == 23
-    @test length(IS.Optimization.list_dual_names(res)) == 0
+    res = OptimizationProblemOutputs(m)
+    @test length(IOM.list_variable_names(res)) == 23
+    @test length(IOM.list_dual_names(res)) == 0
     @test length(PSIN.get_timestamps(res)) == 48
 
     # Weighted-energy expressions are always created, even with no requirements.
@@ -195,7 +195,7 @@
     ) in expr_keys
     # The aggregation expressions are policy-specific, so they must NOT exist here.
     @test !any(
-        IS.Optimization.get_entry_type(k) in
+        PSIN.get_entry_type(k) in
         (WeightedEnergyShareGeneration, WeightedEnergyShareDemand) for k in expr_keys
     )
 end
@@ -300,7 +300,7 @@ end
     jump_model = PSIN.get_jump_model(container)
     balance_key = first(
         k for k in keys(PSIN.get_constraints(container)) if
-        IS.Optimization.get_entry_type(k) == PSIN.MultiRegionBalanceConstraint
+        PSIN.get_entry_type(k) == PSIN.MultiRegionBalanceConstraint
     )
     balance_con = PSIN.get_constraints(container)[balance_key]
     JuMP.set_normalized_rhs(first(balance_con), 1e18)
@@ -585,7 +585,6 @@ end
     fraction = 0.3
     esr = PSIP.EnergyShareRequirements(;
         name="wind_share",
-        id=1,
         available=true,
         target_year=2030,
         generation_fraction_requirement=fraction,

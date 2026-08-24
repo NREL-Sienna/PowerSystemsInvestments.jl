@@ -6,7 +6,7 @@ module PowerSystemsInvestments
 export InvestmentModel
 export InvestmentModelTemplate
 export TransportModel
-export OptimizationProblemResults
+export OptimizationProblemOutputs
 
 ### Algorithms ###
 export SingleInstanceSolve
@@ -99,7 +99,7 @@ export solve!
 export get_initial_conditions
 export get_infeasibility_conflict
 export serialize_problem
-export serialize_results
+export serialize_outputs
 #Results interfaces
 export read_variable
 export read_optimizer_stats
@@ -111,6 +111,7 @@ export get_expression
 #### Imports ###
 
 import InfrastructureSystems
+import InfrastructureOptimizationModels
 import PowerSystems
 import JuMP
 import MathOptInterface
@@ -127,6 +128,7 @@ import DataFrames
 
 const IS = InfrastructureSystems
 const ISOPT = InfrastructureSystems.Optimization
+const IOM = InfrastructureOptimizationModels
 const PSY = PowerSystems
 const MOI = MathOptInterface
 const PSIP = PowerSystemsInvestmentsPortfolios
@@ -154,14 +156,15 @@ import Base.isempty
 
 # IS.Optimization imports that stay private, may or may not be additional methods in PowerSimulations
 import InfrastructureSystems.Optimization: ArgumentConstructStage, ModelConstructStage
-import InfrastructureSystems.Optimization:
+# Concrete container/store types moved to InfrastructureOptimizationModels in the IS4 split
+import InfrastructureOptimizationModels:
     STORE_CONTAINERS,
     STORE_CONTAINER_DUALS,
     STORE_CONTAINER_EXPRESSIONS,
     STORE_CONTAINER_PARAMETERS,
     STORE_CONTAINER_VARIABLES,
     STORE_CONTAINER_AUX_VARIABLES
-import InfrastructureSystems.Optimization:
+import InfrastructureOptimizationModels:
     OptimizationContainerKey,
     VariableKey,
     ConstraintKey,
@@ -178,32 +181,25 @@ import InfrastructureSystems.Optimization:
     ParameterType,
     InitialConditionType,
     ExpressionType
-import InfrastructureSystems.Optimization:
+import InfrastructureOptimizationModels:
     should_export_variable,
     should_export_dual,
     should_export_parameter,
     should_export_aux_variable,
     should_export_expression
-import InfrastructureSystems.Optimization:
-    get_entry_type, get_component_type, get_output_dir
-import InfrastructureSystems.Optimization:
-    read_results_with_keys,
-    deserialize_key,
-    encode_key_as_string,
-    encode_keys_as_strings,
-    should_write_resulting_value,
-    convert_result_to_natural_units,
-    to_matrix,
-    get_store_container_type
-import InfrastructureSystems.Optimization:
-    OptimizationProblemResults, OptimizationProblemResultsExport, OptimizerStats
-import InfrastructureSystems.Optimization:
+import InfrastructureOptimizationModels: get_entry_type, get_component_type, get_output_dir
+import InfrastructureSystems.Optimization: should_write_resulting_value
+import InfrastructureOptimizationModels:
+    deserialize_key, encode_key_as_string, encode_keys_as_strings, get_store_container_type
+import InfrastructureOptimizationModels:
+    OptimizationProblemOutputs, OptimizationProblemOutputsExport, OptimizerStats
+import InfrastructureOptimizationModels:
     list_variable_names, list_aux_variable_names, list_dual_names, list_expression_names
-import InfrastructureSystems.Optimization:
+import InfrastructureOptimizationModels:
     read_optimizer_stats,
     get_optimizer_stats,
-    export_results,
-    serialize_results,
+    export_outputs,
+    serialize_outputs,
     get_timestamps,
     get_model_base_power,
     get_objective_value,

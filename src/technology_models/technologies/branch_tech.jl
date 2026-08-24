@@ -18,9 +18,9 @@ get_variable_upper_bound(::BuildCapacity, d::PSIP.NodalACTransportTechnology, ::
 
 # Cumulative capacity bounds
 get_max_cap(d::PSIP.NodalACTransportTechnology, ::CumulativeCapacity) =
-    PSIP.get_capacity_limits(d).max
+    PSIP.get_capacity_limits(d, IS.NU).max
 get_min_cap(d::PSIP.NodalACTransportTechnology, ::CumulativeCapacity) =
-    PSIP.get_capacity_limits(d).min
+    PSIP.get_capacity_limits(d, IS.NU).min
 get_init_cap(d::PSIP.NodalACTransportTechnology, ::CumulativeCapacity, p::PSIP.Portfolio) =
     PSIP.get_existing_capacity_mw(p, d)
 
@@ -31,7 +31,7 @@ get_variable_lower_bound(
     ::OperationsTechnologyFormulation,
 ) =
     let
-        cap_max = PSIP.get_capacity_limits(d).max
+        cap_max = PSIP.get_capacity_limits(d, IS.NU).max
         -cap_max
     end
 
@@ -39,10 +39,10 @@ get_variable_upper_bound(
     ::FlowActivePowerVariable,
     d::PSIP.NodalACTransportTechnology,
     ::OperationsTechnologyFormulation,
-) = PSIP.get_capacity_limits(d).max
+) = PSIP.get_capacity_limits(d, IS.NU).max
 
-get_max_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity) = PSIP.get_capacity_limits(d).max
-get_min_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity) = PSIP.get_capacity_limits(d).min
+get_max_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity) = PSIP.get_capacity_limits(d, IS.NU).max
+get_min_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity) = PSIP.get_capacity_limits(d, IS.NU).min
 
 get_init_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity, p::PSIP.Portfolio) = PSIP.get_existing_capacity_mw(p, d)
 
@@ -50,13 +50,13 @@ get_init_cap(d::PSIP.TransmissionTechnology, ::CumulativeCapacity, p::PSIP.Portf
 
 function get_max_new_capacity(d::PSIP.TransmissionTechnology)
     @warn "get_existing_line_capacity is not implemented for TransmissionTechnology. Returning maximum limits."
-    return PSIP.get_capacity_limits(d).max
+    return PSIP.get_capacity_limits(d, IS.NU).max
 end
 
 # TODO: Check if there is a different way we can get the existing line capacity
 function get_existing_line_capacity(d::PSIP.TransmissionTechnology)
     @warn "get_existing_line_capacity is not implemented for TransmissionTechnology. Returning minimum limits."
-    return PSIP.get_capacity_limits(d).min
+    return PSIP.get_capacity_limits(d, IS.NU).min
 end
 
 function get_default_attributes(

@@ -35,8 +35,8 @@ get_expression_multiplier(::FeasibilitySurplus, ::ActiveOutPowerVariable, ::PSIP
 get_expression_multiplier(::FeasibilitySurplus, ::ActiveInPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = -1.0
 
 # TODO: Defaulting to using discharge values for symmetric storage, but we need to be careful if we implement asymmetric storage investments
-get_max_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity) = PSIP.get_capacity_limits_discharge(d).max
-get_max_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity) = PSIP.get_capacity_limits_energy(d).max
+get_max_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity) = PSIP.get_capacity_limits_discharge(d, IS.NU).max
+get_max_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity) = PSIP.get_capacity_limits_energy(d, IS.NU).max
 
 get_init_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity, p::PSIP.Portfolio) = PSIP.get_existing_capacity_mw(p, d)
 get_init_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity, p::PSIP.Portfolio) = PSIP.get_existing_capacity_mwh(p, d)
@@ -174,9 +174,9 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size_energy(d)
+        unit_size = PSIP.get_unit_size_energy(d, IS.NU)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),
@@ -215,9 +215,9 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size_energy(d)
+        unit_size = PSIP.get_unit_size_energy(d, IS.NU)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),

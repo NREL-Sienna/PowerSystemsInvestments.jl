@@ -48,7 +48,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -90,7 +90,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -131,7 +131,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -176,7 +176,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -221,7 +221,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -262,7 +262,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -299,7 +299,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"
@@ -341,7 +341,7 @@ function add_to_expression!(
             # Load Data is in MW
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $(d.name) does not match with the expected representative day $op_ix"

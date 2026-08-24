@@ -1,4 +1,4 @@
-mutable struct InvestmentModelStore <: ISOPT.AbstractModelStore
+mutable struct InvestmentModelStore <: IOM.AbstractModelStore
     # All DenseAxisArrays have axes (column names, row indexes)
     duals::Dict{ConstraintKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}
     variables::Dict{VariableKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}
@@ -7,7 +7,7 @@ mutable struct InvestmentModelStore <: ISOPT.AbstractModelStore
         ExpressionKey,
         OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}},
     }
-    optimizer_stats::OrderedDict{Dates.DateTime, ISOPT.OptimizerStats}
+    optimizer_stats::OrderedDict{Dates.DateTime, IOM.OptimizerStats}
 end
 
 function InvestmentModelStore()
@@ -16,25 +16,16 @@ function InvestmentModelStore()
         Dict{VariableKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}(),
         Dict{AuxVarKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}(),
         Dict{ExpressionKey, OrderedDict{Dates.DateTime, DenseAxisArray{Float64, 2}}}(),
-        OrderedDict{Dates.DateTime, ISOPT.OptimizerStats}(),
+        OrderedDict{Dates.DateTime, IOM.OptimizerStats}(),
     )
 end
 
-struct ModelStoreParams <: ISOPT.AbstractModelStoreParams
-    base_power::Float64
-    system_uuid::Base.UUID
-    container_metadata::ISOPT.OptimizationContainerMetadata
-end
-
-get_base_power(params::ModelStoreParams) = params.base_power
-get_system_uuid(params::ModelStoreParams) = params.system_uuid
-deserialize_key(params::ModelStoreParams, name) =
-    deserialize_key(params.container_metadata, name)
+const ModelStoreParams = IOM.ModelStoreParams
 
 function initialize_storage!(
     store::InvestmentModelStore,
     container::ISOPT.AbstractOptimizationContainer,
-    params::ModelStoreParams,
+    params::IOM.ModelStoreParams,
 )
     time_mapping = get_time_mapping(container)
     if length(get_time_steps(time_mapping)) < 1
@@ -50,7 +41,7 @@ function initialize_storage!(
         field_containers = getfield(container, type)
         results_container = getfield(store, type)
         for (key, field_container) in field_containers
-            !should_write_resulting_value(key) && continue
+            !should_write_resulting_value(get_entry_type(key)) && continue
             entry_type = get_entry_type(key)
             if is_operation_entry(entry_type)
                 count = op_time_steps_count
@@ -117,7 +108,7 @@ end
 
 function write_optimizer_stats!(
     store::InvestmentModelStore,
-    stats::ISOPT.OptimizerStats,
+    stats::IOM.OptimizerStats,
     index::Dates.Date,
 )
     if index in keys(store.optimizer_stats)

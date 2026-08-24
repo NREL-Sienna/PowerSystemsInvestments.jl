@@ -111,7 +111,7 @@ function add_variable!(
 
     for t in time_steps, d in devices
         name = PSY.get_name(d)
-        max_capacity = PSIP.get_capacity_limits(d).max
+        max_capacity = PSIP.get_capacity_limits(d, IS.NU).max
 
         # Internal binary decision variable (0 or 1) — NOT stored in PSINV container
         binary_decision = JuMP.@variable(
