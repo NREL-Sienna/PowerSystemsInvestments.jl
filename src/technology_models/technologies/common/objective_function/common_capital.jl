@@ -39,7 +39,7 @@ function add_capital_cost!(
 end
 
 function add_capital_cost!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::U,
     devices::Vector{T},
     ::V,

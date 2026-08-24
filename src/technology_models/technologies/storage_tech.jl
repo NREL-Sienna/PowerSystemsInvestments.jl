@@ -231,7 +231,7 @@ end
 # storage and co-located technologies. Net discharge = out - in. Created for
 # every such technology regardless of whether any requirement uses it.
 function add_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::S,
@@ -349,7 +349,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     var::V,
     devices::U,
@@ -453,7 +453,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     var::V,
     devices::U,

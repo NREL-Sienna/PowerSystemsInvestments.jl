@@ -48,7 +48,7 @@ function _add_cost_to_objective!(
 end
 
 function _add_cost_to_objective!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     technology::PSIP.Technology,
     cost_curve::PSY.CostCurve,

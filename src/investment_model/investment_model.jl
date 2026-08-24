@@ -15,7 +15,7 @@ function InvestmentModel(
     settings::IOM.Settings,
     jump_model::Union{Nothing, JuMP.Model}=nothing;
 )
-    internal = IOM.ModelInternal(OptimizationContainer(settings, jump_model))
+    internal = IOM.ModelInternal(OptimizationContainer(portfolio, settings, jump_model))
 
     model = InvestmentModel{M}(
         :CEM,
@@ -494,6 +494,7 @@ function solve_impl!(model::InvestmentModel)
     if status != RunStatus.SUCCESSFULLY_FINALIZED
         model_name = get_name(model)
         ts = get_initial_time(model)
+        settings = get_settings(model)
         output_dir = get_output_dir(model)
         infeasible_opt_path = joinpath(output_dir, "infeasible_$(model_name).json")
         @error("Serializing Infeasible Problem at $(infeasible_opt_path)")
@@ -570,17 +571,17 @@ end
 read_optimizer_stats(model::InvestmentModel) = read_optimizer_stats(get_store(model))
 
 list_aux_variable_keys(x::InvestmentModel) =
-    IOM.list_keys(get_store(x), STORE_CONTAINER_AUX_VARIABLES)
-list_aux_variable_names(x::InvestmentModel) = _list_names(x, STORE_CONTAINER_AUX_VARIABLES)
+    IOM.list_keys(get_store(x), IOM.AuxVariableType)
+list_aux_variable_names(x::InvestmentModel) = _list_names(x, IOM.AuxVariableType)
 list_variable_keys(x::InvestmentModel) =
-    IOM.list_keys(get_store(x), STORE_CONTAINER_VARIABLES)
-list_variable_names(x::InvestmentModel) = _list_names(x, STORE_CONTAINER_VARIABLES)
+    IOM.list_keys(get_store(x), IOM.VariableType)
+list_variable_names(x::InvestmentModel) = _list_names(x, IOM.VariableType)
 list_dual_keys(x::InvestmentModel) =
-    IOM.list_keys(get_store(x), STORE_CONTAINER_DUALS)
-list_dual_names(x::InvestmentModel) = _list_names(x, STORE_CONTAINER_DUALS)
+    IOM.list_keys(get_store(x), IOM.ConstraintType)
+list_dual_names(x::InvestmentModel) = _list_names(x, IOM.ConstraintType)
 list_expression_keys(x::InvestmentModel) =
-    IOM.list_keys(get_store(x), STORE_CONTAINER_EXPRESSIONS)
-list_expression_names(x::InvestmentModel) = _list_names(x, STORE_CONTAINER_EXPRESSIONS)
+    IOM.list_keys(get_store(x), IOM.ExpressionType)
+list_expression_names(x::InvestmentModel) = _list_names(x, IOM.ExpressionType)
 
 function list_all_keys(x::InvestmentModel)
     return Iterators.flatten(
@@ -588,7 +589,7 @@ function list_all_keys(x::InvestmentModel)
     )
 end
 
-function _list_names(model::InvestmentModel, container_type)
+function _list_names(model::InvestmentModel, container_type::Type{T}) where {T <: IOM.OptimizationKeyType}
     return encode_keys_as_strings(
         IOM.list_keys(get_store(model), container_type),
     )

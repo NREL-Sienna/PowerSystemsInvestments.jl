@@ -6,72 +6,39 @@ accessed via the container's settings.ext dictionary.
 """
 
 function OptimizationContainer(
+    portfolio::PSIP.Portfolio,
     settings::IOM.Settings,
     jump_model::Union{Nothing, JuMP.Model},
 )
-    if jump_model !== nothing && IOM.get_direct_mode_optimizer(settings)
-        throw(
-            IS.ConflictingInputsError(
-                "Externally provided JuMP models are not compatible with the direct model keyword argument. Use JuMP.direct_model before passing the custom model",
-            ),
-        )
-    end
-
-    # Create a minimal "system" object for the IOM constructor that provides get_base_power
-    # Investment models always use natural units (base_power = 1.0)
-    container = OptimizationContainer(
-        jump_model === nothing ? JuMP.Model() : jump_model,
-        1:1,
-        settings,
-        IOM.copy_for_serialization(settings),
-        OrderedDict{VariableKey, AbstractArray}(),
-        OrderedDict{AuxVarKey, AbstractArray}(),
-        OrderedDict{ConstraintKey, AbstractArray}(),
-        OrderedDict{ConstraintKey, AbstractArray}(),
-        IOM.ObjectiveFunction(),
-        OrderedDict{ExpressionKey, AbstractArray}(),
-        OrderedDict{IOM.ParameterKey, IOM.ParameterContainer}(),
-        IOM.PrimalValuesCache(),
-        OrderedDict{IOM.InitialConditionKey, Vector{IOM.InitialCondition}}(),
-        IOM.InitialConditionsData(),
-        Dict{Symbol, Array}(),
-        nothing,
-        1.0,  # base_power = 1.0 for investment models (natural units)
-        IOM.OptimizerStats(),
-        false,
-        OptimizationContainerMetadata(),
-        PSY.SingleTimeSeries,
-        IOM.AbstractPowerFlowEvaluationData[],
-    )
-    # Store investment-specific data
+    # Delegate to IOM's constructor, passing the Portfolio as the "system" (Option 1: duck-typed
+    # via `get_base_power`/`stores_time_series_in_memory` methods defined in PSI). This keeps the
+    # container in sync with IOM's struct and keeps IOM free of any portfolio dependency.
+    container =
+        IOM.OptimizationContainer(portfolio, settings, jump_model, PSY.SingleTimeSeries)
     set_investment_data!(container, InvestmentContainerData())
+    _register_objective_function!(container.objective_function)
     return container
 end
 
-# Re-export IOM accessors that PSI uses with the same names
-get_jump_model(container::OptimizationContainer) = IOM.get_jump_model(container)
-get_settings(container::OptimizationContainer) = IOM.get_settings(container)
-get_variables(container::OptimizationContainer) = IOM.get_variables(container)
-get_aux_variables(container::OptimizationContainer) = IOM.get_aux_variables(container)
-get_constraints(container::OptimizationContainer) = IOM.get_constraints(container)
-get_expressions(container::OptimizationContainer) = IOM.get_expressions(container)
-get_duals(container::OptimizationContainer) = IOM.get_duals(container)
-get_optimizer_stats(container::OptimizationContainer) = IOM.get_optimizer_stats(container)
-get_metadata(container::OptimizationContainer) = IOM.get_metadata(container)
-get_initial_time(container::OptimizationContainer) = IOM.get_initial_time(container)
-get_resolution(container::OptimizationContainer) = IOM.get_resolution(container)
-get_time_steps(container::OptimizationContainer) = IOM.get_time_steps(container)
-
-get_objective_expression(container::OptimizationContainer) =
-    IOM.get_objective_expression(container)
-
-function is_milp(container::OptimizationContainer)::Bool
-    return IOM.is_milp(container)
+# System-less container (e.g. for objective-function unit tests). Uses IOM's `nothing`-"system"
+# accessor defaults (base_power = 1.0).
+function OptimizationContainer(
+    settings::IOM.Settings,
+    jump_model::Union{Nothing, JuMP.Model},
+)
+    container = IOM.OptimizationContainer(nothing, settings, jump_model, PSY.SingleTimeSeries)
+    set_investment_data!(container, InvestmentContainerData())
+    _register_objective_function!(container.objective_function)
+    return container
 end
 
-function supports_milp(container::OptimizationContainer)
-    return IOM.supports_milp(container)
+function Base.getproperty(container::OptimizationContainer, name::Symbol)
+    if name === :time_mapping
+        return get_time_mapping(container)
+    end
+    return getfield(container, name)
 end
+
 
 function _finalize_jump_model!(container::OptimizationContainer, settings::IOM.Settings)
     @debug "Instantiating the JuMP model" _group = LOG_GROUP_OPTIMIZATION_CONTAINER
@@ -139,7 +106,6 @@ function init_optimization_container!(
 end
 
 function check_optimization_container(container::OptimizationContainer)
-    container.settings_copy = IOM.copy_for_serialization(container.settings)
     return
 end
 
@@ -430,19 +396,21 @@ function has_container_key(
 end
 
 ##################################### Objective Function Container #################################
-function update_objective_function!(container::OptimizationContainer)
-    IOM.update_objective_function!(container)
-    return
-end
-
 function add_to_objective_operations_expression!(
     container::OptimizationContainer,
     cost_expr::T,
-) where {T <: JuMP.AbstractJuMPScalar}
-    # Map PSI operation_terms -> IOM variant_terms
-    T_cf = typeof(container.objective_function.variant_terms)
-    if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
-        container.objective_function.variant_terms += cost_expr
+) where {T <: Union{Float64, JuMP.AbstractJuMPScalar}}
+    _track_objective_operation_terms!(container.objective_function, cost_expr)
+    # Map PSI operation_terms -> IOM variant_terms (AffExpr) where possible.
+    # Quadratic terms are stored in invariant_terms after promoting it to QuadExpr.
+    if cost_expr isa JuMP.GenericQuadExpr
+        invariant_terms = container.objective_function.invariant_terms
+        if invariant_terms isa JuMP.GenericAffExpr
+            quad_terms = JuMP.QuadExpr()
+            JuMP.add_to_expression!(quad_terms, invariant_terms)
+            container.objective_function.invariant_terms = quad_terms
+        end
+        JuMP.add_to_expression!(container.objective_function.invariant_terms, cost_expr)
     else
         JuMP.add_to_expression!(container.objective_function.variant_terms, cost_expr)
     end
@@ -452,11 +420,17 @@ end
 function add_to_objective_investment_expression!(
     container::OptimizationContainer,
     cost_expr::T,
-) where {T <: JuMP.AbstractJuMPScalar}
+) where {T <: Union{Float64, JuMP.AbstractJuMPScalar}}
+    _track_objective_capital_terms!(container.objective_function, cost_expr)
     # Map PSI capital_terms -> IOM invariant_terms
-    T_cf = typeof(container.objective_function.invariant_terms)
-    if T_cf <: JuMP.GenericAffExpr && T <: JuMP.GenericQuadExpr
-        container.objective_function.invariant_terms += cost_expr
+    if cost_expr isa JuMP.GenericQuadExpr
+        invariant_terms = container.objective_function.invariant_terms
+        if invariant_terms isa JuMP.GenericAffExpr
+            quad_terms = JuMP.QuadExpr()
+            JuMP.add_to_expression!(quad_terms, invariant_terms)
+            container.objective_function.invariant_terms = quad_terms
+        end
+        JuMP.add_to_expression!(container.objective_function.invariant_terms, cost_expr)
     else
         JuMP.add_to_expression!(container.objective_function.invariant_terms, cost_expr)
     end
@@ -563,7 +537,7 @@ function initialize_system_expressions!(
 end
 
 function initialize_system_expressions!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     transport_model::TransportModel{T},
     port::PSIP.Portfolio,
 ) where {T <: NodalBalanceModel}
@@ -823,7 +797,7 @@ function write_optimizer_stats!(container::OptimizationContainer)
     return
 end
 
-function compute_conflict!(container::SingleOptimizationContainer)
+function compute_conflict!(container::OptimizationContainer)
     jump_model = get_jump_model(container)
     settings = get_settings(container)
     JuMP.unset_silent(jump_model)

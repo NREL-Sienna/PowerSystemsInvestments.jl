@@ -16,7 +16,7 @@ function construct_transport!(
 end
 
 function construct_transport!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     p::PSIP.Portfolio,
     ::TransportModel{NodalBalanceModel},
 )

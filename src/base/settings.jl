@@ -1,6 +1,12 @@
 # PSI uses IOM.Settings directly.
 # This file provides convenience constructors and PSI-specific accessors.
 
+# PSI-facing `Settings` constructors (thin wrappers over `IOM.Settings`). With a portfolio, the
+# portfolio acts as the "system"; with no argument, IOM's system-less default is used.
+#TODO: Determine if this is needed and reconcile IOM.Settings and InvestmentSettings
+Settings(portfolio; kwargs...) = IOM.Settings(portfolio; kwargs...)
+Settings(; kwargs...) = IOM.Settings(; kwargs...)
+
 function InvestmentSettings(
     portfolio;
     initial_time::Dates.DateTime=UNSET_INI_TIME,
@@ -43,8 +49,6 @@ get_portfolio_to_file(settings::IOM.Settings) = IOM.get_system_to_file(settings)
 
 # Re-export commonly used accessors that don't clash
 get_horizon(settings::IOM.Settings) = IOM.get_horizon(settings)
-get_resolution(settings::IOM.Settings) = IOM.get_resolution(settings)
-get_initial_time(settings::IOM.Settings) = IOM.get_initial_time(settings)
 get_optimizer(settings::IOM.Settings) = IOM.get_optimizer(settings)
 get_direct_mode_optimizer(settings::IOM.Settings) = IOM.get_direct_mode_optimizer(settings)
 get_optimizer_solve_log_print(settings::IOM.Settings) = IOM.get_optimizer_solve_log_print(settings)
@@ -59,5 +63,4 @@ set_horizon!(settings::IOM.Settings, horizon::Dates.TimePeriod) = IOM.set_horizo
 set_resolution!(settings::IOM.Settings, resolution::Dates.TimePeriod) = IOM.set_resolution!(settings, resolution)
 set_initial_time!(settings::IOM.Settings, initial_time::Dates.DateTime) = IOM.set_initial_time!(settings, initial_time)
 
-copy_for_serialization(settings::IOM.Settings) = IOM.copy_for_serialization(settings)
 log_values(settings::IOM.Settings) = IOM.log_values(settings)

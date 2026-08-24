@@ -34,7 +34,7 @@ deserialize_key(params::InvestmentModelStoreParams, name) =
 function initialize_storage!(
     store::InvestmentModelStore,
     container::IOM.AbstractOptimizationContainer,
-    params::InvestmentModelStoreParams,
+    params::IOM.AbstractModelStoreParams,
 )
     time_mapping = get_time_mapping(container)
     if length(get_time_steps(time_mapping)) < 1

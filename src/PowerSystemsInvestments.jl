@@ -97,7 +97,6 @@ export set_requirement_model!
 # Model Exports
 export solve!
 export get_initial_conditions
-export get_infeasibility_conflict
 export serialize_problem
 export serialize_outputs
 #Results interfaces
@@ -154,10 +153,12 @@ export optimizer_with_attributes
 # Base imports
 import Base.isempty
 
-# IS.Optimization imports that stay private, may or may not be additional methods in PowerSimulations
-import InfrastructureSystems.Optimization: ArgumentConstructStage, ModelConstructStage, OptimizationContainer
 # Concrete container/store types moved to InfrastructureOptimizationModels in the IS4 split
 import InfrastructureOptimizationModels:
+    ArgumentConstructStage, 
+    ModelConstructStage, 
+    OptimizationContainer,
+    OptimizationContainerMetadata,
     STORE_CONTAINERS,
     STORE_CONTAINER_DUALS,
     STORE_CONTAINER_EXPRESSIONS,
@@ -170,6 +171,7 @@ import InfrastructureOptimizationModels:
     ConstraintKey,
     ExpressionKey,
     AuxVarKey,
+    ParameterKey,
     # Abstract types for dispatch
     VariableType,
     ConstraintType,
@@ -231,6 +233,21 @@ import InfrastructureOptimizationModels:
 import InfrastructureOptimizationModels:
     read_optimizer_stats,
     get_optimizer_stats,
+    get_jump_model,
+    get_settings,
+    get_variables,
+    get_aux_variables,
+    get_constraints,
+    get_expressions,
+    get_duals,
+    get_metadata,
+    get_initial_time,
+    get_resolution,
+    get_time_steps,
+    get_objective_expression,
+    is_milp,
+    supports_milp,
+    update_objective_function!,
     export_outputs,
     serialize_outputs,
     get_timestamps,
@@ -238,7 +255,9 @@ import InfrastructureOptimizationModels:
     get_objective_value,
     read_variable,
     read_dual,
-    read_expression
+    read_expression,
+    get_infeasibility_conflict,
+    stores_time_series_in_memory
 import TimerOutputs
 
 ####

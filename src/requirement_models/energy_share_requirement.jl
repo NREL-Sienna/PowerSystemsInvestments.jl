@@ -9,7 +9,7 @@ get_default_attributes(
 # (from the eligible loads' demand time series). Both are exported so users can
 # inspect them directly in the results.
 function construct_requirement!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     p::PSIP.Portfolio,
     names::Vector{String},
     ::ArgumentConstructStage,
@@ -33,7 +33,7 @@ function construct_requirement!(
 end
 
 function construct_requirement!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     p::PSIP.Portfolio,
     names::Vector{String},
     ::ModelConstructStage,
@@ -109,7 +109,7 @@ visibility; the energy-share constraint later consumes only the target period's
 subset.
 """
 function add_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::WeightedEnergyShareGeneration,
     p::PSIP.Portfolio,
     requirements::Vector{T},
@@ -165,7 +165,7 @@ technology, read from its `"ops_demand"` time series. A constant `AffExpr`. Buil
 over all operational indexes for full results visibility.
 """
 function add_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::WeightedEnergyShareDemand,
     p::PSIP.Portfolio,
     requirements::Vector{T},
@@ -225,7 +225,7 @@ the per-policy weighted-energy expressions built in the argument stage, so the
 share is a true (weighted) energy ratio.
 """
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::EnergyShareRequirementConstraint,
     p::PSIP.Portfolio,
     requirements::Vector{T},

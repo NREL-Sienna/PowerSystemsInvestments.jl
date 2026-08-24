@@ -150,7 +150,7 @@ end
 # Created for every demand technology regardless of whether any requirement uses
 # it.
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
@@ -193,7 +193,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
@@ -234,7 +234,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatch,
@@ -275,7 +275,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::BasicDispatchFeasibility,

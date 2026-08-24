@@ -1,20 +1,22 @@
 @testset "Objective Function" begin
-    test_obj = PSIN.ObjectiveFunction()
+    
+    m = JuMP.Model()
+    container = PSIN.OptimizationContainer(IOM.Settings(), m)
+    test_obj = PSIN.get_objective_expression(container)
     @test PSIN.get_capital_terms(test_obj) == zero(AffExpr)
     @test PSIN.get_operation_terms(test_obj) == zero(AffExpr)
     @test PSIN.get_objective_expression(test_obj) == zero(AffExpr)
     @test PSIN.get_sense(test_obj) == JuMP.MOI.MIN_SENSE
 
     test_obj = PSIN.ObjectiveFunction()
-    PSIN.add_to_capital_terms(test_obj, 10.0)
-    m = JuMP.Model()
+    PSIN.add_to_objective_investment_expression!(container, 10.0)
     x = JuMP.@variable(m)
-    PSIN.add_to_capital_terms(test_obj, 5.0 * x)
+    PSIN.add_to_objective_investment_expression!(container, 5.0 * x)
     @test PSIN.get_capital_terms(test_obj) == 5.0 * x + 10.0
 
-    PSIN.add_to_operation_terms(test_obj, 50.0)
+    PSIN.add_to_objective_operations_expression!(container, 50.0)
     y = JuMP.@variable(m)
-    PSIN.add_to_operation_terms(test_obj, 10.0 * x^2)
+    PSIN.add_to_objective_operations_expression!(container, 10.0 * x^2)
     @test PSIN.get_operation_terms(test_obj) == 10.0 * x^2 + 50.0
 
     @test PSIN.get_objective_expression(test_obj) == 10.0 * x^2 + 5.0 * x + 60.0

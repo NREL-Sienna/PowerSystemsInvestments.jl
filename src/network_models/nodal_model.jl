@@ -2,7 +2,7 @@
 # Structure mirrors multiregion_model.jl but uses PSIP.Node instead of PSIP.Zone.
 
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::Type{T},
     port::U,
 ) where {T <: NodalBalanceConstraint, U <: PSIP.Portfolio}

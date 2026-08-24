@@ -58,7 +58,7 @@ function serialize_problem(model::InvestmentModel; optimizer=nothing)
     obj = ProblemSerializationWrapper(
         model.template,
         portfolio_filename,
-        container.settings_copy,
+        get_settings(model),
         typeof(model),
         string(get_name(model)),
         OptimizerAttributes(model, optimizer),

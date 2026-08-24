@@ -132,7 +132,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    ::SingleOptimizationContainer,
+    ::OptimizationContainer,
     ::T,
     ::U,
     ::BasicDispatch,
@@ -302,7 +302,7 @@ end
 
 # Maximum cumulative capacity for NodalACTransportTechnology
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     ::V,
     devices::U,
@@ -356,7 +356,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     devices::Vector{T},
     formulation::S,
 ) where {T <: PSIP.NodalACTransportTechnology, S <: ContinuousInvestment}
@@ -369,7 +369,7 @@ end
 
 # Energy balance contribution: negative at start node, positive at end node (no losses for now)
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     devices::U,
     ::S,
@@ -402,7 +402,7 @@ end
 
 # Constraints: |flow| <= cumulative capacity (two inequality constraints per line)
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     ::V,
     devices::U,
@@ -473,7 +473,7 @@ end
 # ============================================================================
 
 function add_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     portfolio::PSIP.Portfolio,
     expression_type::T,
     devices::U,

@@ -25,34 +25,34 @@ end
 const _INVESTMENT_DATA_KEY = "investment_data"
 
 function get_investment_data(
-    container::OptimizationContainer,
+    container::IOM.OptimizationContainer,
 )::InvestmentContainerData
     return container.settings.ext[_INVESTMENT_DATA_KEY]
 end
 
 function set_investment_data!(
-    container::OptimizationContainer,
+    container::IOM.OptimizationContainer,
     data::InvestmentContainerData,
 )
     container.settings.ext[_INVESTMENT_DATA_KEY] = data
     return
 end
 
-get_time_mapping(container::OptimizationContainer) =
+get_time_mapping(container::IOM.OptimizationContainer) =
     get_investment_data(container).time_mapping
-get_operational_weights(container::OptimizationContainer) =
+get_operational_weights(container::IOM.OptimizationContainer) =
     get_investment_data(container).operational_weights
-get_base_year(container::OptimizationContainer) =
+get_base_year(container::IOM.OptimizationContainer) =
     get_investment_data(container).base_year
-get_discount_rate(container::OptimizationContainer) =
+get_discount_rate(container::IOM.OptimizationContainer) =
     get_investment_data(container).discount_rate
-get_inflation_rate(container::OptimizationContainer) =
+get_inflation_rate(container::IOM.OptimizationContainer) =
     get_investment_data(container).inflation_rate
-get_interest_rate(container::OptimizationContainer) =
+get_interest_rate(container::IOM.OptimizationContainer) =
     get_investment_data(container).interest_rate
 
 function set_time_mapping!(
-    container::OptimizationContainer,
+    container::IOM.OptimizationContainer,
     time_mapping::TimeMapping,
 )
     get_investment_data(container).time_mapping = time_mapping
@@ -60,29 +60,29 @@ function set_time_mapping!(
 end
 
 function set_operational_weights!(
-    container::OptimizationContainer,
+    container::IOM.OptimizationContainer,
     operational_weights::Union{Nothing, Vector{Float64}},
 )
     get_investment_data(container).operational_weights = operational_weights
     return
 end
 
-function set_base_year!(container::OptimizationContainer, base_year::Int)
+function set_base_year!(container::IOM.OptimizationContainer, base_year::Int)
     get_investment_data(container).base_year = base_year
     return
 end
 
-function set_discount_rate!(container::OptimizationContainer, discount_rate::Float64)
+function set_discount_rate!(container::IOM.OptimizationContainer, discount_rate::Float64)
     get_investment_data(container).discount_rate = discount_rate
     return
 end
 
-function set_inflation_rate!(container::OptimizationContainer, inflation_rate::Float64)
+function set_inflation_rate!(container::IOM.OptimizationContainer, inflation_rate::Float64)
     get_investment_data(container).inflation_rate = inflation_rate
     return
 end
 
-function set_interest_rate!(container::OptimizationContainer, interest_rate::Float64)
+function set_interest_rate!(container::IOM.OptimizationContainer, interest_rate::Float64)
     get_investment_data(container).interest_rate = interest_rate
     return
 end

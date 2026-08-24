@@ -150,7 +150,7 @@ end
 # Weighted (representative-day) energy generation per operational index. Created
 # for every supply technology regardless of whether any requirement uses it.
 function add_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::S,
@@ -296,7 +296,7 @@ function add_to_expression!(
 end
 
 function add_to_expression!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     expression_type::T,
     devices::U,
     formulation::S,
@@ -580,7 +580,7 @@ end
 
 # ActivePowerLimitsConstraint for HydroDispatch + BasicDispatchWithBudget
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     ::V,
     devices::U,
@@ -632,7 +632,7 @@ end
 
 # HydroEnergyBudgetConstraint for HydroDispatch + BasicDispatchWithBudget
 function add_constraints!(
-    container::SingleOptimizationContainer,
+    container::OptimizationContainer,
     ::T,
     ::V,
     devices::U,
