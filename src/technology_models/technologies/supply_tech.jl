@@ -1,6 +1,6 @@
 #! format: off
-get_variable_upper_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::InvestmentTechnologyFormulation) = PSIP.get_capacity_limits(d).max
-get_variable_lower_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::InvestmentTechnologyFormulation) = PSIP.get_capacity_limits(d).min
+get_variable_upper_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::InvestmentTechnologyFormulation) = PSIP.get_capacity_limits(d, IS.NU).max
+get_variable_lower_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::InvestmentTechnologyFormulation) = PSIP.get_capacity_limits(d, IS.NU).min
 get_variable_binary(::BuildCapacity, d::PSIP.SupplyTechnology, ::ContinuousInvestment) = false
 get_variable_upper_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::BinaryInvestment) = nothing
 get_variable_lower_bound(::BuildCapacity, d::PSIP.SupplyTechnology, ::BinaryInvestment) = 0.0
@@ -108,7 +108,7 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size(d)
+        unit_size = PSIP.get_unit_size(d, IS.NU)
         name = PSIP.get_name(d)
         init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
@@ -143,6 +143,52 @@ function add_expression!(
         time_steps,
         meta=tech_model,
     )
+
+    return
+end
+
+# Weighted (representative-day) energy generation per operational index. Created
+# for every supply technology regardless of whether any requirement uses it.
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::S,
+) where {
+    T <: WeightedEnergyGeneration,
+    U <: Vector{D},
+    S <: Union{BasicDispatch, BasicDispatchWithBudget},
+} where {D <: PSIP.SupplyTechnology}
+    @assert !isempty(devices)
+    time_mapping = get_time_mapping(container)
+    operational_indexes = get_operational_indexes(time_mapping)
+    consecutive_slices = get_consecutive_slices(time_mapping)
+    operational_weights = get_operational_weights(container)
+    tech_model = string(S)
+
+    W = ActivePowerVariable
+    variable = get_variable(container, W(), D, tech_model)
+    mult = get_variable_multiplier(W(), D, S())
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        [PSIP.get_name(d) for d in devices],
+        operational_indexes,
+        meta=tech_model,
+    )
+
+    for d in devices
+        name = PSIP.get_name(d)
+        for op_ix in operational_indexes
+            weight = operational_weights[op_ix]
+            expression[name, op_ix] = JuMP.@expression(
+                get_jump_model(container),
+                weight * mult * sum(variable[name, t] for t in consecutive_slices[op_ix])
+            )
+        end
+    end
 
     return
 end
@@ -348,10 +394,12 @@ function add_constraints!(
     V <: ActivePowerVariable,
     S <: BasicDispatch,
     X <: TechnologyModel,
-} where {D <: Union{
-    PSIP.SupplyTechnology{PSY.RenewableDispatch},
-    PSIP.SupplyTechnology{PSY.HydroDispatch},
-}}
+} where {
+    D <: Union{
+        PSIP.SupplyTechnology{PSY.RenewableDispatch},
+        PSIP.SupplyTechnology{PSY.HydroDispatch},
+    },
+}
     time_mapping = get_time_mapping(container)
     time_steps = get_time_steps(time_mapping)
     tech_model = string(S)
@@ -381,7 +429,7 @@ function add_constraints!(
             time_series = retrieve_ops_time_series(d, op_ix, time_mapping)
             ts_data = TimeSeries.values(time_series.data)
             first_tstamp = time_stamps[first(time_slices)]
-            first_ts_tstamp = first(TimeSeries.timestamp(time_series.data))
+            first_ts_tstamp = IS.get_initial_timestamp(time_series)
             if first_tstamp != first_ts_tstamp
                 @error(
                     "Initial timestamp of timeseries $(IS.get_name(time_series)) of technology $name does not match with the expected representative day $op_ix"
@@ -482,7 +530,7 @@ function add_constraints!(
 
     for d in devices
         name = PSIP.get_name(d)
-        max_capacity = PSIP.get_capacity_limits(d).max
+        max_capacity = PSIP.get_capacity_limits(d, IS.NU).max
         for t in time_steps
             con_ub[name, t] = JuMP.@constraint(
                 get_jump_model(container),
@@ -623,7 +671,7 @@ function add_constraints!(
         for op_ix in operational_indexes
             time_slices = consecutive_slices[op_ix]
             time_step_inv = inverse_invest_mapping[op_ix]
-            budget_ts = retrieve_ops_time_series(d, op_ix, time_mapping, "hydro_budget")
+            budget_ts = retrieve_ops_time_series(d, op_ix, time_mapping, "ops_hydro_budget")
             budget_vals = TimeSeries.values(budget_ts.data)
             total_budget_fraction = sum(budget_vals)
             con_budget[name, op_ix] = JuMP.@constraint(

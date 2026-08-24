@@ -6,13 +6,16 @@ module PowerSystemsInvestments
 export InvestmentModel
 export InvestmentModelTemplate
 export TransportModel
-export OptimizationProblemResults
+export OptimizationProblemOutputs
 
 ### Algorithms ###
 export SingleInstanceSolve
 
 ### Technology Models ###
 export TechnologyModel
+
+### Requirement Models ###
+export RequirementModel
 
 ### Capital Model ###
 export DiscountedCashFlow
@@ -40,11 +43,15 @@ export CyclicalStorageDispatch
 export ChronologicalColocatedDispatch
 export CyclicalColocatedDispatch
 
+### Requirement Formulations ###
+export RequirementEnergyShare
+
 ### Transport Formulations ###
 export SingleRegionBalanceModel
 export MultiRegionBalanceModel
 export NodalBalanceModel
 export NodalBalanceConstraint
+export EnergyShareRequirementConstraint
 export HydroEnergyBudgetConstraint
 
 ### Variables ###
@@ -76,18 +83,23 @@ export CumulativeEnergyCapacity
 export CumulativeSolarCapacity
 export CumulativeWindCapacity
 export CumulativeInverterCapacity
+export WeightedEnergyGeneration
+export WeightedEnergyDemand
+export WeightedEnergyShareGeneration
+export WeightedEnergyShareDemand
 
 ### Functions ###
 # methods
 export build!
 # Template exports
 export set_technology_model!
+export set_requirement_model!
 # Model Exports
 export solve!
 export get_initial_conditions
 export get_infeasibility_conflict
 export serialize_problem
-export serialize_results
+export serialize_outputs
 #Results interfaces
 export read_variable
 export read_optimizer_stats
@@ -142,19 +154,17 @@ export optimizer_with_attributes
 # Base imports
 import Base.isempty
 
-# Import from IOM (which re-exports from IS.Optimization where needed)
+# IS.Optimization imports that stay private, may or may not be additional methods in PowerSimulations
+import InfrastructureSystems.Optimization: ArgumentConstructStage, ModelConstructStage, OptimizationContainer
+# Concrete container/store types moved to InfrastructureOptimizationModels in the IS4 split
 import InfrastructureOptimizationModels:
-    ArgumentConstructStage,
-    ModelConstructStage,
-    OptimizationContainer,
-    # Store container type symbols
     STORE_CONTAINERS,
     STORE_CONTAINER_DUALS,
     STORE_CONTAINER_EXPRESSIONS,
     STORE_CONTAINER_PARAMETERS,
     STORE_CONTAINER_VARIABLES,
-    STORE_CONTAINER_AUX_VARIABLES,
-    # Container key types
+    STORE_CONTAINER_AUX_VARIABLES
+import InfrastructureOptimizationModels:
     OptimizationContainerKey,
     VariableKey,
     ConstraintKey,
@@ -165,24 +175,9 @@ import InfrastructureOptimizationModels:
     ConstraintType,
     AuxVariableType,
     ParameterType,
-    ExpressionType,
-    # Key utility functions
-    encode_key_as_string,
-    encode_keys_as_strings,
-    should_write_resulting_value,
-    get_store_container_type,
-    get_entry_type,
-    get_component_type,
-    deserialize_key,
-    # Model types
-    OptimizerStats,
-    # Functions from IOM
-    get_timestamps,
-    read_variable,
-    read_dual,
-    read_expression,
-    read_optimizer_stats,
-    # Export-control functions
+    InitialConditionType,
+    ExpressionType
+import InfrastructureOptimizationModels:
     should_export_variable,
     should_export_dual,
     should_export_parameter,
@@ -225,6 +220,25 @@ const serialize_results = IOM.serialize_outputs
 #     read_dual,
 #     read_expression
 
+import InfrastructureOptimizationModels: get_entry_type, get_component_type, get_output_dir
+import InfrastructureSystems.Optimization: should_write_resulting_value
+import InfrastructureOptimizationModels:
+    deserialize_key, encode_key_as_string, encode_keys_as_strings, get_store_container_type
+import InfrastructureOptimizationModels:
+    OptimizationProblemOutputs, OptimizationProblemOutputsExport, OptimizerStats
+import InfrastructureOptimizationModels:
+    list_variable_names, list_aux_variable_names, list_dual_names, list_expression_names
+import InfrastructureOptimizationModels:
+    read_optimizer_stats,
+    get_optimizer_stats,
+    export_outputs,
+    serialize_outputs,
+    get_timestamps,
+    get_model_base_power,
+    get_objective_value,
+    read_variable,
+    read_dual,
+    read_expression
 import TimerOutputs
 
 ####
@@ -247,6 +261,8 @@ include("base/expressions.jl")
 include("base/settings.jl")
 include("base/solution_algorithms.jl")
 include("base/technology_model.jl")
+include("requirement_models/requirement_formulations.jl")
+include("base/requirement_model.jl")
 include("base/investment_model_template.jl")
 include("base/time_mapping.jl")
 include("base/objective_function.jl")
@@ -288,6 +304,10 @@ include("technology_models/technology_constructors/storage_constructor.jl")
 include("technology_models/technology_constructors/colocated_constructor.jl")
 include("technology_models/technology_constructors/branch_constructor.jl")
 include("technology_models/technology_constructors/constructor_validations.jl")
+# Requirement Models #
+include("requirement_models/requirement_constructor.jl")
+include("requirement_models/requirement_utils.jl")
+include("requirement_models/energy_share_requirement.jl")
 # Objective Function #
 include("technology_models/technologies/common/objective_function/common_financial.jl")
 include("technology_models/technologies/common/objective_function/common_capital.jl")

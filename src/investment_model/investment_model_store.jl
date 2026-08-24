@@ -50,7 +50,7 @@ function initialize_storage!(
         field_containers = getfield(container, type)
         results_container = getfield(store, type)
         for (key, field_container) in field_containers
-            !should_write_resulting_value(key) && continue
+            !should_write_resulting_value(get_entry_type(key)) && continue
             entry_type = get_entry_type(key)
             if is_operation_entry(entry_type)
                 count = op_time_steps_count

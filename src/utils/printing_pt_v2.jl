@@ -61,20 +61,12 @@ function Base.show(io::IO, ::MIME"text/html", input::InvestmentModel)
     )
 end
 
-function Base.show(io::IO, ::MIME"text/plain", input::OptimizationProblemResults)
-    _show_method(io, input, :auto)
-end
-
-function Base.show(io::IO, ::MIME"text/html", input::OptimizationProblemResults)
-    _show_method(io, input, :html; standalone=false, tf=PrettyTables.tf_html_simple)
-end
-
 function _show_method(
     io::IO,
     results::T,
     backend::Symbol;
     kwargs...,
-) where {T <: OptimizationProblemResults}
+) where {T <: OptimizationProblemOutputs}
     values = Dict{String, Vector{String}}(
         "Variables" => list_variable_names(results),
         "Auxiliary variables" => list_aux_variable_names(results),

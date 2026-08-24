@@ -84,6 +84,28 @@ function _show_method(io::IO, template::InvestmentModelTemplate, backend::Symbol
         title="Technology Models",
         alignment=:l,
     )
+
+    println(io)
+    requirement_labels = ["Requirement Type", "Requirement Name", "Formulation"]
+    table = Matrix{String}(
+        undef,
+        length(template.requirement_models),
+        length(requirement_labels),
+    )
+    for (ix, model) in enumerate(keys(template.requirement_models))
+        table[ix, 1] = string(get_requirement_type(model))
+        table[ix, 2] = only(template.requirement_models[model])
+        table[ix, 3] = string(get_requirement_formulation(model))
+    end
+
+    PrettyTables.pretty_table(
+        io,
+        table;
+        backend=backend,
+        column_labels=requirement_labels,
+        title="Requirement Models",
+        alignment=:l,
+    )
     return
 end
 
@@ -95,20 +117,12 @@ function Base.show(io::IO, ::MIME"text/html", input::InvestmentModel)
     _show_method(io, input.template, :html; stand_alone=false, table_format=tf_html_simple)
 end
 
-function Base.show(io::IO, ::MIME"text/plain", input::OptimizationProblemResults)
-    _show_method(io, input, :auto)
-end
-
-function Base.show(io::IO, ::MIME"text/html", input::OptimizationProblemResults)
-    _show_method(io, input, :html; stand_alone=false, table_format=tf_html_simple)
-end
-
 function _show_method(
     io::IO,
     results::T,
     backend::Symbol;
     kwargs...,
-) where {T <: OptimizationProblemResults}
+) where {T <: OptimizationProblemOutputs}
     values = Dict{String, Vector{String}}(
         "Variables" => list_variable_names(results),
         "Auxiliary variables" => list_aux_variable_names(results),

@@ -1,6 +1,7 @@
 using Test
 import InfrastructureSystems
 import InfrastructureSystems.Optimization
+import InfrastructureOptimizationModels
 using JuMP
 import MathOptInterface
 using Logging
@@ -11,6 +12,7 @@ using DataFrames
 using HiGHS
 
 const IS = InfrastructureSystems
+const IOM = InfrastructureOptimizationModels
 const PSIP = PowerSystemsInvestmentsPortfolios
 const PSIN = PowerSystemsInvestments
 const PSY = PowerSystems

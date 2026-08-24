@@ -14,7 +14,7 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
+        capital_cost_data = PSIP.get_capital_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
     end
     return
@@ -32,7 +32,7 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
+        capital_cost_data = PSIP.get_capital_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
     end
     return
@@ -50,7 +50,7 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
+        capital_cost_data = PSIP.get_capital_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
     end
     return
@@ -88,7 +88,7 @@ function add_fixed_om_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        fixed_cost_data = PSIP.get_operation_costs(d)
+        fixed_cost_data = PSIP.get_operation_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, fixed_cost_data, V(), tech_model)
     end
     return
@@ -106,7 +106,7 @@ function add_fixed_om_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        fixed_cost_data = PSIP.get_operation_costs(d)
+        fixed_cost_data = PSIP.get_operation_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, fixed_cost_data, V(), tech_model)
     end
     return
@@ -124,7 +124,7 @@ function add_fixed_om_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        fixed_cost_data = PSIP.get_operation_costs(d)
+        fixed_cost_data = PSIP.get_operation_costs(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, fixed_cost_data, V(), tech_model)
     end
     return
@@ -162,7 +162,7 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs_energy(d)
+        capital_cost_data = PSIP.get_capital_costs_energy(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
     end
     return
@@ -184,7 +184,7 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs_discharge(d)
+        capital_cost_data = PSIP.get_capital_costs_discharge(d, IS.NU)
         _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
     end
     return

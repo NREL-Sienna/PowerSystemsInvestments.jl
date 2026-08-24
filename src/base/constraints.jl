@@ -52,3 +52,7 @@ struct ColocatedInternalBalanceConstraint <: ConstraintType end
 struct EnergyBalanceConstraint <: ConstraintType end
 
 struct SingleRegionBalanceFeasibilityConstraint <: ConstraintType end
+
+### Requirement Constraints ###
+
+struct EnergyShareRequirementConstraint <: ConstraintType end

@@ -1,4 +1,4 @@
-function OptimizationProblemResults(model::InvestmentModel)
+function OptimizationProblemOutputs(model::InvestmentModel)
     status = get_run_status(model)
     status != RunStatus.SUCCESSFULLY_FINALIZED &&
         error("problem was not solved successfully: $status")
@@ -20,11 +20,11 @@ function OptimizationProblemResults(model::InvestmentModel)
         Dict(x => read_expression(model, x) for x in list_expression_keys(model))
 
     portfolio = get_portfolio(model)
-    return OptimizationProblemResults(
+    return OptimizationProblemOutputs(
         get_problem_base_power(model),
         timestamps,
         portfolio,
-        IS.get_uuid(portfolio),
+        IOM.get_system_uuid(get_store_params(model)),
         aux_variable_values,
         variable_values,
         dual_values,

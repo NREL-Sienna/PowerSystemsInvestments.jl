@@ -29,12 +29,14 @@ get_variable_multiplier(::ActiveOutPowerVariable, ::Type{PSIP.StorageTechnology}
 
 get_expression_multiplier(::EnergyBalance, ::ActiveOutPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = 1.0
 get_expression_multiplier(::EnergyBalance, ::ActiveInPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = -1.0
+get_expression_multiplier(::WeightedEnergyGeneration, ::ActiveOutPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = 1.0
+get_expression_multiplier(::WeightedEnergyGeneration, ::ActiveInPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = -1.0
 get_expression_multiplier(::FeasibilitySurplus, ::ActiveOutPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = 1.0
 get_expression_multiplier(::FeasibilitySurplus, ::ActiveInPowerVariable, ::PSIP.StorageTechnology, ::OperationsTechnologyFormulation) = -1.0
 
 # TODO: Defaulting to using discharge values for symmetric storage, but we need to be careful if we implement asymmetric storage investments
-get_max_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity) = PSIP.get_capacity_limits_discharge(d).max
-get_max_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity) = PSIP.get_capacity_limits_energy(d).max
+get_max_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity) = PSIP.get_capacity_limits_discharge(d, IS.NU).max
+get_max_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity) = PSIP.get_capacity_limits_energy(d, IS.NU).max
 
 get_init_cap(d::PSIP.StorageTechnology, ::CumulativePowerCapacity, p::PSIP.Portfolio) = PSIP.get_existing_capacity_mw(p, d)
 get_init_cap(d::PSIP.StorageTechnology, ::CumulativeEnergyCapacity, p::PSIP.Portfolio) = PSIP.get_existing_capacity_mwh(p, d)
@@ -172,9 +174,9 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size_energy(d)
+        unit_size = PSIP.get_unit_size_energy(d, IS.NU)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),
@@ -213,13 +215,64 @@ function add_expression!(
     )
 
     for t in time_steps, d in devices
-        unit_size = PSIP.get_unit_size_energy(d)
+        unit_size = PSIP.get_unit_size_energy(d, IS.NU)
         name = PSIP.get_name(d)
-        init_cap = PSIP.get_init_cap(d, T(), portfolio)
+        init_cap = get_init_cap(d, T(), portfolio)
         expression[name, t] = JuMP.@expression(
             get_jump_model(container),
             init_cap + sum(var[name, t_p] * unit_size for t_p in time_steps if t_p <= t),
         )
+    end
+
+    return
+end
+
+# Weighted (representative-day) net-discharge energy per operational index for
+# storage and co-located technologies. Net discharge = out - in. Created for
+# every such technology regardless of whether any requirement uses it.
+function add_expression!(
+    container::SingleOptimizationContainer,
+    expression_type::T,
+    devices::U,
+    formulation::S,
+) where {
+    T <: WeightedEnergyGeneration,
+    U <: Vector{D},
+    S <: Union{OperationsStorageFormulation, OperationsColocatedFormulation},
+} where {D <: Union{PSIP.StorageTechnology, PSIP.ColocatedSupplyStorageTechnology}}
+    @assert !isempty(devices)
+    time_mapping = get_time_mapping(container)
+    operational_indexes = get_operational_indexes(time_mapping)
+    consecutive_slices = get_consecutive_slices(time_mapping)
+    operational_weights = get_operational_weights(container)
+    tech_model = string(S)
+
+    out_var = get_variable(container, ActiveOutPowerVariable(), D, tech_model)
+    in_var = get_variable(container, ActiveInPowerVariable(), D, tech_model)
+
+    expression = add_expression_container!(
+        container,
+        expression_type,
+        D,
+        [PSIP.get_name(d) for d in devices],
+        operational_indexes,
+        meta=tech_model,
+    )
+
+    for d in devices
+        name = PSIP.get_name(d)
+        out_mult = get_expression_multiplier(T(), ActiveOutPowerVariable(), d, S())
+        in_mult = get_expression_multiplier(T(), ActiveInPowerVariable(), d, S())
+        for op_ix in operational_indexes
+            weight = operational_weights[op_ix]
+            expression[name, op_ix] = JuMP.@expression(
+                get_jump_model(container),
+                weight * sum(
+                    out_mult * out_var[name, t] + in_mult * in_var[name, t] for
+                    t in consecutive_slices[op_ix]
+                )
+            )
+        end
     end
 
     return

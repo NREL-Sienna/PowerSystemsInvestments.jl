@@ -192,7 +192,7 @@ function write_model_dual_results!(
     end
 
     for (key, constraint) in get_duals(container)
-        !should_write_resulting_value(key) && continue
+        !should_write_resulting_value(get_entry_type(key)) && continue
         data = jump_value.(constraint)
         write_result!(store, model_name, key, index, update_timestamp, data)
 
@@ -204,7 +204,7 @@ function write_model_dual_results!(
             df = to_dataframe(jump_value.(constraint), key)
             time_col = range(index; length=horizon_count, step=resolution)
             DataFrames.insertcols!(df, 1, :DateTime => time_col)
-            IOM.export_result(file_type, exports_path, key, index, df)
+            IOM.export_output(file_type, exports_path, key, index, df)
         end
     end
     return
@@ -231,7 +231,7 @@ function write_model_variable_results!(
     end
 
     for (key, variable) in variables
-        !should_write_resulting_value(key) && continue
+        !should_write_resulting_value(get_entry_type(key)) && continue
         data = jump_value.(variable)
         write_result!(store, model_name, key, index, update_timestamp, data)
         if export_params !== nothing &&
@@ -242,7 +242,7 @@ function write_model_variable_results!(
             df = to_dataframe(data, key)
             time_col = range(index; length=horizon_count, step=resolution)
             DataFrames.insertcols!(df, 1, :DateTime => time_col)
-            IOM.export_result(file_type, exports_path, key, index, df)
+            IOM.export_output(file_type, exports_path, key, index, df)
         end
     end
     return
@@ -263,7 +263,7 @@ function write_model_aux_variable_results!(
     end
 
     for (key, variable) in get_aux_variables(container)
-        !should_write_resulting_value(key) && continue
+        !should_write_resulting_value(get_entry_type(key)) && continue
         data = jump_value.(variable)
         write_result!(store, model_name, key, index, update_timestamp, data)
 
@@ -275,7 +275,7 @@ function write_model_aux_variable_results!(
             df = to_dataframe(data, key)
             time_col = range(index; length=horizon_count, step=resolution)
             DataFrames.insertcols!(df, 1, :DateTime => time_col)
-            IOM.export_result(file_type, exports_path, key, index, df)
+            IOM.export_output(file_type, exports_path, key, index, df)
         end
     end
     return
@@ -302,7 +302,7 @@ function write_model_expression_results!(
     end
 
     for (key, expression) in expressions
-        !should_write_resulting_value(key) && continue
+        !should_write_resulting_value(get_entry_type(key)) && continue
         data = jump_value.(expression)
         write_result!(store, model_name, key, index, update_timestamp, data)
 
@@ -314,7 +314,7 @@ function write_model_expression_results!(
             df = to_dataframe(data, key)
             time_col = range(index; length=horizon_count, step=resolution)
             DataFrames.insertcols!(df, 1, :DateTime => time_col)
-            IOM.export_result(file_type, exports_path, key, index, df)
+            IOM.export_output(file_type, exports_path, key, index, df)
         end
     end
     return
@@ -322,12 +322,22 @@ end
 
 function init_model_store_params!(model::InvestmentModel)
     base_power = 1.0 # Investment Models should default to Natural Units
-    port_uuid = IS.get_uuid(get_portfolio(model))
+    port_uuid = IS.make_uuid()
+    container = get_optimization_container(model)
+    time_mapping = get_time_mapping(container)
+    horizon_count = length(get_time_steps(time_mapping))
+    resolution = get_resolution(model)
+    interval = resolution
+    num_executions = get_executions(model)
 
-    store_params = InvestmentModelStoreParams(
+    store_params = IOM.ModelStoreParams(
+        num_executions,
+        horizon_count,
+        interval,
+        resolution,
         base_power,
         port_uuid,
-        get_metadata(get_optimization_container(model)),
+        get_metadata(container),
     )
     IOM.set_store_params!(get_internal(model), store_params)
     return
@@ -426,11 +436,7 @@ function solve!(
     disable_timer_outputs && TimerOutputs.disable_timer!(RUN_OPERATION_MODEL_TIMER)
     file_mode = "a"
     register_recorders!(model, file_mode)
-    logger = IOM.configure_logging(
-        get_internal(model),
-        PROBLEM_LOG_FILENAME,
-        file_mode,
-    )
+    logger = IOM.configure_logging(get_internal(model), PROBLEM_LOG_FILENAME, file_mode)
     optimizer = get(kwargs, :optimizer, nothing)
     try
         Logging.with_logger(logger) do
@@ -463,9 +469,9 @@ function solve!(
                     end
                 end
                 TimerOutputs.@timeit RUN_OPERATION_MODEL_TIMER "Results processing" begin
-                    results = OptimizationProblemResults(model)
-                    serialize_results(results, get_output_dir(model))
-                    export_problem_results && export_results(results)
+                    results = OptimizationProblemOutputs(model)
+                    serialize_outputs(results, get_output_dir(model))
+                    export_problem_results && export_outputs(results)
                 end
                 @info "\n$(RUN_OPERATION_MODEL_TIMER)\n"
             catch e
