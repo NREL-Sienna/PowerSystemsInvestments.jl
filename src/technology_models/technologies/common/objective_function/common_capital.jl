@@ -14,8 +14,18 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        capital_costs = PSIP.get_capital_costs(d)
+        value_curve = PSIP.get_capital_cost(capital_costs)
+        interconnection_cost = PSIP.get_interconnection_cost(capital_costs)
+        _add_cost_to_objective!(
+            container,
+            U(),
+            d,
+            value_curve,
+            V(),
+            tech_model;
+            interconnection_cost=interconnection_cost,
+        )
     end
     return
 end
@@ -32,8 +42,18 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        capital_costs = PSIP.get_capital_costs(d)
+        value_curve = PSIP.get_capital_cost(capital_costs)
+        interconnection_cost = PSIP.get_interconnection_cost(capital_costs)
+        _add_cost_to_objective!(
+            container,
+            U(),
+            d,
+            value_curve,
+            V(),
+            tech_model;
+            interconnection_cost=interconnection_cost,
+        )
     end
     return
 end
@@ -50,8 +70,18 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs(d)
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        capital_costs = PSIP.get_capital_costs(d)
+        value_curve = PSIP.get_capital_cost(capital_costs)
+        interconnection_cost = PSIP.get_interconnection_cost(capital_costs)
+        _add_cost_to_objective!(
+            container,
+            U(),
+            d,
+            value_curve,
+            V(),
+            tech_model;
+            interconnection_cost=interconnection_cost,
+        )
     end
     return
 end
@@ -162,8 +192,9 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs_energy(d)
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        storage_capital_costs = PSIP.get_capital_costs_storage(d)
+        value_curve = PSIP.get_energy_capital_cost(storage_capital_costs)
+        _add_cost_to_objective!(container, U(), d, value_curve, V(), tech_model)
     end
     return
 end
@@ -184,8 +215,18 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = PSIP.get_capital_costs_discharge(d)
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        storage_capital_costs = PSIP.get_capital_costs_storage(d)
+        value_curve = PSIP.get_discharge_capital_cost(storage_capital_costs)
+        interconnection_cost = PSIP.get_interconnection_cost(storage_capital_costs)
+        _add_cost_to_objective!(
+            container,
+            U(),
+            d,
+            value_curve,
+            V(),
+            tech_model;
+            interconnection_cost=interconnection_cost,
+        )
     end
     return
 end
@@ -206,8 +247,16 @@ function add_capital_cost!(
     V <: InvestmentTechnologyFormulation,
 }
     for d in devices
-        capital_cost_data = get_capital_cost_data(d, U())
-        _add_cost_to_objective!(container, U(), d, capital_cost_data, V(), tech_model)
+        value_curve, interconnection_cost = get_capital_cost_data(d, U())
+        _add_cost_to_objective!(
+            container,
+            U(),
+            d,
+            value_curve,
+            V(),
+            tech_model;
+            interconnection_cost=interconnection_cost,
+        )
     end
     return
 end

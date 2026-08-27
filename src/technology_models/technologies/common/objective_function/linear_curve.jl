@@ -30,10 +30,13 @@ function _add_cost_to_objective!(
     technology::PSIP.Technology,
     value_curve::IS.ValueCurve,
     ::U,
-    tech_model::String,
+    tech_model::String;
+    interconnection_cost::Float64=0.0,
 ) where {T <: VariableType, U <: AbstractTechnologyFormulation}
     cost_component = PSY.get_function_data(value_curve)
-    proportional_term = PSY.get_proportional_term(cost_component)
+    # Overnight capital and last-mile interconnection costs are both in \$/MW,
+    # so the interconnection term is added directly to the proportional term.
+    proportional_term = PSY.get_proportional_term(cost_component) + interconnection_cost
     @debug "Cost is assumed to be in natural units: \$/MWh"
     multiplier = objective_function_multiplier(T(), U())
     _add_linearcurve_cost!(
