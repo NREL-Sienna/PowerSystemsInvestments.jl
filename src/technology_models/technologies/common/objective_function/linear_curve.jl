@@ -235,7 +235,7 @@ function _add_linearcurve_cost!(
     base_year = get_base_year(container)
     discount_rate = get_discount_rate(container)
     inflation_rate = get_inflation_rate(container)
-    tech_base_year = PSIP.get_technology_base_year(technology)
+    tech_base_year = PSIP.get_technology_base_year(PSIP.get_financial_data(technology))
 
     discount_factor = 1 / (1 + discount_rate)
     dollars_to_base_year = (1.0 + inflation_rate)^(-(tech_base_year - base_year))
@@ -278,6 +278,8 @@ function _add_linearcurve_cost!(
     time_mapping = get_time_mapping(container)
     operational_weights = get_operational_weights(container)
     consecutive_slices = get_consecutive_slices(time_mapping)
+    inverse_invest_mapping = get_inverse_invest_mapping(time_mapping)
+    investment_time_stamps = get_investment_time_stamps(time_mapping)
 
     discount_factor = 1.0 / (1.0 + discount_rate)
     dollars_to_base_year = (1.0 + inflation_rate)^(-(tech_base_year - base_year))
@@ -285,6 +287,11 @@ function _add_linearcurve_cost!(
 
     for op_ix in get_operational_indexes(time_mapping)
         weight = operational_weights[op_ix]
+        stage = inverse_invest_mapping[op_ix]
+        inv_tuple = investment_time_stamps[stage]
+        num_years =
+            Dates.value(Dates.Year(inv_tuple[2])) - Dates.value(Dates.Year(inv_tuple[1])) +
+            1
         for t in consecutive_slices[op_ix]
             future_to_present_value = discount_factor^(years[t] - base_year)
             npv_proportional_term =
@@ -294,7 +301,7 @@ function _add_linearcurve_cost!(
                 T(),
                 VariableOMCost(),
                 technology,
-                weight * npv_proportional_term,
+                num_years * weight * npv_proportional_term,
                 t,
                 tech_model,
             )

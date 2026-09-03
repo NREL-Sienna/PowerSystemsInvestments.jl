@@ -294,7 +294,7 @@ function add_to_expression!(
 } where {D <: Union{PSIP.StorageTechnology, PSIP.ColocatedSupplyStorageTechnology}}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -328,7 +328,7 @@ function add_to_expression!(
 } where {D <: Union{PSIP.StorageTechnology, PSIP.ColocatedSupplyStorageTechnology}}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -364,7 +364,7 @@ function add_to_expression!(
 } where {D <: Union{PSIP.StorageTechnology, PSIP.ColocatedSupplyStorageTechnology}}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -400,7 +400,7 @@ function add_to_expression!(
 } where {D <: PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -433,7 +433,7 @@ function add_to_expression!(
 } where {D <: PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -468,7 +468,7 @@ function add_to_expression!(
 } where {D <: PSIP.StorageTechnology}
     @assert !isempty(devices)
     time_mapping = get_time_mapping(container)
-    time_steps = get_time_steps(time_mapping)
+    time_steps = get_feasibility_time_steps(time_mapping)
     tech_model = string(S)
 
     variable = get_variable(container, V(), D, tech_model)
@@ -642,7 +642,8 @@ function add_constraints!(
                 else
                     tstamp_first = time_stamps[time_slices[1]]
                     tstamp_second = time_stamps[time_slices[2]]
-                    fraction_of_hour = Dates.Hour(tstamp_second - tstamp_first).value
+                    fraction_of_hour =
+                        Dates.value(Dates.Millisecond(tstamp_second - tstamp_first)) / 3.6e6
                 end
                 for (ix, t) in enumerate(time_slices)
                     # First representative day and first time point
@@ -718,7 +719,8 @@ function add_constraints!(
             else
                 tstamp_first = time_stamps[time_slices[1]]
                 tstamp_second = time_stamps[time_slices[2]]
-                fraction_of_hour = Dates.Hour(tstamp_second - tstamp_first).value
+                fraction_of_hour =
+                    Dates.value(Dates.Millisecond(tstamp_second - tstamp_first)) / 3.6e6
             end
             first_time = first(time_slices)
             last_time = last(time_slices)

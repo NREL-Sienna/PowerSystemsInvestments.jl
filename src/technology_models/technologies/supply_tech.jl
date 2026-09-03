@@ -573,8 +573,7 @@ function objective_function!(
 }
     tech_model = string(B)
     add_capital_cost!(container, BuildCapacity(), devices, formulation, tech_model)
-    #TODO: Add fixed_om costs for renewables (RenewableGenerationCost does not have fixed cost component?)
-    # add_fixed_om_cost!(container, BuildCapacity(), devices, formulation, tech_model)
+    add_fixed_om_cost!(container, BuildCapacity(), devices, formulation, tech_model)
     return
 end
 

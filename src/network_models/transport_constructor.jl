@@ -13,6 +13,7 @@ function construct_transport!(
     ::TransportModel{MultiRegionBalanceModel},
 )
     add_constraints!(container, MultiRegionBalanceConstraint, p)
+    add_constraints!(container, MultiRegionBalanceFeasibilityConstraint, p)
 end
 
 function construct_transport!(

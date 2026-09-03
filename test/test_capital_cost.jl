@@ -134,8 +134,12 @@ end
         slope_expensive =
             _curve_slope(PSIP.get_capital_cost(PSIP.get_capital_costs(expensive)))
 
-        coef_cheap =
-            _capital_coefficients(container, PSIN.BuildCapacity(), tech_type, "cheap_thermal")
+        coef_cheap = _capital_coefficients(
+            container,
+            PSIN.BuildCapacity(),
+            tech_type,
+            "cheap_thermal",
+        )
         coef_expensive = _capital_coefficients(
             container,
             PSIN.BuildCapacity(),
@@ -165,7 +169,14 @@ end
 
         # Baseline: interconnection_cost == 0.0
         base_coef = _capital_coefficients(
-            _build_capital_container(p, template, capital, tech_type, tm, ["cheap_thermal"]),
+            _build_capital_container(
+                p,
+                template,
+                capital,
+                tech_type,
+                tm,
+                ["cheap_thermal"],
+            ),
             PSIN.BuildCapacity(),
             tech_type,
             "cheap_thermal",
@@ -179,7 +190,14 @@ end
         PSIP.set_capital_costs!(cheap, PSIP.CapitalCost(curve, interconnection))
 
         ic_coef = _capital_coefficients(
-            _build_capital_container(p, template, capital, tech_type, tm, ["cheap_thermal"]),
+            _build_capital_container(
+                p,
+                template,
+                capital,
+                tech_type,
+                tm,
+                ["cheap_thermal"],
+            ),
             PSIN.BuildCapacity(),
             tech_type,
             "cheap_thermal",
@@ -203,8 +221,14 @@ end
             PSIN.BasicDispatchFeasibility,
         )
 
-        base_container =
-            _build_capital_container(p, template, capital, storage_type, tm, ["test_storage"])
+        base_container = _build_capital_container(
+            p,
+            template,
+            capital,
+            storage_type,
+            tm,
+            ["test_storage"],
+        )
         base_power = _capital_coefficients(
             base_container,
             PSIN.BuildPowerCapacity(),
@@ -232,8 +256,14 @@ end
             ),
         )
 
-        ic_container =
-            _build_capital_container(p, template, capital, storage_type, tm, ["test_storage"])
+        ic_container = _build_capital_container(
+            p,
+            template,
+            capital,
+            storage_type,
+            tm,
+            ["test_storage"],
+        )
         ic_power = _capital_coefficients(
             ic_container,
             PSIN.BuildPowerCapacity(),
@@ -272,8 +302,14 @@ end
         slope = _curve_slope(PSIP.get_capital_cost(PSIP.get_capital_costs(cheap)))
 
         # Without interconnection: amortized/discounted term is driven by the curve slope.
-        container = _build_capital_container(p, template, capital, tech_type, tm, ["cheap_thermal"])
-        coef = _capital_coefficients(container, PSIN.BuildCapacity(), tech_type, "cheap_thermal")
+        container =
+            _build_capital_container(p, template, capital, tech_type, tm, ["cheap_thermal"])
+        coef = _capital_coefficients(
+            container,
+            PSIN.BuildCapacity(),
+            tech_type,
+            "cheap_thermal",
+        )
         expected = _expected_capital_coefficients(container, cheap, slope)
         @test length(coef) == length(expected)
         for (c, e) in zip(coef, expected)
@@ -284,12 +320,19 @@ end
         interconnection = 1234.5
         PSIP.set_capital_costs!(
             cheap,
-            PSIP.CapitalCost(PSIP.get_capital_cost(PSIP.get_capital_costs(cheap)), interconnection),
+            PSIP.CapitalCost(
+                PSIP.get_capital_cost(PSIP.get_capital_costs(cheap)),
+                interconnection,
+            ),
         )
         ic_container =
             _build_capital_container(p, template, capital, tech_type, tm, ["cheap_thermal"])
-        ic_coef =
-            _capital_coefficients(ic_container, PSIN.BuildCapacity(), tech_type, "cheap_thermal")
+        ic_coef = _capital_coefficients(
+            ic_container,
+            PSIN.BuildCapacity(),
+            tech_type,
+            "cheap_thermal",
+        )
         ic_expected =
             _expected_capital_coefficients(ic_container, cheap, slope + interconnection)
         for (c, e) in zip(ic_coef, ic_expected)
